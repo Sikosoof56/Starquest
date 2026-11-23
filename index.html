@@ -367,6 +367,11 @@ button.cooling .si{filter:grayscale(1) brightness(.7)}
 .cv-eyes{position:absolute;left:50%;top:15%;width:min(118vw,560px);aspect-ratio:1;transform:translateX(-50%);z-index:1;pointer-events:none;
   animation:cvBreath 4s ease-in-out infinite,cvEyes 2.2s ease-in-out infinite;mix-blend-mode:screen}
 @keyframes cvEyes{50%{opacity:.55}}
+.ch.buy .e .art{filter:grayscale(.6) brightness(.8)}
+.chb{display:block;margin:6px auto 0;font-size:11px;font-weight:900;border-radius:8px;padding:3px 6px;border:1px solid #3f7347;color:var(--mute);width:fit-content}
+.chb.on{color:var(--gold);border-color:var(--gold)}
+button.chb{padding:5px 8px;font-size:12px;gap:3px}
+button.chb .i{width:13px;height:13px}
 </style>
 </head>
 <body>
@@ -904,8 +909,8 @@ const ACC_KEY = 'sq_accounts', CUR_KEY = 'sq_current';
 // Characters — base stats (levels do NOT change stats; items do). Every character has 20% crit rate.
 // skills: [normal attack, skill 1 (CD 1), skill 2 (CD 2), skill 3 (CD 5)]
 const CHARS = {
-  pilot:     { n:'Ranger',    art:'hero', d:'Swift forest guardian', hp:80,  atk:16, def:0, spd:15, skills:['atk','leaf','guard','heal'] },
-  valcarile: { n:'Valcarile', art:'valc', d:'Roman legionary',       hp:100, atk:20, def:0, spd:20, skills:['gladius','thrust','testudo','smash'] }
+  pilot:     { n:'Ranger',    art:'hero', d:'Swift forest guardian', hp:80,  atk:16, def:0, spd:15, price:0,    skills:['atk','leaf','guard','heal'] },
+  valcarile: { n:'Valcarile', art:'valc', d:'Roman legionary',       hp:100, atk:20, def:0, spd:20, price:1000, skills:['gladius','thrust','testudo','smash'] }
 };
 const CD = [0, 1, 2, 5];    // cooldown (turns) for normal, skill 1, skill 2, skill 3
 // Skills — kind: hit | heal | guard
@@ -997,13 +1002,15 @@ const G = n => `<span class="gold">${IC.coin} ${n}</span>`;
 // ====== State & saving ======
 function newGame(){
   return {char:'pilot',lv:1,exp:0,hp:80,gold:30,stage:1,best:1,
-          inv:{potion:3,power:1,iron:0,bomb:1},arts:['potion','power'],gear:[],eq:[],up:{},powder:0,ss:1,
+          inv:{potion:3,power:1,iron:0,bomb:1},arts:['potion','power'],gear:[],eq:[],up:{},powder:0,ss:1,chars:['pilot'],
           st:{wins:0,bosses:0,lasers:0,buys:0},qt:{}};
 }
 function fix(o){
   const s = Object.assign(newGame(), o);
   if(!o.st) s.st = {wins:o.wins||0, bosses:Math.floor(((o.stage||1)-1)/5), lasers:0, buys:0};
-  if(!CHARS[s.char]) s.char = 'pilot';
+  if(!Array.isArray(s.chars)) s.chars = ['pilot'];
+  if(!s.chars.includes('pilot')) s.chars.unshift('pilot');
+  if(!CHARS[s.char] || !s.chars.includes(s.char)) s.char = 'pilot';
   // older saves: mana potions become power potions, armor is gone, weapons only
   s.inv = Object.assign({potion:0,power:0,iron:0,bomb:0}, s.inv);
   if(s.inv.ether){ s.inv.power += s.inv.ether; delete s.inv.ether; }
@@ -1332,8 +1339,11 @@ function pvp(){
 function setView(){
   let h = '<div class="card"><h2>Characters</h2><div class="chars">';
   for(const k in CHARS){ const c = CHARS[k];
-    h += `<div class="ch ${S.char===k?'sel':''}" onclick="pickChar('${k}')"><div class="e">${artOf(c.art)}</div><b>${c.n}</b><div class="small">${c.d}</div>
-      <div class="chs">HP ${c.hp} · ATK ${c.atk} · SPD ${c.spd} · CRIT 20%</div></div>`;
+    const own = S.chars.includes(k);
+    h += `<div class="ch ${S.char===k?'sel':''} ${own?'':'buy'}" onclick="pickChar('${k}')"><div class="e">${artOf(c.art)}</div><b>${c.n}</b><div class="small">${c.d}</div>
+      <div class="chs">HP ${c.hp} · ATK ${c.atk} · SPD ${c.spd} · CRIT 20%</div>
+      ${own ? (S.char===k ? '<div class="chb on">In use</div>' : '<div class="chb">Select</div>')
+            : `<button class="chb pri" onclick="event.stopPropagation();buyChar('${k}')" ${S.gold<c.price?'disabled':''}>${IC.coin} ${c.price}</button>`}</div>`;
   }
   for(let i = Object.keys(CHARS).length; i < 3; i++)
     h += `<div class="ch lock"><div class="e lk">${IC.lock}</div><b>???</b><div class="small">Coming soon</div></div>`;
@@ -1357,7 +1367,15 @@ function setView(){
   }
   return h + note() + back() + '</div>';
 }
-function pickChar(k){ if(!CHARS[k]) return; S.char = k; S.hp = MHP(); msg = `${CHARS[k].n} is ready for battle!`; save(); render(); }
+function pickChar(k){ if(!CHARS[k]) return;
+  if(!S.chars.includes(k)){ msg = `${CHARS[k].n} costs ${CHARS[k].price} gold — tap the price to buy.`; render(); return; }
+  S.char = k; S.hp = MHP(); msg = `${CHARS[k].n} is ready for battle!`; save(); render(); }
+function buyChar(k){
+  const c = CHARS[k]; if(!c || S.chars.includes(k)) return;
+  if(S.gold < c.price){ msg = `Not enough gold — ${c.n} costs ${c.price} gold.`; render(); return; }
+  S.gold -= c.price; S.chars.push(k); S.char = k; S.hp = MHP();
+  msg = `You recruited ${c.n}! Now in your party.`; save(); render();
+}
 function equip(k){ if(S.eq.includes(k) || S.eq.length >= 4) return; S.eq.push(k); msg = `Equipped the ${GEAR[k].n}`; save(); render(); }
 function unequip(k){ S.eq = S.eq.filter(x => x !== k); msg = `Took off the ${GEAR[k].n}`; save(); render(); }
 function equipArt(k){
