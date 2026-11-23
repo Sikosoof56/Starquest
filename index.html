@@ -385,6 +385,13 @@ h1{position:relative}
   background:linear-gradient(180deg,#24472d,#16301d);border-color:#3f7347}
 .sound:active{transform:translateY(-50%) scale(.92)}
 .sound.cv{position:fixed;z-index:60;top:max(12px,env(safe-area-inset-top));left:12px;transform:none;background:#0008;border-color:#ffffff44}
+.bye{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:32px;text-align:center;
+  background:radial-gradient(ellipse at 50% 30%,#2a5232,#0d1d12 70%)}
+.bye-ic{width:150px;height:150px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 35%,#cfeaa8,#5fa043 70%);border:3px solid var(--gold);margin-bottom:8px}
+.bye-ic .art{width:100%;height:100%;transform:translateY(8px) scale(1.1)}
+.bye h2{font-size:24px;justify-content:center}
+.bye .full{max-width:260px}
+.exit,.sound{z-index:5}
 </style>
 </head>
 <body>
@@ -1172,9 +1179,18 @@ function askExit(){
 }
 function exitGame(){
   save();
-  try{ window.close(); }catch(e){}
-  // browsers only let a page close itself if a script opened it — otherwise leave the link
-  setTimeout(() => location.replace('about:blank'), 250);
+  const d = $('dlg'); if(d) d.remove();
+  B = null; view = 'bye'; render();          // always show a goodbye screen, so the button visibly works
+  try{ window.close(); }catch(e){}           // works when the game was opened by another app/page
+  setTimeout(() => { if(history.length > 1) history.back(); }, 500);   // otherwise go back to where the link came from
+}
+function bye(){
+  return `<div class="bye">
+    <div class="bye-ic">${artOf(ch().art)}</div>
+    <h2>See you next time!</h2>
+    <p class="small">Your progress is saved. You can close this tab or app now.</p>
+    <button class="pri full" onclick="go('cover')">Play again</button>
+  </div>`;
 }
 
 // ---- Cover / title screen ----
@@ -1222,6 +1238,7 @@ function cover(){
 
 function render(){
   if(view === 'cover'){ $('app').innerHTML = cover() + soundBtn('cv') + exitBtn('cv'); return; }
+  if(view === 'bye'){ $('app').innerHTML = bye(); return; }
   let h = '';
   if(view==='home') h += heroCard() + menu();
   else if(view==='battle') h += battle();
@@ -1646,8 +1663,8 @@ function controls(){
   const e = B.en, dis = B.busy ? 'disabled' : '';
   if(B.over) return `<div class="btns"><button onclick="go('home')">${IC.home} Home</button>
       ${B.mode==='steel'
-        ? `<button class="pri" onclick="startBattle('steel', ${B.won ? 'S.ss' : B.stage})">${IC.sword} ${B.won ? 'Next — Stage '+S.ss : 'Retry — Stage '+B.stage}</button></div>`
-        : `<button class="pri" onclick="startBattle('story')">${IC.sword} Next — Stage ${S.stage}</button></div>`}`;
+        ? `<button class="pri" onclick="startBattle('steel', ${B.won ? 'S.ss' : 'Math.min(B.stage, S.ss)'})">${IC.sword} ${B.won ? 'Next — Stage '+S.ss : 'Retry — Stage '+Math.min(B.stage, S.ss)}</button></div>`
+        : `<button class="pri" onclick="startBattle('story')">${IC.sword} ${B.won ? 'Next' : 'Retry'} — Stage ${S.stage}</button></div>`}`;
   if(B.menu){
     let h = '<div class="small" style="margin-bottom:4px">Artifacts</div>';
     S.arts.forEach(k => { const n = S.inv[k]||0;
@@ -1928,8 +1945,15 @@ function win(){
 function refill(){ S.hp = MHP(); B.log.push('HP fully restored.'); }
 function lose(){
   B.over = true; SFX.play('lose');
-  const lost = Math.floor(S.gold/2); S.gold -= lost;
-  B.log.push(`You were defeated... lost ${lost} gold and returned to camp.`);
+  // no gold lost — you just go back to the first stage of the current base (every 5 stages is one base)
+  const baseStart = st => Math.floor((st-1)/5)*5 + 1;
+  if(B.mode === 'steel'){
+    if(B.stage === S.ss && S.ss !== baseStart(S.ss)){ S.ss = baseStart(S.ss); }
+    B.log.push(`You were defeated... no reward. Steel Sand restarts at stage ${S.ss}.`);
+  } else {
+    S.stage = baseStart(S.stage);
+    B.log.push(`You were defeated... no reward. Back to the start of base ${chapIdx(S.stage)+1} (stage ${S.stage}).`);
+  }
   refill();
 }
 
