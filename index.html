@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>STAR QUEST</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#070b1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="STAR QUEST">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,"Noto Sans Thai",sans-serif;background:#070b1a;color:#e6f1ff}
+#app{max-width:520px;margin:0 auto;padding:12px;padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
+h1{font-size:22px;text-align:center;color:#5ef2ff;letter-spacing:2px;margin:6px 0 10px;text-shadow:0 0 10px #5ef2ff88}
+.card{background:#0f1730;border:1px solid #1f3a66;border-radius:12px;padding:12px;margin-bottom:10px}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.bar{height:10px;background:#1a2340;border-radius:6px;overflow:hidden;margin:3px 0 6px}
+.bar>i{display:block;height:100%;transition:width .3s}
+.hp>i{background:linear-gradient(90deg,#ff4d6d,#ff8fa3)}
+.mp>i{background:linear-gradient(90deg,#3a86ff,#5ef2ff)}
+.ex>i{background:linear-gradient(90deg,#ffd60a,#ffef9f)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font:inherit;font-size:15px;padding:12px;border-radius:10px;border:1px solid #2d5a9e;background:#14244a;color:#e6f1ff;cursor:pointer}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.4;cursor:default}
+button.pri{background:#0b6e8a;border-color:#5ef2ff}
+button.warn{background:#5a1a2a;border-color:#ff4d6d}
+.full{width:100%;margin-top:8px}
+.small{font-size:13px;color:#9fb3d9}
+#log{height:130px;overflow-y:auto;font-size:14px;line-height:1.6}
+.enemy{text-align:center;font-size:60px;margin:6px 0}
+.shake{animation:sh .35s}
+@keyframes sh{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #1f3a66}
+.item:last-child{border:0}
+.item button{padding:8px 12px;font-size:14px;white-space:nowrap}
+textarea{width:100%;height:70px;background:#070b1a;color:#5ef2ff;border:1px solid #2d5a9e;border-radius:8px;font-size:12px;padding:6px}
+.msg{color:#ffd60a;font-size:14px;margin:8px 0 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ====== ข้อมูลเกม (แก้ชื่อ/ราคา/ค่าพลังได้ตรงนี้) ======
+const KEY = 'starquest_save_v1';
+const ITEMS = {
+  potion: { n:'ยาฟื้นพลัง',      e:'🧪', d:'ฟื้น HP 40',                 p:20 },
+  ether:  { n:'แบตเตอรี่พลังงาน', e:'🔋', d:'ฟื้น MP 15',                 p:25 },
+  bomb:   { n:'ระเบิดพลาสมา',    e:'💣', d:'ศัตรูโดน 35 ดาเมจ (ใช้ตอนสู้)', p:40, battleOnly:true }
+};
+const GEAR = {
+  w1: { n:'ปืนเลเซอร์',      e:'🔫', t:'atk', v:5,  p:80  },
+  w2: { n:'ดาบพลาสมา',      e:'🗡️', t:'atk', v:12, p:220 },
+  w3: { n:'ปืนใหญ่ควอนตัม',  e:'☄️', t:'atk', v:22, p:500 },
+  a1: { n:'เกราะนาโน',       e:'🦺', t:'def', v:4,  p:100 },
+  a2: { n:'เกราะไททาเนียม',  e:'🛡️', t:'def', v:9,  p:260 },
+  a3: { n:'โล่พลังงาน',      e:'💠', t:'def', v:16, p:550 }
+};
+const ENEMIES = [
+  {n:'หุ่นสอดแนม',e:'🤖'},{n:'สไลม์อวกาศ',e:'🦠'},{n:'แมงมุมเหล็ก',e:'🕷️'},
+  {n:'โจรอวกาศ',e:'👾'},{n:'ยานรบไร้คนขับ',e:'🛸'}
+];
+const BOSSES = [{n:'ราชาเอเลี่ยน',e:'👽'},{n:'มังกรดวงดาว',e:'🐉'},{n:'AI ผู้พิทักษ์',e:'🧠'}];
+
+// ====== สถานะ & การบันทึก ======
+let storageOK = true;
+function newGame(){
+  return {lv:1,exp:0,hp:60,mhp:60,mp:20,mmp:20,batk:10,bdef:3,gold:30,stage:1,best:1,
+          inv:{potion:3,ether:1,bomb:1},gear:[],w:null,a:null,wins:0};
+}
+function load(){
+  try{ const t = localStorage.getItem(KEY); return t ? Object.assign(newGame(), JSON.parse(t)) : null; }
+  catch(e){ storageOK = false; return null; }
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ storageOK = false; }
+}
+let S = load() || newGame();
+let B = null, view = 'town', msg = '', resetArm = false;
+
+const atk = () => S.batk + (S.w ? GEAR[S.w].v : 0);
+const def = () => S.bdef + (S.a ? GEAR[S.a].v : 0);
+const expNeed = () => 20 + S.lv * 15;
+const rnd = (a,b) => a + Math.random()*(b-a);
+const dmgCalc = (a,d,m=1) => Math.max(1, Math.round((a*rnd(.85,1.15) - d*.6) * m));
+
+// ====== หน้าจอ ======
+function go(v){ view = v; msg = ''; resetArm = false; if(v !== 'battle') B = null; render(); }
+function bar(c,v,m){ return `<div class="bar ${c}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i></div>`; }
+function back(){ return `<button class="full" onclick="go('town')">⬅️ กลับฐาน</button>`; }
+function note(){ return msg ? `<p class="msg">${msg}</p>` : ''; }
+
+function render(){
+  let h = '<h1>🚀 STAR QUEST</h1>' + statusCard();
+  if(view==='town') h += town();
+  else if(view==='shop') h += shop();
+  else if(view==='bag') h += bag();
+  else if(view==='save') h += saveView();
+  else if(view==='battle') h += battle();
+  document.getElementById('app').innerHTML = h;
+  const lg = document.getElementById('log'); if(lg) lg.scrollTop = lg.scrollHeight;
+  if(B) B.shake = false;
+}
+
+function statusCard(){
+  return `<div class="card">
+    <div class="row"><b>นักบินอวกาศ Lv.${S.lv}</b><span>💰 ${S.gold}</span></div>
+    <div class="small">HP ${S.hp}/${S.mhp}</div>${bar('hp',S.hp,S.mhp)}
+    <div class="small">MP ${S.mp}/${S.mmp}</div>${bar('mp',S.mp,S.mmp)}
+    <div class="small">EXP ${S.exp}/${expNeed()}</div>${bar('ex',S.exp,expNeed())}
+    <div class="small">⚔️ โจมตี ${atk()} · 🛡️ ป้องกัน ${def()} · 🗺️ ด่าน ${S.stage} · 🏆 ชนะ ${S.wins}</div>
+  </div>`;
+}
+
+function town(){
+  return `<div class="card">
+    <div class="small" style="margin-bottom:8px">🛰️ ฐานทัพ — ${S.stage%5===0 ? '⚠️ ด่านนี้มีบอส! เตรียมตัวให้ดี' : 'เลือกสิ่งที่จะทำ'}</div>
+    <div class="btns">
+      <button class="pri" onclick="startBattle()">⚔️ ออกสู้ ด่าน ${S.stage}</button>
+      <button onclick="go('shop')">🏪 ร้านค้า</button>
+      <button onclick="go('bag')">🎒 กระเป๋า</button>
+      <button onclick="rest()">🛏️ พักฟื้น (10💰)</button>
+      <button onclick="go('save')" style="grid-column:span 2">💾 เซฟ / โหลด</button>
+    </div>${note()}
+  </div>`;
+}
+
+function rest(){
+  if(S.hp===S.mhp && S.mp===S.mmp) msg = 'HP และ MP เต็มอยู่แล้ว';
+  else if(S.gold < 10) msg = 'เงินไม่พอ';
+  else { S.gold -= 10; S.hp = S.mhp; S.mp = S.mmp; msg = '😴 พักผ่อนแล้ว HP/MP เต็ม!'; save(); }
+  render();
+}
+
+function shop(){
+  let h = '<div class="card"><b>🏪 ร้านค้า</b>';
+  for(const k in ITEMS){ const it = ITEMS[k];
+    h += `<div class="item"><div>${it.e} ${it.n}<div class="small">${it.d} · มี ${S.inv[k]||0}</div></div>
+      <button onclick="buy('${k}')" ${S.gold<it.p?'disabled':''}>${it.p}💰</button></div>`;
+  }
+  for(const k in GEAR){ const g = GEAR[k], own = S.gear.includes(k);
+    h += `<div class="item"><div>${g.e} ${g.n}<div class="small">${g.t==='atk'?'โจมตี':'ป้องกัน'} +${g.v}</div></div>
+      ${own ? '<span class="small">มีแล้ว</span>' : `<button onclick="buyGear('${k}')" ${S.gold<g.p?'disabled':''}>${g.p}💰</button>`}</div>`;
+  }
+  return h + note() + back() + '</div>';
+}
+function buy(k){
+  const it = ITEMS[k]; if(S.gold < it.p) return;
+  S.gold -= it.p; S.inv[k] = (S.inv[k]||0) + 1; msg = `ซื้อ ${it.e} ${it.n} แล้ว`; save(); render();
+}
+function buyGear(k){
+  const g = GEAR[k]; if(S.gold < g.p || S.gear.includes(k)) return;
+  S.gold -= g.p; S.gear.push(k); equip(k, true); msg = `ซื้อและสวม ${g.e} ${g.n} แล้ว`; save(); render();
+}
+function equip(k, silent){
+  if(GEAR[k].t==='atk') S.w = k; else S.a = k;
+  if(!silent){ msg = `สวม ${GEAR[k].e} ${GEAR[k].n} แล้ว`; save(); render(); }
+}
+
+function bag(){
+  let h = '<div class="card"><b>🎒 ไอเทม</b>', any = false;
+  for(const k in ITEMS){ const n = S.inv[k]||0; if(!n) continue; any = true; const it = ITEMS[k];
+    h += `<div class="item"><div>${it.e} ${it.n} x${n}<div class="small">${it.d}</div></div>
+      ${it.battleOnly ? '' : `<button onclick="useItem('${k}')">ใช้</button>`}</div>`;
+  }
+  if(!any) h += '<p class="small">ไม่มีไอเทม</p>';
+  h += '<b style="display:block;margin-top:12px">🧰 อุปกรณ์</b>';
+  if(!S.gear.length) h += '<p class="small">ยังไม่มีอุปกรณ์ ไปซื้อที่ร้านค้าได้</p>';
+  S.gear.forEach(k => { const g = GEAR[k], on = S.w===k || S.a===k;
+    h += `<div class="item"><div>${g.e} ${g.n}<div class="small">${g.t==='atk'?'โจมตี':'ป้องกัน'} +${g.v}</div></div>
+      ${on ? '<span class="small">✅ สวมอยู่</span>' : `<button onclick="equip('${k}')">สวม</button>`}</div>`;
+  });
+  return h + note() + back() + '</div>';
+}
+function applyItem(k){
+  if(k==='potion'){ const b = S.hp; S.hp = Math.min(S.mhp, S.hp+40); return `ฟื้น HP ${S.hp-b}`; }
+  if(k==='ether'){ const b = S.mp; S.mp = Math.min(S.mmp, S.mp+15); return `ฟื้น MP ${S.mp-b}`; }
+  if(k==='bomb'){ B.en.hp -= 35; B.shake = true; return 'ระเบิดใส่ศัตรู 35 ดาเมจ!'; }
+}
+function useItem(k){
+  if(!S.inv[k] || ITEMS[k].battleOnly) return;
+  S.inv[k]--; msg = ITEMS[k].e + ' ' + applyItem(k); save(); render();
+}
+
+// ====== ระบบต่อสู้แบบเทิร์น ======
+function makeEnemy(){
+  const st = S.stage, boss = st % 5 === 0;
+  const base = boss ? BOSSES[(st/5 - 1) % BOSSES.length] : ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
+  const hp = Math.round((30 + st*10) * (boss ? 1.8 : 1));
+  return { n:(boss?'👑 ':'') + base.n, e:base.e, hp, mhp:hp, boss,
+    atk: Math.round((5 + st*2.2) * (boss ? 1.15 : 1)),
+    def: Math.round((1 + st*1.2) * (boss ? 1.2 : 1)),
+    gold: Math.round((10 + st*6) * (boss ? 2 : 1)),
+    exp:  Math.round((10 + st*6) * (boss ? 2 : 1)) };
+}
+function startBattle(){
+  if(S.hp <= 0) S.hp = 1;
+  view = 'battle'; msg = '';
+  B = { en:makeEnemy(), log:[], defend:false, menu:false, over:false, shake:false };
+  B.log.push(`${B.en.e} ${B.en.n} ปรากฏตัว!`);
+  render();
+}
+function battle(){
+  const e = B.en;
+  let h = `<div class="card"><div class="row"><b>${e.n} <span class="small">ด่าน ${S.stage}</span></b>
+    <span class="small">HP ${Math.max(0,e.hp)}/${e.mhp}</span></div>${bar('hp',e.hp,e.mhp)}
+    <div class="enemy ${B.shake?'shake':''}">${e.hp>0 ? e.e : '💥'}</div></div>
+    <div class="card" id="log">${B.log.map(l=>`<div>${l}</div>`).join('')}</div><div class="card">`;
+  if(B.over){
+    h += `<button class="pri full" style="margin:0" onclick="go('town')">🛰️ กลับฐาน</button>`;
+  } else if(B.menu){
+    let any = false;
+    for(const k in ITEMS){ const n = S.inv[k]||0; if(!n) continue; any = true;
+      h += `<div class="item"><div>${ITEMS[k].e} ${ITEMS[k].n} x${n}<div class="small">${ITEMS[k].d}</div></div>
+        <button onclick="act('item','${k}')">ใช้</button></div>`;
+    }
+    if(!any) h += '<p class="small">ไม่มีไอเทม</p>';
+    h += `<button class="full" onclick="B.menu=false;render()">⬅️ ย้อนกลับ</button>`;
+  } else {
+    h += `<div class="btns">
+      <button onclick="act('atk')">⚔️ โจมตี</button>
+      <button onclick="act('laser')" ${S.mp<6?'disabled':''}>⚡ เลเซอร์ (6MP)</button>
+      <button onclick="act('fix')" ${S.mp<8?'disabled':''}>🔧 ซ่อมแซม (8MP)</button>
+      <button onclick="act('guard')">🛡️ ป้องกัน</button>
+      <button onclick="B.menu=true;render()">🎒 ไอเทม</button>
+      <button class="warn" onclick="act('run')" ${e.boss?'disabled':''}>🏃 หนี</button></div>`;
+  }
+  return h + '</div>';
+}
+function act(type, k){
+  if(!B || B.over) return;
+  const e = B.en; B.defend = false; B.menu = false;
+  if(type==='atk'){
+    const crit = Math.random() < .12, d = dmgCalc(atk(), e.def, crit ? 1.7 : 1);
+    e.hp -= d; B.shake = true;
+    B.log.push(crit ? `💥 คริติคอล! คุณโจมตี ${d} ดาเมจ` : `⚔️ คุณโจมตี ${d} ดาเมจ`);
+  } else if(type==='laser'){
+    if(S.mp < 6) return; S.mp -= 6;
+    const d = dmgCalc(atk()*1.8, e.def*.5); e.hp -= d; B.shake = true;
+    B.log.push(`⚡ ยิงเลเซอร์ทะลวง ${d} ดาเมจ!`);
+  } else if(type==='fix'){
+    if(S.mp < 8) return; S.mp -= 8;
+    const b = S.hp; S.hp = Math.min(S.mhp, S.hp + Math.round(S.mhp*.4));
+    B.log.push(`🔧 ซ่อมแซมตัวเอง ฟื้น HP ${S.hp-b}`);
+  } else if(type==='guard'){
+    B.defend = true; S.mp = Math.min(S.mmp, S.mp+3);
+    B.log.push('🛡️ ตั้งท่าป้องกัน (+3 MP)');
+  } else if(type==='item'){
+    if(!S.inv[k]) return; S.inv[k]--;
+    B.log.push(ITEMS[k].e + ' ' + applyItem(k));
+  } else if(type==='run'){
+    if(e.boss) return;
+    if(Math.random() < .5){ B.log.push('🏃 หนีสำเร็จ!'); B.over = true; save(); render(); return; }
+    B.log.push('🏃 หนีไม่สำเร็จ!');
+  }
+  if(e.hp <= 0){ win(); save(); render(); return; }
+  enemyTurn();
+  if(S.hp <= 0) lose();
+  save(); render();
+}
+function enemyTurn(){
+  const e = B.en, heavy = Math.random() < (e.boss ? .3 : .18);
+  let d = dmgCalc(e.atk, def(), heavy ? 1.5 : 1);
+  if(B.defend) d = Math.max(1, Math.round(d/2));
+  S.hp = Math.max(0, S.hp - d);
+  B.log.push(heavy ? `🔥 ${e.n} ใช้ท่าโจมตีหนัก! คุณโดน ${d}` : `${e.e} ${e.n} โจมตี คุณโดน ${d}`);
+}
+function win(){
+  const e = B.en; B.over = true;
+  S.gold += e.gold; S.exp += e.exp; S.wins++;
+  B.log.push(`🏆 ชนะ! ได้ ${e.gold}💰 และ ${e.exp} EXP`);
+  if(Math.random() < (e.boss ? 1 : .3)){
+    const ks = Object.keys(ITEMS), d = ks[Math.floor(Math.random()*ks.length)];
+    S.inv[d] = (S.inv[d]||0) + 1;
+    B.log.push(`🎁 ได้รับ ${ITEMS[d].e} ${ITEMS[d].n}`);
+  }
+  S.stage++; S.best = Math.max(S.best, S.stage);
+  while(S.exp >= expNeed()){
+    S.exp -= expNeed(); S.lv++;
+    S.mhp += 12; S.mmp += 4; S.batk += 3; S.bdef += 2; S.hp = S.mhp; S.mp = S.mmp;
+    B.log.push(`⭐ เลเวลอัป! ตอนนี้ Lv.${S.lv} (HP/MP เต็ม)`);
+  }
+}
+function lose(){
+  B.over = true;
+  const lost = Math.floor(S.gold/2); S.gold -= lost; S.hp = S.mhp; S.mp = S.mmp;
+  B.log.push(`💀 คุณแพ้... เสีย ${lost}💰 และถูกส่งกลับฐาน`);
+}
+
+// ====== เซฟ / โหลดด้วยรหัส ======
+function exportCode(){ return btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
+function saveView(){
+  return `<div class="card"><b>💾 เซฟ / โหลด</b>
+    <p class="small">${storageOK ? '✅ เกมบันทึกอัตโนมัติในเครื่องนี้ทุกครั้งที่เล่น' : '⚠️ เบราว์เซอร์นี้ไม่ให้บันทึกอัตโนมัติ ใช้รหัสเซฟด้านล่างแทน'}</p>
+    <p class="small">รหัสเซฟ: คัดลอกเก็บไว้ ใช้โหลดในเครื่องอื่น หรือตอนที่ข้อมูลหาย</p>
+    <textarea id="code" readonly onclick="this.select()">${exportCode()}</textarea>
+    <button class="full" onclick="copyCode()">📋 คัดลอกรหัส</button>
+    <p class="small" style="margin-top:12px">โหลดจากรหัสเซฟ:</p>
+    <textarea id="imp" placeholder="วางรหัสเซฟที่นี่"></textarea>
+    <div class="btns" style="margin-top:6px">
+      <button onclick="importCode()">📥 โหลด</button>
+      <button class="warn" onclick="resetGame()">${resetArm ? '⚠️ กดอีกครั้งเพื่อยืนยัน' : '🗑️ เริ่มใหม่'}</button>
+    </div>${note()}${back()}</div>`;
+}
+function copyCode(){
+  const t = document.getElementById('code'); t.select();
+  const done = () => { msg = '📋 คัดลอกแล้ว!'; render(); };
+  if(navigator.clipboard) navigator.clipboard.writeText(t.value).then(done, () => { document.execCommand('copy'); done(); });
+  else { document.execCommand('copy'); done(); }
+}
+function importCode(){
+  try{
+    const o = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('imp').value.trim()))));
+    if(typeof o.lv !== 'number' || !o.inv) throw 0;
+    S = Object.assign(newGame(), o); save(); msg = '✅ โหลดเซฟสำเร็จ!';
+  } catch(e){ msg = '❌ รหัสเซฟไม่ถูกต้อง'; }
+  render();
+}
+function resetGame(){
+  if(!resetArm){ resetArm = true; msg = ''; render(); return; }
+  S = newGame(); save(); resetArm = false; msg = 'เริ่มเกมใหม่แล้ว'; render();
+}
+
+render();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
