@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
@@ -7,205 +7,1041 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#070b1a">
+<meta name="theme-color" content="#0d1d12">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="STAR QUEST">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Nunito:wght@400;700;800;900&display=swap">
 <style>
+:root{--bg:#0d1d12;--card:#152b1b;--card2:#1c3824;--line:#2f5a37;--leaf:#8fd14f;--leaf2:#4caf50;--gold:#f2c94c;
+  --ink:#eef6e6;--mute:#a9c4a0;--red:#e5533d;--blue:#3f8fd8}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{margin:0;font-family:system-ui,"Noto Sans Thai",sans-serif;background:#070b1a;color:#e6f1ff;
-  -webkit-user-select:none;user-select:none;overscroll-behavior:none}
+body{margin:0;font-family:Nunito,system-ui,sans-serif;color:var(--ink);overscroll-behavior:none;
+  background:radial-gradient(ellipse at 50% -10%,#2c5a33 0%,#13281a 45%,var(--bg) 80%) fixed;
+  -webkit-user-select:none;user-select:none;min-height:100vh}
 #app{max-width:520px;margin:0 auto;padding:12px;padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))}
-h1{font-size:20px;text-align:center;color:#5ef2ff;letter-spacing:3px;margin:4px 0 10px;text-shadow:0 0 10px #5ef2ff88}
-h2{font-size:17px;margin:0 0 8px}
-.card{background:#0f1730;border:1px solid #1f3a66;border-radius:14px;padding:12px;margin-bottom:10px}
+h1{font-family:Cinzel,Georgia,serif;font-weight:900;font-size:24px;text-align:center;letter-spacing:2px;margin:4px 0 12px;
+  color:var(--gold);text-shadow:0 2px 0 #5a3e0a,0 0 14px #f2c94c55;display:flex;align-items:center;justify-content:center;gap:8px}
+h1 .crest .i{width:24px;height:24px;vertical-align:-3px}
+h2{font-family:Cinzel,Georgia,serif;font-size:17px;margin:0 0 10px;color:#f4e7c0;display:flex;align-items:center;gap:6px}
+.sub{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--leaf);margin:10px 0 2px;font-weight:800}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px;
+  box-shadow:0 4px 14px #0006,inset 0 1px 0 #ffffff10}
 .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
-.bar{height:10px;background:#1a2340;border-radius:6px;overflow:hidden;margin:3px 0 6px}
-.bar>i{display:block;height:100%;transition:width .3s}
-.hp>i{background:linear-gradient(90deg,#ff4d6d,#ff8fa3)}
-.mp>i{background:linear-gradient(90deg,#3a86ff,#5ef2ff)}
-.ex>i{background:linear-gradient(90deg,#ffd60a,#ffef9f)}
-.qb>i{background:linear-gradient(90deg,#06d6a0,#9ef01a)}
+.i{width:1.15em;height:1.15em;vertical-align:-.22em;flex-shrink:0}
+.ii{width:30px;height:30px;flex-shrink:0;vertical-align:middle}
+.bar{height:10px;background:#0b170e;border-radius:6px;overflow:hidden;margin:3px 0 6px;box-shadow:inset 0 1px 2px #000a}
+.bar>i{display:block;height:100%;transition:width .35s;border-radius:6px}
+.hp>i{background:linear-gradient(90deg,#d83a2c,#ff7b6b)}
+.mp>i{background:linear-gradient(90deg,#2f7fd0,#7fd3ff)}
+.ex>i{background:linear-gradient(90deg,#d9a520,#ffe27a)}
+.qb>i{background:linear-gradient(90deg,#4caf50,#b8ff5a)}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-button{font:inherit;font-size:15px;padding:12px;border-radius:10px;border:1px solid #2d5a9e;background:#14244a;color:#e6f1ff;cursor:pointer}
-button:active{transform:scale(.96)}
-button:disabled{opacity:.4;cursor:default}
-button.pri{background:#0b6e8a;border-color:#5ef2ff}
-button.warn{background:#5a1a2a;border-color:#ff4d6d}
-button.ok{background:#0d5c44;border-color:#06d6a0}
+button{font:inherit;font-weight:700;font-size:15px;padding:12px;border-radius:12px;border:1px solid #3f7347;color:var(--ink);cursor:pointer;
+  background:linear-gradient(180deg,#24472d,#1a3622);box-shadow:0 3px 0 #0b1a0f,inset 0 1px 0 #ffffff14;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #0b1a0f}
+button:disabled{opacity:.42;cursor:default}
+button.pri{background:linear-gradient(180deg,#8fd14f,#4f9a2c);border-color:#b8ff5a;color:#10230f;box-shadow:0 3px 0 #2c5a18}
+button.warn{background:linear-gradient(180deg,#a8392b,#7a2418);border-color:#e5533d}
+button.ok{background:linear-gradient(180deg,#f2c94c,#c99a1e);border-color:#ffe27a;color:#3a2a05;box-shadow:0 3px 0 #7a5a0a}
 .full{width:100%;margin-top:8px}
-.small{font-size:13px;color:#9fb3d9}
-.msg{color:#ffd60a;font-size:14px;margin:8px 0 0}
-/* การ์ดสเตตัวละคร */
-.hero{background:linear-gradient(160deg,#13224a,#0f1730 60%);border-color:#2d5a9e}
-.avatar{width:64px;height:64px;border-radius:16px;background:#070b1a;border:2px solid #5ef2ff;display:flex;align-items:center;justify-content:center;font-size:38px;flex-shrink:0}
-.tag{display:inline-block;background:#5ef2ff22;color:#5ef2ff;border:1px solid #5ef2ff66;border-radius:8px;padding:1px 8px;font-size:12px;margin-left:4px}
-.gold{font-weight:700;color:#ffd60a;white-space:nowrap}
+.small{font-size:13px;color:var(--mute)}
+.msg{color:var(--gold);font-size:14px;font-weight:700;margin:8px 0 0}
+.gold{font-weight:800;color:var(--gold);white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.tag{display:inline-block;background:#8fd14f22;color:var(--leaf);border:1px solid #8fd14f66;border-radius:8px;padding:0 7px;font-size:12px;margin-left:6px;font-weight:800}
+/* Hero card */
+.hero{position:relative;overflow:hidden;background:linear-gradient(160deg,#2a5232,#152b1b 65%);border-color:#4b8a4f}
+.hero::before{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,#ffffff12,transparent);animation:shine 6s ease-in-out infinite}
+.nm{font-family:Cinzel,Georgia,serif;font-size:17px}
+.avatar{width:70px;height:70px;border-radius:18px;flex-shrink:0;overflow:hidden;
+  background:radial-gradient(circle at 50% 35%,#cfeaa8,#5fa043 70%);border:2px solid var(--gold);box-shadow:0 0 0 3px #0b170e,0 4px 10px #0008}
+.avatar .art{width:100%;height:100%;transform:translateY(6px) scale(1.15)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
-.stat{background:#070b1a;border-radius:10px;padding:6px 4px;text-align:center}
-.stat b{display:block;font-size:16px}
-.stat span{font-size:11px;color:#9fb3d9}
+.stat{background:#0b170e99;border:1px solid #2f5a37;border-radius:10px;padding:6px 4px;text-align:center}
+.stat b{display:block;font-size:17px}
+.stat span{font-size:11px;color:var(--mute);letter-spacing:.5px}
 .mini{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.mini button{padding:8px;font-size:13px}
-/* ปุ่มเมนูหลัก */
+.mini button{padding:9px;font-size:13px}
+.topbar{display:flex;gap:10px;align-items:center}
+.mini-av{width:48px;height:48px;border-radius:12px;overflow:hidden;flex-shrink:0;background:radial-gradient(circle at 50% 35%,#cfeaa8,#5fa043 70%);border:2px solid var(--gold)}
+.mini-av .art{width:100%;height:100%;transform:translateY(4px) scale(1.15)}
+.topbar .bar{height:7px;margin:3px 0}
+/* Menu tiles */
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.tile{position:relative;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;font-size:13px;line-height:1.3;text-align:center;border-radius:14px;background:#0f1730;border:1px solid #2d5a9e}
-.tile .ic{font-size:34px}
-.badge{position:absolute;top:6px;right:6px;background:#ff4d6d;color:#fff;border-radius:10px;font-size:11px;padding:1px 6px}
-.badge.soon{background:#334;color:#9fb3d9}
-/* ต่อสู้ */
-#log{height:110px;overflow-y:auto;font-size:14px;line-height:1.6}
-/* ฉากต่อสู้ */
-.scene{position:relative;height:300px;border-radius:16px;overflow:hidden;margin-bottom:10px;border:1px solid #2d5a9e;
-  background:radial-gradient(ellipse at 75% 15%,#2a3f80 0%,#121d42 45%,#070b1a 80%)}
-.v-battle .scene::after{content:'';position:absolute;left:0;right:0;bottom:0;height:38%;
-  background:linear-gradient(180deg,transparent,#0b1a3a 40%,#0f2550);border-top:1px solid #5ef2ff22;z-index:0}
-.stars{position:absolute;inset:0;opacity:.7;background-size:180px 180px;animation:drift 30s linear infinite;
-  background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 90px 80px,#cfe,transparent),
-  radial-gradient(2px 2px at 150px 20px,#fff,transparent),radial-gradient(1px 1px at 60px 140px,#fff,transparent),radial-gradient(1.5px 1.5px at 130px 120px,#9ef,transparent)}
-.stars.s2{background-size:260px 260px;opacity:.4;animation-duration:55s}
-@keyframes drift{to{background-position:-360px 0}}
-.ent{position:absolute;z-index:2;line-height:1;text-align:center}
-.ent .spr{display:inline-block;animation:bob 2.4s ease-in-out infinite}
-.en{right:11%;top:66px;animation:inR .7s cubic-bezier(.2,.9,.3,1.2) backwards}
-.pl{left:9%;bottom:44px;animation:inL .7s cubic-bezier(.2,.9,.3,1.2) .15s backwards}
-.en .spr{font-size:76px;animation-delay:-1.2s}
-.pl .spr{font-size:66px}
-.boss .spr{font-size:100px;filter:drop-shadow(0 0 16px #ff4d6d)}
-.boss{top:44px}
-.pad{position:absolute;z-index:1;width:130px;height:28px;border-radius:50%;background:radial-gradient(#5ef2ff40,transparent 70%)}
-.pe{right:calc(11% - 18px);top:140px}.v-battle .boss~.pad{}
-.pp{left:calc(9% - 22px);bottom:30px}
-.ent.guard::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:3px solid #5ef2ff;
-  box-shadow:0 0 18px #5ef2ff,inset 0 0 18px #5ef2ff66;animation:pulse 1s ease-in-out infinite}
-.plate{position:absolute;z-index:3;width:48%;background:#0b1430e6;border:1px solid #2d5a9e;border-radius:10px;padding:6px 8px;font-size:12px}
+.tile{position:relative;aspect-ratio:1/1;flex-direction:column;gap:4px;padding:6px;font-size:13px;line-height:1.25;text-align:center;border-radius:16px;
+  background:linear-gradient(180deg,#24472d,#16301d);border:1px solid #3f7347}
+.tile .ic{display:block;width:46px;height:46px;transition:transform .2s;filter:drop-shadow(0 3px 2px #0008)}
+.tile .ic svg{width:100%;height:100%}
+.tile:active .ic{transform:scale(1.15) rotate(-6deg)}
+.tile-av{display:block;width:46px;height:46px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);background:#5fa043}
+.tile-av .art{width:100%;height:100%;transform:translateY(4px) scale(1.2)}
+.badge{position:absolute;top:6px;right:6px;background:var(--red);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px;font-weight:800}
+.badge.soon{background:#0b170e;color:var(--mute);border:1px solid #2f5a37}
+/* Lists */
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #2f5a3766}
+.item:last-child{border:0}
+.item button{padding:8px 12px;font-size:14px;white-space:nowrap}
+.it{display:flex;align-items:center;gap:10px}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.slot{display:flex;gap:8px;align-items:center;background:#0b170e88;border:1px dashed #3f7347;border-radius:12px;padding:8px;font-size:13px;font-weight:700}
+.slot>.i{width:30px;height:30px;color:var(--mute)}
+.story{font-size:14px;line-height:1.7;color:#e0eed6;background:#0b170e99;border-left:3px solid var(--leaf);border-radius:10px;padding:10px 12px;margin:10px 0}
+.map{width:100%;height:auto;display:block;border-radius:14px;box-shadow:inset 0 0 0 2px #0b170e,0 4px 10px #0007}
+.map .ping{animation:ping 1.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.chars{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ch{border:1px solid #3f7347;border-radius:14px;padding:8px 4px;text-align:center;font-size:12px;background:#0b170e88}
+.ch .e{width:64px;height:64px;margin:0 auto;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 35%,#cfeaa8,#5fa043 70%)}
+.ch .e .art{width:100%;height:100%;transform:translateY(5px) scale(1.15)}
+.ch .e.lk{display:flex;align-items:center;justify-content:center;background:#0b170e}
+.ch .e.lk .i{width:28px;height:28px;color:var(--mute)}
+.ch.sel{border-color:var(--gold);box-shadow:0 0 10px #f2c94c55}
+.ch.lock{opacity:.5}
+.pvp-art{display:flex;align-items:center;justify-content:center;gap:4px}
+.pvp-art .art{width:110px;height:110px}
+.pvp-art .art:last-child{transform:scaleX(-1)}
+.vs{font-family:Cinzel,serif;font-weight:900;font-size:28px;color:var(--gold);text-shadow:0 2px 0 #5a3e0a}
+textarea{width:100%;height:70px;background:#0b170e;color:var(--leaf);border:1px solid #3f7347;border-radius:10px;font-size:16px;padding:8px;-webkit-user-select:text;user-select:text}
+.lbl{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px;font-weight:700}
+input:not([type=checkbox]){width:100%;font:inherit;font-size:16px;padding:12px;border-radius:12px;border:1px solid #3f7347;background:#0b170e;color:var(--ink);
+  -webkit-user-select:text;user-select:text;outline:none}
+input:focus{border-color:var(--leaf);box-shadow:0 0 0 3px #8fd14f33}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;margin:12px 0 2px}
+.check input{width:20px;height:20px;accent-color:#8fd14f}
+/* ===== Battle scene ===== */
+#log{height:104px;overflow-y:auto;font-size:14px;line-height:1.6}
+#log div:last-child{color:#fff;font-weight:700}
+.scene{position:relative;height:300px;border-radius:18px;overflow:hidden;margin-bottom:10px;border:2px solid #4b8a4f;box-shadow:0 6px 18px #000a}
+.scene .bg{position:absolute;inset:0;width:100%;height:100%}
+.ent{position:absolute;z-index:2}
+.ent .art{width:100%;height:100%;overflow:visible;display:block}
+.en{right:6%;top:64px;width:124px;height:124px;animation:inR .7s cubic-bezier(.2,.9,.3,1.2) backwards}
+.en.flyer{top:40px}
+.en.boss{right:3%;top:38px;width:160px;height:160px}
+.pl{left:6%;bottom:30px;width:112px;height:112px;animation:inL .7s cubic-bezier(.2,.9,.3,1.2) .15s backwards}
+.shadow{position:absolute;z-index:1;border-radius:50%;background:radial-gradient(#0008,transparent 70%)}
+.se{right:calc(6% + 12px);top:176px;width:100px;height:22px}
+.se.fly{width:70px;right:calc(6% + 27px);opacity:.6}
+.se.big{right:calc(3% + 16px);top:186px;width:128px;height:26px}
+.sp{left:calc(6% + 12px);bottom:24px;width:90px;height:18px}
+.ent.guard::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:3px solid #b8ff5a;
+  box-shadow:0 0 18px #8fd14f,inset 0 0 18px #8fd14f66;animation:pulse 1s ease-in-out infinite;pointer-events:none}
+.plate{position:absolute;z-index:3;width:48%;background:#0d1d12e0;border:1px solid #4b8a4f;border-radius:12px;padding:6px 8px;font-size:12px;box-shadow:0 3px 8px #0008}
+.plate b{font-size:12px}
 .plate .bar{height:7px;margin:3px 0}
 .plate.e{left:8px;top:8px}.plate.p{right:8px;bottom:8px}
-.ft{position:absolute;z-index:6;pointer-events:none;white-space:nowrap;font-weight:900;font-size:24px;color:#fff;
-  text-shadow:0 2px 0 #000,0 0 10px #ff4d6d}
-.ft.crit{font-size:32px;color:#ffd60a;text-shadow:0 2px 0 #000,0 0 12px #ff8800}
-.ft.heal{color:#b8ff5a;text-shadow:0 2px 0 #000,0 0 10px #06d6a0}
-.ft.mp{color:#7ff7ff;text-shadow:0 2px 0 #000,0 0 10px #3a86ff}
-.ft.big{font-size:30px;color:#ffd60a;text-shadow:0 2px 0 #000,0 0 16px #ffd60a}
-.pt{position:absolute;z-index:5;pointer-events:none;font-size:22px;transform:translate(-50%,-50%)}
-.pt.sm{font-size:16px}.pt.big{font-size:34px}
-.beam{position:absolute;z-index:4;height:10px;border-radius:5px;transform-origin:0 50%;pointer-events:none;
-  background:linear-gradient(90deg,#fff,#5ef2ff 30%,#3a86ff);box-shadow:0 0 12px #5ef2ff,0 0 28px #3a86ff}
-@keyframes bob{50%{transform:translateY(-8px)}}
+.ff{position:absolute;z-index:1;width:5px;height:5px;border-radius:50%;background:#fffbb0;box-shadow:0 0 8px 3px #fff59d99;animation:ff 6s ease-in-out infinite;pointer-events:none}
+.lf{position:absolute;z-index:1;top:-12px;width:10px;height:10px;background:#9ccc65;border-radius:0 100% 0 100%;animation:fall 9s linear infinite;pointer-events:none;opacity:.85}
+.ft{position:absolute;z-index:6;pointer-events:none;white-space:nowrap;font-family:Nunito,sans-serif;font-weight:900;font-size:26px;color:#fff;
+  -webkit-text-stroke:1px #2a0f0a;text-shadow:0 3px 0 #2a0f0a,0 0 10px #ff5a4a}
+.ft.crit{font-size:32px;color:#ffd54a;text-shadow:0 3px 0 #4a2a00,0 0 12px #ff9800}
+.ft.heal{color:#c6ff7a;-webkit-text-stroke:1px #0f2a0f;text-shadow:0 3px 0 #0f2a0f,0 0 10px #4caf50}
+.ft.mp{color:#9be3ff;-webkit-text-stroke:1px #0a1f33;text-shadow:0 3px 0 #0a1f33,0 0 10px #3f8fd8}
+.ft.big{font-family:Cinzel,serif;font-size:30px;color:#ffd54a;text-shadow:0 3px 0 #4a2a00,0 0 16px #ffd54a}
+.pt{position:absolute;z-index:5;pointer-events:none;transform:translate(-50%,-50%)}
+.pt.spark{width:9px;height:9px;border-radius:50%;background:var(--c,#fff);box-shadow:0 0 10px 3px var(--c,#fff)}
+.pt.leaf{width:12px;height:12px;background:#8fd14f;border-radius:0 100% 0 100%;box-shadow:0 0 6px #b8ff5a}
+.pt.coin{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff2b0,#f2c94c 50%,#b8861b);border:1px solid #8a6312}
+.pt.fire{width:14px;height:14px;border-radius:50%;background:radial-gradient(#fff3b0,#ff9800 50%,#e5533d);box-shadow:0 0 12px 4px #ff9800aa}
+.pt.plus{font-weight:900;font-size:22px;color:var(--c,#b8ff5a);text-shadow:0 0 8px var(--c,#b8ff5a),0 2px 0 #0008}
+.pt.star{width:14px;height:14px;background:#ffd54a;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);filter:drop-shadow(0 0 6px #ffd54a)}
+.pt.big .ii{width:38px;height:38px}
+.slash{position:absolute;z-index:5;pointer-events:none;filter:drop-shadow(0 0 8px #fff)}
+/* ===== Character idle / attack animation ===== */
+.art .bod,.art .arm,.art .wingL,.art .wingR,.art .tail,.art .crown{transform-box:view-box}
+.art .bod{transform-origin:60px 110px;animation:breathe 2.6s ease-in-out infinite}
+.art .eyes{transform-box:fill-box;transform-origin:center;animation:blink 4.2s infinite}
+.art.hero-art .arm{transform-origin:76px 66px;animation:sway-arm 2.6s ease-in-out infinite}
+.hero-art .tail{transform-origin:40px 38px;animation:flutter 1.2s ease-in-out infinite}
+.art .squish{animation:squish 1.3s ease-in-out infinite}
+.art .hop{animation:hop 1.6s ease-in-out infinite}
+.art .fly{transform-origin:60px 62px;animation:hover 1.8s ease-in-out infinite}
+.art .wingL{transform-origin:48px 64px;animation:flapL .35s ease-in-out infinite alternate}
+.art .wingR{transform-origin:72px 64px;animation:flapR .35s ease-in-out infinite alternate}
+.big .wingL{animation-duration:.9s}.big .wingR{animation-duration:.9s}
+.art .sway{animation:treesway 3.2s ease-in-out infinite}
+.art .crown{transform-origin:60px 40px;animation:treesway 3.2s ease-in-out infinite reverse}
+.art .arm{transform-origin:44px 68px}
+.big .tail{transform-origin:80px 92px;animation:wag 1.6s ease-in-out infinite}
+.atk .art.hero-art .arm{animation:hslash .44s ease-in-out}
+.atk .art:not(.hero-art) .arm{animation:club .5s ease-in-out}
+.atk .art .squish{animation:jump .44s ease-in-out}
+.atk .art .eyes{animation:none;transform:scaleY(.6)}
+.hurt .art .eyes{animation:none;transform:scaleY(.15)}
+@keyframes breathe{50%{transform:scale(1.025,.975)}}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes sway-arm{50%{transform:rotate(-4deg)}}
+@keyframes flutter{50%{transform:rotate(12deg)}}
+@keyframes hslash{0%{transform:rotate(0)}35%{transform:rotate(-55deg)}70%{transform:rotate(70deg)}100%{transform:rotate(0)}}
+@keyframes club{0%{transform:rotate(0)}40%{transform:rotate(35deg)}75%{transform:rotate(-60deg)}100%{transform:rotate(0)}}
+@keyframes squish{0%,100%{transform:scale(1,1)}50%{transform:scale(1.08,.9)}}
+@keyframes jump{0%{transform:scale(1)}30%{transform:scale(1.15,.8)}60%{transform:scale(.9,1.15) translateY(-14px)}100%{transform:scale(1)}}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px) rotate(-3deg)}60%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes hover{50%{transform:translateY(-9px)}}
+@keyframes flapL{from{transform:rotate(18deg) scaleY(.85)}to{transform:rotate(-14deg)}}
+@keyframes flapR{from{transform:rotate(-18deg) scaleY(.85)}to{transform:rotate(14deg)}}
+@keyframes treesway{50%{transform:rotate(1.5deg)}}
+@keyframes wag{50%{transform:rotate(-10deg)}}
 @keyframes pulse{50%{transform:scale(1.06);opacity:.7}}
-@keyframes inR{from{transform:translateX(160px);opacity:0}}
-@keyframes inL{from{transform:translateX(-160px);opacity:0}}
-/* แอนิเมชันหน้าเมนู */
+@keyframes ping{0%{transform:scale(.8);opacity:.6}100%{transform:scale(1.6);opacity:0}}
+@keyframes inR{from{transform:translateX(170px);opacity:0}}
+@keyframes inL{from{transform:translateX(-170px);opacity:0}}
+@keyframes ff{0%,100%{transform:translate(0,0);opacity:.2}50%{transform:translate(14px,-18px);opacity:1}}
+@keyframes fall{0%{transform:translate(0,0) rotate(0)}100%{transform:translate(-60px,330px) rotate(540deg)}}
+/* Page animation */
 .page{animation:fadeUp .35s ease-out}
 .page .tile{animation:pop .45s cubic-bezier(.2,.9,.3,1.3) backwards}
 .page .tile:nth-child(2){animation-delay:.05s}.page .tile:nth-child(3){animation-delay:.1s}
-.page .tile:nth-child(4){animation-delay:.15s}.page .tile:nth-child(5){animation-delay:.2s}
-.avatar{animation:bob 2.6s ease-in-out infinite}
-.tile .ic{display:inline-block;transition:transform .2s}
-.tile:active .ic{transform:scale(1.25) rotate(-8deg)}
-.hero{position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;pointer-events:none;
-  background:linear-gradient(100deg,transparent,#ffffff14,transparent);animation:shine 5s ease-in-out infinite}
+.page .tile:nth-child(4){animation-delay:.15s}.page .tile:nth-child(5){animation-delay:.2s}.page .tile:nth-child(6){animation-delay:.25s}
 @keyframes shine{0%,60%{left:-60%}100%{left:130%}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}}
 @keyframes pop{from{opacity:0;transform:scale(.6)}}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #1f3a66}
-.item:last-child{border:0}
-.item button{padding:8px 12px;font-size:14px;white-space:nowrap}
-.dots{display:flex;gap:6px;margin:8px 0}
-.dots i{flex:1;height:8px;border-radius:4px;background:#1a2340}
-.dots i.on{background:#5ef2ff}
-.dots i.boss{background:#5a1a2a}
-.dots i.boss.on{background:#ffd60a}
-.story{font-size:14px;line-height:1.7;color:#cfe0ff;background:#070b1a;border-radius:10px;padding:10px;margin:8px 0}
-.chars{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.ch{border:1px solid #2d5a9e;border-radius:12px;padding:8px 4px;text-align:center;font-size:12px;background:#070b1a}
-.ch .e{font-size:32px}
-.ch.sel{border-color:#5ef2ff;box-shadow:0 0 8px #5ef2ff66}
-.ch.lock{opacity:.45}
-textarea{width:100%;height:70px;background:#070b1a;color:#5ef2ff;border:1px solid #2d5a9e;border-radius:8px;font-size:16px;padding:6px;-webkit-user-select:text;user-select:text}
+small.mpc{font-size:11px;background:#2f7fd0;color:#fff;border-radius:6px;padding:1px 5px;font-weight:800}
+small.mpc::after{content:' MP'}
+#ctrl button{font-size:14px;white-space:nowrap;padding:12px 6px}
+.valc-art .crest{transform-box:fill-box;transform-origin:50% 100%;animation:flutter 1.8s ease-in-out infinite}
+/* ===== Character card (home) ===== */
+.cc{display:grid;grid-template-columns:42% 1fr;gap:12px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#2a5232,#152b1b 65%);border-color:#4b8a4f}
+.cc::before{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,#ffffff10,transparent);animation:shine 6s ease-in-out infinite}
+.cc-name{font-family:Cinzel,Georgia,serif;font-weight:900;font-size:18px;color:#f4e7c0;text-align:center;margin-bottom:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.portrait{position:relative;display:block;width:100%;aspect-ratio:3/4;padding:0;border-radius:16px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 30%,#d6f0b0,#6fb04f 55%,#2f6b34);border:2px solid var(--gold);
+  box-shadow:0 0 0 3px #0b170e,0 6px 14px #0009}
+.portrait::after{content:'';position:absolute;left:15%;right:15%;bottom:7%;height:8%;border-radius:50%;background:radial-gradient(#0007,transparent 70%)}
+.portrait .art{position:absolute;inset:4% -6% 0;width:112%;height:96%;z-index:1}
+.portrait .swap{position:absolute;z-index:2;left:50%;bottom:6px;transform:translateX(-50%);font-size:11px;font-weight:800;
+  background:#0d1d12cc;border:1px solid #4b8a4f;color:var(--mute);border-radius:8px;padding:1px 8px}
+.cc-stats{margin-top:8px;display:grid;gap:3px}
+.cc-stats div{display:flex;justify-content:space-between;align-items:center;background:#0b170e99;border:1px solid #2f5a37;border-radius:8px;padding:3px 8px}
+.cc-stats span{font-size:11px;letter-spacing:.8px;color:var(--mute);font-weight:800}
+.cc-stats b{font-size:15px}
+.cc-r{display:flex;flex-direction:column;min-width:0}
+.tag.big{font-size:14px;padding:2px 10px;margin:0}
+.xp{margin:6px 0 2px}.xp .bar{height:6px;margin:0}.xp span{font-size:10px;color:var(--mute)}
+.sec{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--leaf);font-weight:900;margin:8px 0 4px}
+.s4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.sl{position:relative;aspect-ratio:1/1;padding:0;border-radius:12px;flex-direction:column;gap:0;
+  background:radial-gradient(circle at 50% 35%,#2f5a37,#122617);border:1px solid #4b8a4f;box-shadow:0 2px 0 #0b1a0f,inset 0 1px 0 #ffffff14}
+.sl .ii{width:62%;height:62%}
+.sl>.i{width:52%;height:52%;color:#cfe8b8}
+.sl.empty{opacity:.55;border-style:dashed;background:#0b170e88}
+.sl.empty>.i{color:var(--mute)}
+.sl .plus{font-size:20px;color:var(--mute);font-weight:900}
+.sl .cnt{position:absolute;right:-3px;bottom:-3px;font-size:10px;min-width:16px;padding:0 3px;border-radius:7px;
+  background:#0d1d12;border:1px solid #4b8a4f;color:#fff;line-height:15px}
+.sl .cnt.mp{background:#2f7fd0;border-color:#7fd3ff;top:-3px;bottom:auto}
+.sl.sk{background:radial-gradient(circle at 50% 35%,#3c6e3f,#16301d);border-color:#8fd14f88}
+.sl .sll{position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--mute);white-space:nowrap;font-weight:800}
+.cc-r .s4:last-child{margin-bottom:14px}
+.tip{font-size:14px;line-height:1.5;color:#e0eed6;border-left:3px solid var(--gold)}
+.chs{font-size:10px;color:var(--leaf);margin-top:3px;font-weight:800}
+@media (max-width:360px){.cc{grid-template-columns:40% 1fr;gap:8px}.s4{gap:4px}}
+small.cdt{font-size:10px;color:var(--mute);border:1px solid #4b8a4f;border-radius:6px;padding:0 4px;font-weight:800}
+small.cdc{font-size:11px;background:#7a2418;color:#fff;border-radius:6px;padding:1px 6px;font-weight:900}
+small.cdc::before{content:'CD '}
+button.cooling{opacity:.55}
+.sl.on{border:2px solid var(--gold);box-shadow:0 0 10px #f2c94c77,inset 0 1px 0 #ffffff14}
+.sl.locked .ii{filter:grayscale(1) brightness(.6)}
+.sl.locked{opacity:.5;border-style:dashed}
+.sl.dim .ii{filter:grayscale(.7);opacity:.6}
+.sl .cnt.cd{background:#5a3e0a;border-color:var(--gold);color:#ffe27a;top:-3px;bottom:auto}
+.buffs{display:flex;gap:4px;margin-top:2px}
+.bf{font-size:10px;font-weight:900;border-radius:6px;padding:0 5px}
+.atkb{background:#f2a51c;color:#3a2405}.ironb{background:#b0bec5;color:#263238}
+.crit-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px;background:#0b170e99;border:1px solid #2f5a37;border-radius:8px;padding:3px 8px}
+.crit-row span{font-size:11px;letter-spacing:.8px;color:var(--mute);font-weight:800}.crit-row b{font-size:15px;color:#ffd54a}
+/* skill animations */
+.thrust .art.hero-art .arm{animation:thrust .52s ease-in-out}
+.slam .art.hero-art .arm{animation:slamarm .76s ease-in-out}
+.valc-art .shield{transform-box:view-box;transform-origin:34px 81px;transition:transform .25s}
+.shieldup .valc-art .shield{animation:shieldup .6s ease-out}
+.guard .valc-art .shield{transform:translate(12px,-4px) scale(1.14);filter:drop-shadow(0 0 4px #ffd54a)}
+@keyframes thrust{0%{transform:rotate(0)}30%{transform:rotate(-25deg)}55%,75%{transform:rotate(62deg)}100%{transform:rotate(0)}}
+@keyframes slamarm{0%{transform:rotate(0)}45%{transform:rotate(-100deg)}75%{transform:rotate(95deg)}100%{transform:rotate(0)}}
+@keyframes shieldup{0%{transform:none}50%{transform:translate(16px,-8px) scale(1.25)}100%{transform:translate(12px,-4px) scale(1.14)}}
+.stab{position:absolute;z-index:5;width:140px;height:6px;border-radius:3px;transform-origin:0 50%;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#fff 40%,#e8f4ff);box-shadow:0 0 10px #fff,0 0 22px #90caf9}
+.wave{position:absolute;z-index:1;width:120px;height:30px;border-radius:50%;border:4px solid #ffd54a;box-shadow:0 0 16px #ffb74a,inset 0 0 10px #ffb74a;pointer-events:none}
+.flash{position:absolute;inset:0;z-index:7;background:#fff7d6;pointer-events:none}
+.pt.dust{width:14px;height:14px;border-radius:50%;background:radial-gradient(#d7c29a,#a98a5a 60%,transparent 70%)}
+.ii.gi{width:38px;height:38px}
+.sl .ii.gi{width:84%;height:84%}
+.pt.big .ii.gi{width:44px;height:44px}
+.rar{font-size:10px;font-weight:900;letter-spacing:.5px;border-radius:6px;padding:0 5px;vertical-align:1px}
+.r-common{color:#cfd8dc;border:1px solid #78909c}.r-rare{color:#81d4fa;border:1px solid #29b6f6}
+.r-epic{color:#e1bee7;border:1px solid #ba68c8}.r-legend{color:#ffe082;border:1px solid #ffc107;box-shadow:0 0 6px #ffc10766}
+.sl.on.r-common{border-color:#90a4ae;box-shadow:0 0 6px #90a4ae66}.sl.on.r-rare{border-color:#29b6f6;box-shadow:0 0 10px #29b6f688}
+.sl.on.r-epic{border-color:#ba68c8;box-shadow:0 0 10px #ba68c888}.sl.on.r-legend{border-color:#ffc107;box-shadow:0 0 12px #ffc107aa}
+.sl.r-common,.sl.r-rare,.sl.r-epic,.sl.r-legend{padding:0}
+.gi .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flick .5s ease-in-out infinite alternate}
+@keyframes flick{from{transform:scale(1,1) rotate(-4deg)}to{transform:scale(.9,1.12) rotate(4deg)}}
+.ent .tintw{width:100%;height:100%}
+.money{display:inline-flex;gap:8px;align-items:center}
+.powder{font-weight:800;color:#d1c4e9;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
+button.upb{padding:5px 8px;font-size:11px;line-height:1.25;gap:4px}
+button.upb span{display:inline-block;text-align:left}
+button.upb .i{width:12px;height:12px;vertical-align:-2px}
+/* mode select */
+.mode{width:100%;display:flex;align-items:center;gap:12px;padding:10px;margin-bottom:10px;text-align:left;justify-content:flex-start;border-radius:16px}
+.mode .mart{width:84px;height:84px;flex-shrink:0;border-radius:14px;overflow:hidden;border:2px solid #0006}
+.mode .mart .art{width:100%;height:100%;transform:translateY(6px) scale(1.15)}
+.mode .mtx{display:flex;flex-direction:column;gap:2px;font-weight:400}
+.mode .mtx b{font-family:Cinzel,Georgia,serif;font-size:18px}
+.m-story{background:linear-gradient(120deg,#3f7f45,#1b3a23);border-color:#8fd14f}
+.m-story .mart{background:radial-gradient(circle at 50% 35%,#cfeaa8,#3f7f45 75%)}
+.m-steel{background:linear-gradient(120deg,#b8763a,#5a3418);border-color:#f2c27a}
+.m-steel .mart{background:radial-gradient(circle at 50% 35%,#ffe2b0,#c98b48 75%)}
+.m-steel .small{color:#ffe2c0}
+/* steel sand screen */
+.steel-card{background:linear-gradient(180deg,#4a3520,#2a1d10);border-color:#b8763a}
+.steel-card h2{color:#ffe2b0}
+.steel-card .story{border-left-color:#f2c27a;background:#1a1208aa}
+.ss-banner{position:relative;height:120px;border-radius:14px;overflow:hidden;border:2px solid #b8763a}
+.ss-banner .bg{position:absolute;inset:0;width:100%;height:100%}
+.ss-over{position:absolute;left:10px;bottom:8px;display:flex;flex-direction:column;text-shadow:0 2px 0 #0008}
+.ss-over b{font-family:Cinzel,serif;font-size:22px;color:#fff3d6}.ss-over span{font-size:12px;font-weight:800;color:#ffe2b0}
+.ss-pick{display:flex;align-items:center;justify-content:center;gap:18px;text-align:center;margin-top:6px}
+.ss-pick b{font-family:Cinzel,serif;font-size:30px;color:#ffe2b0;display:block;line-height:1}
+.ss-pick button{width:48px;height:48px;padding:0}
+.sand{position:absolute;z-index:1;left:-10px;width:16px;height:2px;border-radius:2px;background:#fff1d0;opacity:.7;animation:blow 2.5s linear infinite;pointer-events:none}
+@keyframes blow{0%{transform:translateX(0)}100%{transform:translateX(440px) translateY(10px)}}
+.mode .mart .tintw{display:block;width:100%;height:100%}
+.si{width:24px;height:24px;flex-shrink:0;filter:drop-shadow(0 2px 2px #0007)}
+.sl.sk{background:none;border:none;box-shadow:none}
+.sl.sk .si{width:100%;height:100%}
+.sl.sk:active .si{transform:scale(.92)}
+#ctrl .si{width:26px;height:26px;margin-left:-4px}
+button.cooling .si{filter:grayscale(1) brightness(.7)}
+/* ===== Cover screen ===== */
+.cover{position:fixed;inset:0;z-index:50;overflow:hidden;cursor:pointer;background:#05030a;animation:cvIn 1s ease-out}
+.cv-bg{position:absolute;inset:0;width:100%;height:100%}
+.cv-dragon{position:absolute;left:50%;top:15%;width:min(118vw,560px);aspect-ratio:1;transform:translateX(-50%);
+  filter:brightness(.18) saturate(.4) drop-shadow(0 0 30px #ff3d00aa);animation:cvBreath 4s ease-in-out infinite;opacity:.95}
+.cv-dragon .eyes{filter:brightness(14) saturate(3)}
+.cv-dragon .art{width:100%;height:100%}
+.cv-flash{position:absolute;inset:0;background:#ffe0c0;opacity:0;animation:cvFlash 7s infinite;pointer-events:none;mix-blend-mode:screen}
+.ember{position:absolute;bottom:-10px;width:5px;height:5px;border-radius:50%;background:#ffb74a;box-shadow:0 0 8px 2px #ff6d00;animation:cvEmber 4s linear infinite;pointer-events:none}
+.cv-title{position:absolute;left:0;right:0;top:max(7%,env(safe-area-inset-top));text-align:center;z-index:3;padding:0 10px}
+.cv-pre{font-family:Cinzel,serif;font-weight:700;letter-spacing:3px;font-size:clamp(10px,3vw,14px);color:#ffcc99;opacity:.85;text-shadow:0 0 10px #ff3d00}
+.cv-name{font-family:Cinzel,Georgia,serif;font-weight:900;line-height:.92;margin-top:6px;display:flex;flex-direction:column;align-items:center}
+.cv-name span{display:block;font-size:clamp(58px,19vw,104px);letter-spacing:4px;
+  background:linear-gradient(180deg,#fff8d6 0%,#ffd54a 38%,#c8861a 62%,#7a3e0a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:2px #3a1505;filter:drop-shadow(0 4px 0 #1a0803) drop-shadow(0 0 18px #ff6d0099);animation:cvTitle 3s ease-in-out infinite}
+.cv-name span:last-child{font-size:clamp(46px,15vw,84px);letter-spacing:10px;animation-delay:-.4s}
+.cv-sword{width:min(80vw,340px);margin:-4px auto 0;filter:drop-shadow(0 0 8px #ffd54a)}
+.cv-sword svg{width:100%;display:block;animation:cvShine 2.4s ease-in-out infinite}
+.cv-heroes{position:absolute;left:0;right:0;bottom:12%;display:flex;justify-content:center;gap:2vw;z-index:3}
+.cv-h{width:min(44vw,210px);aspect-ratio:1;filter:drop-shadow(0 0 14px #ff6d00aa) drop-shadow(0 8px 6px #000)}
+.cv-h .art{width:100%;height:100%}
+.cv-h.v{animation:cvHeroL 1s cubic-bezier(.2,.9,.3,1.2) .3s backwards}
+.cv-h.r{transform:scaleX(-1);animation:cvHeroR 1s cubic-bezier(.2,.9,.3,1.2) .45s backwards}
+.cv-tap{position:absolute;left:0;right:0;bottom:max(5%,env(safe-area-inset-bottom));text-align:center;z-index:4;font-family:Cinzel,serif;font-weight:900;
+  letter-spacing:5px;font-size:18px;color:#fff3c4;text-shadow:0 0 12px #ff6d00,0 2px 0 #000;animation:cvBlink 1.4s ease-in-out infinite}
+.cv-ver{position:absolute;left:0;right:0;bottom:calc(max(5%,env(safe-area-inset-bottom)) - 20px);text-align:center;z-index:4;font-size:11px;color:#ffcc99aa;letter-spacing:1px}
+@keyframes cvIn{from{opacity:0}}
+@keyframes cvBreath{50%{transform:translateX(-50%) scale(1.04) translateY(-6px)}}
+@keyframes cvFlash{0%,88%,100%{opacity:0}89%{opacity:.55}90%{opacity:.05}91.5%{opacity:.4}93%{opacity:0}}
+@keyframes cvEmber{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(var(--dx),-105vh);opacity:0}}
+@keyframes cvTitle{50%{filter:drop-shadow(0 4px 0 #1a0803) drop-shadow(0 0 28px #ff8a00cc)}}
+@keyframes cvShine{50%{opacity:.6}}
+@keyframes cvHeroL{from{transform:translateX(-60vw);opacity:0}}
+@keyframes cvHeroR{from{transform:scaleX(-1) translateX(-60vw);opacity:0}}
+@keyframes cvBlink{50%{opacity:.35}}
+.cv-eyes{position:absolute;left:50%;top:15%;width:min(118vw,560px);aspect-ratio:1;transform:translateX(-50%);z-index:1;pointer-events:none;
+  animation:cvBreath 4s ease-in-out infinite,cvEyes 2.2s ease-in-out infinite;mix-blend-mode:screen}
+@keyframes cvEyes{50%{opacity:.55}}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
-// ====== ข้อมูลเกม (แก้ชื่อ/ราคา/ค่าพลังได้ตรงนี้) ======
-const KEY = 'starquest_save_v1';
+// ====== DRAWN ART (SVG) ======
+const SV = (inner, cls='') => `<svg class="art ${cls}" viewBox="0 0 120 120" aria-hidden="true">${inner}</svg>`;
+const EYES = (x1,x2,y,col='#22170f',rx=3,ry=4.2) => `<g class="eyes">
+  <ellipse cx="${x1}" cy="${y}" rx="${rx}" ry="${ry}" fill="${col}"/><ellipse cx="${x2}" cy="${y}" rx="${rx}" ry="${ry}" fill="${col}"/>
+  <circle cx="${x1+1}" cy="${y-1.6}" r="${rx*.4}" fill="#fff"/><circle cx="${x2+1}" cy="${y-1.6}" r="${rx*.4}" fill="#fff"/></g>`;
 
-// ตัวละคร — เพิ่มตัวใหม่ได้ที่นี่
+const ART = {
+  // ---- Hero: the Ranger ----
+  hero: () => SV(`
+  <defs>
+    <linearGradient id="hTun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ccf55"/><stop offset="1" stop-color="#2e7d32"/></linearGradient>
+    <linearGradient id="hBlade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#a7bccb"/></linearGradient>
+    <radialGradient id="hSkin" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#ffe3c8"/><stop offset="1" stop-color="#eeb088"/></radialGradient>
+  </defs>
+  <g class="bod">
+    <path d="M45 60 Q34 86 38 106 L82 106 Q84 84 75 60 Z" fill="#1d5a29"/>
+    <path d="M45 60 Q38 84 41 104 L50 104 Q46 84 52 62Z" fill="#164a21"/>
+    <rect x="48" y="92" width="10" height="15" rx="3" fill="#6b4428"/><rect x="62" y="92" width="10" height="15" rx="3" fill="#6b4428"/>
+    <path d="M45 104 h15 v6 h-17 q0-4 2-6z" fill="#3e2716"/><path d="M60 104 h15 q2 2 2 6 h-17z" fill="#3e2716"/>
+    <path d="M46 62 Q60 55 74 62 L77 96 Q60 101 43 96 Z" fill="url(#hTun)" stroke="#215f25" stroke-width="1.2"/>
+    <path d="M53 60 L60 72 L67 60" fill="none" stroke="#215f25" stroke-width="1.5"/>
+    <rect x="44" y="82" width="33" height="5" fill="#7a4a2a"/><rect x="57" y="80.5" width="7" height="8" rx="1.5" fill="#f2c94c" stroke="#b8902a"/>
+    <path d="M46 66 Q37 76 41 88" stroke="#eeb088" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+    <g class="head">
+      <circle cx="60" cy="41" r="21" fill="url(#hSkin)"/>
+      <path d="M38 42 Q35 17 60 16 Q87 15 83 41 Q79 30 71 29 Q72 36 64 34 Q62 28 54 30 Q51 37 44 33 Q42 38 38 42Z" fill="#7a4a24"/>
+      <path d="M38.5 33 Q60 21 82.5 33 L82 38 Q60 27 39 38.5Z" fill="#d23c2e"/>
+      <path class="tail" d="M40 35 Q28 38 24 46 Q32 44 38 41Z" fill="#d23c2e"/>
+      ${EYES(53.5,67.5,45)}
+      <ellipse cx="48.5" cy="52" rx="3.6" ry="2" fill="#f28b82" opacity=".6"/><ellipse cx="72.5" cy="52" rx="3.6" ry="2" fill="#f28b82" opacity=".6"/>
+      <path d="M57 54 Q61 57.5 65 54" stroke="#8a4b2f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </g>
+    <g class="arm">
+      <path d="M74 65 Q84 71 87 80" stroke="#eeb088" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+      <g transform="translate(87 80) rotate(32)">
+        <rect x="-2.2" y="-42" width="6.4" height="40" rx="2" fill="url(#hBlade)" stroke="#6d8596" stroke-width=".8"/>
+        <path d="M-2.2 -42 L1 -49 L4.2 -42Z" fill="#fff" stroke="#6d8596" stroke-width=".8"/>
+        <rect x="-7" y="-3" width="16.4" height="4.5" rx="2" fill="#f2c94c" stroke="#b8902a" stroke-width=".8"/>
+        <rect x="-.4" y="1.5" width="3.2" height="8" fill="#6b4428"/><circle cx="1.2" cy="11" r="2.6" fill="#f2c94c"/>
+      </g>
+    </g>
+  </g>`, 'hero-art'),
+
+
+  // ---- Valcarile: Roman legionary ----
+  valc: () => SV(`
+  <defs>
+    <pattern id="vChain" width="4" height="3.4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="3.4" fill="#8e9aa3"/><circle cx="2" cy="1.7" r="1.35" fill="none" stroke="#5d6a73" stroke-width=".7"/>
+      <circle cx="0" cy="0" r="1.35" fill="none" stroke="#5d6a73" stroke-width=".7"/><circle cx="4" cy="0" r="1.35" fill="none" stroke="#5d6a73" stroke-width=".7"/>
+    </pattern>
+    <linearGradient id="vSteel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef3f6"/><stop offset=".5" stop-color="#b9c5cd"/><stop offset="1" stop-color="#7d8b95"/></linearGradient>
+    <linearGradient id="vBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset=".5" stop-color="#d9a33a"/><stop offset="1" stop-color="#9a6a18"/></linearGradient>
+    <linearGradient id="vShield" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e1b14"/><stop offset=".45" stop-color="#d23a2c"/><stop offset="1" stop-color="#9e2218"/></linearGradient>
+    <radialGradient id="vSkin" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#f6d0ad"/><stop offset="1" stop-color="#d79a6e"/></radialGradient>
+  </defs>
+  <g class="bod">
+    <path class="cape" d="M44 58 Q30 86 34 108 L84 108 Q88 84 76 58Z" fill="#9e1f16"/>
+    <path d="M44 58 Q34 84 37 106 L46 106 Q42 84 50 60Z" fill="#7d150e"/>
+    <rect x="49" y="92" width="9" height="14" rx="3" fill="url(#vSkin)"/><rect x="63" y="92" width="9" height="14" rx="3" fill="url(#vSkin)"/>
+    <path d="M49 97 l9 2 M49 101 l9 2 M63 97 l9 2 M63 101 l9 2" stroke="#6b4428" stroke-width="1.6"/>
+    <path d="M46 105 h14 v5 h-16 q0-3 2-5z M61 105 h14 q2 2 2 5 h-16z" fill="#6b4428"/>
+    <path d="M44 84 Q60 88 77 84 L79 96 Q60 100 42 96Z" fill="#c0392b"/>
+    <g fill="#8a5a33" stroke="#4a2f1b" stroke-width=".8">
+      <rect x="45" y="86" width="5" height="11" rx="1"/><rect x="51" y="87" width="5" height="11" rx="1"/><rect x="57" y="87.5" width="5" height="11" rx="1"/>
+      <rect x="63" y="87" width="5" height="11" rx="1"/><rect x="69" y="86" width="5" height="11" rx="1"/>
+    </g>
+    <path d="M45 60 Q60 54 75 60 L78 86 Q60 90 43 86Z" fill="url(#vChain)" stroke="#4b565e" stroke-width="1.4"/>
+    <path d="M45 60 Q60 54 75 60 L74 64 Q60 59 46 64Z" fill="#6b7780"/>
+    <rect x="43" y="81" width="35" height="5" rx="1" fill="#6b4428"/>
+    <g fill="url(#vBronze)"><circle cx="49" cy="83.5" r="1.6"/><circle cx="55" cy="83.5" r="1.6"/><circle cx="61" cy="83.5" r="1.6"/><circle cx="67" cy="83.5" r="1.6"/><circle cx="73" cy="83.5" r="1.6"/></g>
+    <path d="M58 86 v8 M61 86 v9 M64 86 v8" stroke="#6b4428" stroke-width="1.6"/>
+    <path d="M40 60 Q44 54 52 58 L50 66 Q44 66 40 60Z M80 60 Q76 54 68 58 L70 66 Q76 66 80 60Z" fill="url(#vSteel)" stroke="#4b565e" stroke-width="1.2"/>
+    <g class="shield">
+      <path d="M22 62 Q34 58 46 62 L46 100 Q34 104 22 100Z" fill="url(#vShield)" stroke="#5e120c" stroke-width="1.8"/>
+      <path d="M24.5 64.5 Q34 61.5 43.5 64.5 L43.5 97.5 Q34 100.5 24.5 97.5Z" fill="none" stroke="#f2c94c" stroke-width="1.6"/>
+      <circle cx="34" cy="81" r="5.5" fill="url(#vBronze)" stroke="#7a5212" stroke-width="1"/>
+      <path d="M34 67 l2 6 l-2 -2 l-2 2z M34 95 l2 -6 l-2 2 l-2 -2z M27 81 l3 0 M38 81 l3 0" stroke="#f2c94c" stroke-width="1.4" fill="#f2c94c"/>
+    </g>
+    <g class="head">
+      <circle cx="60" cy="42" r="19" fill="url(#vSkin)"/>
+      <path d="M52 55 Q60 60 68 55 Q66 58 60 58.5 Q54 58 52 55Z" fill="#8a5a3a" opacity=".35"/>
+      <g class="eyes"><ellipse cx="53.5" cy="45" rx="2.6" ry="3.4" fill="#22170f"/><ellipse cx="66.5" cy="45" rx="2.6" ry="3.4" fill="#22170f"/>
+        <circle cx="54.4" cy="43.8" r="1" fill="#fff"/><circle cx="67.4" cy="43.8" r="1" fill="#fff"/></g>
+      <path d="M48.5 39.5 L57 41.5 M71.5 39.5 L63 41.5" stroke="#4a2f1b" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M57 52 Q60 53.5 63 52" stroke="#7a3e26" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M40 42 Q38 20 60 19 Q82 20 80 42 L76 42 Q75 30 60 29.5 Q45 30 44 42Z" fill="url(#vSteel)" stroke="#4b565e" stroke-width="1.5"/>
+      <path d="M41 37 Q60 30 79 37" stroke="url(#vBronze)" stroke-width="3" fill="none"/>
+      <path d="M41 41 L44 41 L46 56 Q42 56 40 50Z M79 41 L76 41 L74 56 Q78 56 80 50Z" fill="url(#vSteel)" stroke="#4b565e" stroke-width="1.2"/>
+      <circle cx="42.6" cy="47" r="1" fill="#4b565e"/><circle cx="77.4" cy="47" r="1" fill="#4b565e"/>
+      <path d="M57 20 L58 15 L62 15 L63 20Z" fill="url(#vBronze)"/>
+      <g class="crest">
+        <path d="M46 16 Q60 2 76 14 Q74 18 72 18 Q60 9 50 19 Q47 19 46 16Z" fill="#d23a2c" stroke="#7d150e" stroke-width="1.4"/>
+        <path d="M52 15 l-1 -4 M56 12 l0 -4 M60 11 l1 -4 M64 11.5 l2 -4 M68 13 l3 -3.5" stroke="#7d150e" stroke-width="1.2" stroke-linecap="round"/>
+      </g>
+    </g>
+    <g class="arm">
+      <path d="M74 65 Q84 71 87 80" stroke="#d79a6e" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+      <path d="M83 75 l6 3" stroke="#6b4428" stroke-width="3"/>
+      <g transform="translate(87 80) rotate(32)">
+        <path d="M-3.4 -3 L-3.8 -30 L1 -38 L5.8 -30 L5.4 -3Z" fill="url(#vSteel)" stroke="#5d6a73" stroke-width=".9"/>
+        <path d="M1 -35 L1 -5" stroke="#fff" stroke-width="1" opacity=".7"/>
+        <rect x="-6" y="-3.5" width="14" height="4" rx="2" fill="url(#vBronze)" stroke="#7a5212" stroke-width=".8"/>
+        <rect x="-.6" y=".5" width="3.2" height="8" rx="1" fill="#6b4428"/><circle cx="1" cy="10.5" r="3" fill="url(#vBronze)" stroke="#7a5212" stroke-width=".8"/>
+      </g>
+    </g>
+  </g>`, 'hero-art valc-art'),
+  // ---- Slime ----
+  slime: () => SV(`
+  <defs><radialGradient id="slG" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#e2ff9e"/><stop offset=".5" stop-color="#7fd63c"/><stop offset="1" stop-color="#3b8a1c"/></radialGradient></defs>
+  <g class="bod squish">
+    <path d="M16 106 Q12 70 40 52 Q60 36 80 52 Q108 70 104 106 Q60 114 16 106Z" fill="url(#slG)" stroke="#2c6a14" stroke-width="2.2"/>
+    <ellipse cx="42" cy="64" rx="11" ry="6" fill="#fff" opacity=".55" transform="rotate(-28 42 64)"/>
+    <circle cx="86" cy="86" r="3" fill="#fff" opacity=".35"/>
+    ${EYES(47,73,80,'#1b2a10',5,7)}
+    <path d="M51 95 Q60 102 69 95" stroke="#1b2a10" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  </g>`),
+
+  // ---- Mushroom ----
+  mushroom: () => SV(`
+  <defs><radialGradient id="muG" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#ff7d6b"/><stop offset="1" stop-color="#b8261b"/></radialGradient></defs>
+  <g class="bod hop">
+    <ellipse cx="47" cy="108" rx="9" ry="5" fill="#7d4f33"/><ellipse cx="73" cy="108" rx="9" ry="5" fill="#7d4f33"/>
+    <path d="M41 68 Q38 100 49 106 L71 106 Q82 100 79 68Z" fill="#f5e6c8" stroke="#c4a87f" stroke-width="2"/>
+    <g class="eyes"><ellipse cx="52" cy="85" rx="3.6" ry="5" fill="#2b1d14"/><ellipse cx="68" cy="85" rx="3.6" ry="5" fill="#2b1d14"/>
+      <circle cx="53" cy="83" r="1.3" fill="#fff"/><circle cx="69" cy="83" r="1.3" fill="#fff"/></g>
+    <path d="M45 77 L56 81 M75 77 L64 81" stroke="#2b1d14" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M54 96 Q60 92 66 96" stroke="#2b1d14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <g class="arm"><path d="M41 82 Q32 86 30 94" stroke="#f5e6c8" stroke-width="6" stroke-linecap="round" fill="none"/></g>
+    <path d="M79 82 Q88 86 90 94" stroke="#f5e6c8" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <path d="M12 72 Q14 28 60 24 Q106 28 108 72 Q60 81 12 72Z" fill="url(#muG)" stroke="#86160e" stroke-width="2.2"/>
+    <circle cx="35" cy="51" r="7.5" fill="#fff7ea"/><circle cx="61" cy="38" r="8.5" fill="#fff7ea"/><circle cx="86" cy="53" r="7" fill="#fff7ea"/>
+    <circle cx="49" cy="65" r="4" fill="#fff7ea"/><circle cx="75" cy="66" r="4" fill="#fff7ea"/>
+    <path d="M28 40 Q40 30 52 29" stroke="#fff" stroke-width="3" opacity=".4" fill="none" stroke-linecap="round"/>
+  </g>`),
+
+  // ---- Bat ----
+  bat: () => SV(`
+  <defs><radialGradient id="baG" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#a888e0"/><stop offset="1" stop-color="#4f2f80"/></radialGradient></defs>
+  <g class="bod fly">
+    <g class="wingL"><path d="M48 60 Q28 36 4 44 Q16 52 11 64 Q23 58 26 70 Q36 60 48 70Z" fill="#5d3c91" stroke="#36205e" stroke-width="2"/>
+      <path d="M44 62 Q30 50 14 50 M40 66 Q30 60 20 64" stroke="#36205e" stroke-width="1.3" fill="none"/></g>
+    <g class="wingR"><path d="M72 60 Q92 36 116 44 Q104 52 109 64 Q97 58 94 70 Q84 60 72 70Z" fill="#5d3c91" stroke="#36205e" stroke-width="2"/>
+      <path d="M76 62 Q90 50 106 50 M80 66 Q90 60 100 64" stroke="#36205e" stroke-width="1.3" fill="none"/></g>
+    <path d="M46 50 L42 30 L55 45Z M74 50 L78 30 L65 45Z" fill="#7a58b8" stroke="#36205e" stroke-width="1.5"/>
+    <circle cx="60" cy="62" r="19" fill="url(#baG)" stroke="#36205e" stroke-width="2"/>
+    <g class="eyes"><circle cx="52.5" cy="59" r="4.3" fill="#ff4d4d"/><circle cx="67.5" cy="59" r="4.3" fill="#ff4d4d"/>
+      <circle cx="53.5" cy="57.6" r="1.5" fill="#fff"/><circle cx="68.5" cy="57.6" r="1.5" fill="#fff"/></g>
+    <path d="M53 69 Q60 73 67 69" stroke="#2a1647" stroke-width="2" fill="none"/>
+    <path d="M55 70 l2 5 l2 -4.5Z M61 70.5 l2 4.5 l2 -5Z" fill="#fff"/>
+    <path d="M54 80 l-2 6 M66 80 l2 6" stroke="#36205e" stroke-width="2.5" stroke-linecap="round"/>
+  </g>`),
+
+  // ---- Goblin (and Goblin King) ----
+  goblin: (king) => SV(`
+  <defs><radialGradient id="gbG" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#a6d86a"/><stop offset="1" stop-color="#4c7f24"/></radialGradient></defs>
+  <g class="bod">
+    ${king ? `<path d="M40 58 Q24 90 28 108 L92 108 Q96 90 80 58Z" fill="#6a2c8c" stroke="#3f1658" stroke-width="2"/>
+      <path d="M40 58 L44 64 L48 58 L52 64 L56 58 L60 64 L64 58 L68 64 L72 58 L76 64 L80 58" fill="#f2c94c"/>` : ''}
+    <rect x="49" y="92" width="9" height="14" rx="3" fill="#5f8f30"/><rect x="63" y="92" width="9" height="14" rx="3" fill="#5f8f30"/>
+    <ellipse cx="52" cy="107" rx="8" ry="4" fill="#4a2f1b"/><ellipse cx="68" cy="107" rx="8" ry="4" fill="#4a2f1b"/>
+    <path d="M45 64 Q60 58 75 64 L78 92 L72 97 L67 92 L62 98 L56 92 L50 97 L43 92Z" fill="#8a5a33" stroke="#5a3a1f" stroke-width="1.5"/>
+    <path d="M47 76 L73 74" stroke="#5a3a1f" stroke-width="2.5"/>
+    <path d="M75 68 Q83 76 82 86" stroke="#7fb348" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <g class="arm">
+      <path d="M45 68 Q36 74 34 84" stroke="#7fb348" stroke-width="7" stroke-linecap="round" fill="none"/>
+      <g transform="translate(34 85) rotate(-25)">
+        <path d="M-3 0 L-6 -34 Q0 -42 6 -34 L3 0Z" fill="#9b6a3c" stroke="#5a3a1f" stroke-width="1.5"/>
+        <circle cx="-3" cy="-28" r="1.6" fill="#5a3a1f"/><circle cx="2" cy="-20" r="1.6" fill="#5a3a1f"/><circle cx="-1" cy="-34" r="1.4" fill="#5a3a1f"/>
+      </g>
+    </g>
+    <g class="head">
+      <path d="M43 40 L14 28 Q24 42 42 50Z" fill="#7fb348" stroke="#4c7f24" stroke-width="1.5"/>
+      <path d="M77 40 L106 28 Q96 42 78 50Z" fill="#7fb348" stroke="#4c7f24" stroke-width="1.5"/>
+      <ellipse cx="60" cy="44" rx="20" ry="18" fill="url(#gbG)" stroke="#4c7f24" stroke-width="1.5"/>
+      <g class="eyes"><ellipse cx="52" cy="42" rx="4.5" ry="4" fill="#ffe14d"/><ellipse cx="68" cy="42" rx="4.5" ry="4" fill="#ffe14d"/>
+        <circle cx="51" cy="42.5" r="2" fill="#c0261b"/><circle cx="67" cy="42.5" r="2" fill="#c0261b"/></g>
+      <path d="M46 35 L56 39 M74 35 L64 39" stroke="#2f4d14" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M58 47 Q60 51 62 47" fill="#5f8f30" stroke="#3b6119" stroke-width="1.2"/>
+      <path d="M50 53 Q60 60 70 53 Q60 56 50 53Z" fill="#2a1a0f"/>
+      <path d="M53 54 l2 3 l2-2.4 M63 54.6 l2 2.4 l2-3" fill="#fff"/>
+      ${king ? `<path d="M44 29 L47 14 L54 23 L60 10 L66 23 L73 14 L76 29Z" fill="#f2c94c" stroke="#a87b15" stroke-width="1.5"/>
+        <circle cx="60" cy="20" r="2.6" fill="#e5533d"/><circle cx="49" cy="24" r="1.8" fill="#4aa3df"/><circle cx="71" cy="24" r="1.8" fill="#4aa3df"/>` : ''}
+    </g>
+  </g>`, king ? 'king' : ''),
+
+  // ---- Ancient Treant (boss) ----
+  treant: () => SV(`
+  <defs>
+    <linearGradient id="trB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6d4c33"/><stop offset=".5" stop-color="#9a7350"/><stop offset="1" stop-color="#5a3c26"/></linearGradient>
+    <radialGradient id="trE"><stop offset="0" stop-color="#fffbb0"/><stop offset=".5" stop-color="#ffd54a"/><stop offset="1" stop-color="#ffd54a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <g class="bod sway">
+    <path d="M38 110 Q42 100 46 96 M82 110 Q78 100 74 96 M30 112 Q38 106 44 104 M90 112 Q82 106 76 104" stroke="#5a3c26" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <path d="M42 106 Q38 70 44 44 L76 44 Q82 70 78 106 Q60 112 42 106Z" fill="url(#trB)" stroke="#3e2716" stroke-width="2"/>
+    <path d="M50 54 Q48 74 51 98 M70 52 Q73 76 69 100 M60 86 Q58 94 61 104" stroke="#4a3020" stroke-width="1.6" fill="none" opacity=".7"/>
+    <path d="M78 64 Q94 56 100 40 M95 48 Q104 46 108 40" stroke="#6d4c33" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <circle cx="102" cy="38" r="8" fill="#3f9142"/>
+    <g class="arm">
+      <path d="M42 64 Q26 58 18 44 M24 50 Q14 50 10 44" stroke="#6d4c33" stroke-width="7" stroke-linecap="round" fill="none"/>
+      <circle cx="16" cy="40" r="8" fill="#3f9142"/>
+    </g>
+    <g class="crown">
+      <circle cx="40" cy="34" r="17" fill="#2e7d32"/><circle cx="80" cy="34" r="17" fill="#2e7d32"/>
+      <circle cx="60" cy="24" r="21" fill="#388e3c"/><circle cx="46" cy="18" r="13" fill="#43a047"/><circle cx="74" cy="17" r="13" fill="#43a047"/>
+      <circle cx="60" cy="12" r="11" fill="#66bb6a"/><circle cx="52" cy="22" r="4" fill="#9ccc65" opacity=".7"/><circle cx="70" cy="28" r="3" fill="#9ccc65" opacity=".7"/>
+    </g>
+    <circle cx="52" cy="66" r="9" fill="url(#trE)"/><circle cx="70" cy="66" r="9" fill="url(#trE)"/>
+    <g class="eyes"><ellipse cx="52" cy="66" rx="4" ry="3.2" fill="#fff6a0"/><ellipse cx="70" cy="66" rx="4" ry="3.2" fill="#fff6a0"/></g>
+    <path d="M45 59 L57 63 M77 59 L65 63" stroke="#3e2716" stroke-width="3" stroke-linecap="round"/>
+    <path d="M50 80 Q60 76 70 80 L67 88 L63 84 L60 89 L57 84 L53 88Z" fill="#2a1a0f"/>
+  </g>`, 'big'),
+
+  // ---- Forest Dragon (boss) ----
+  dragon: () => SV(`
+  <defs>
+    <radialGradient id="drG" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#7fdc6a"/><stop offset="1" stop-color="#1f6b2c"/></radialGradient>
+    <linearGradient id="drW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e8b3e"/><stop offset="1" stop-color="#14502a"/></linearGradient>
+  </defs>
+  <g class="bod">
+    <g class="wingL"><path d="M44 60 Q24 30 2 34 Q12 44 6 52 Q18 50 16 62 Q28 58 30 70 Q38 62 46 70Z" fill="url(#drW)" stroke="#0d3a1c" stroke-width="2"/>
+      <path d="M42 62 L8 40 M40 66 L18 56 M42 68 L30 66" stroke="#0d3a1c" stroke-width="1.4"/></g>
+    <g class="wingR"><path d="M76 60 Q96 30 118 34 Q108 44 114 52 Q102 50 104 62 Q92 58 90 70 Q82 62 74 70Z" fill="url(#drW)" stroke="#0d3a1c" stroke-width="2"/>
+      <path d="M78 62 L112 40 M80 66 L102 56 M78 68 L90 66" stroke="#0d3a1c" stroke-width="1.4"/></g>
+    <path class="tail" d="M78 96 Q100 100 104 86 Q108 76 100 72 Q104 84 94 88 Q86 90 80 88Z" fill="#2f8a3b" stroke="#0d3a1c" stroke-width="1.8"/>
+    <path d="M100 72 L108 66 L104 76Z" fill="#f2c94c"/>
+    <ellipse cx="60" cy="84" rx="23" ry="22" fill="url(#drG)" stroke="#0d3a1c" stroke-width="2"/>
+    <ellipse cx="60" cy="88" rx="13" ry="15" fill="#f3e2a6"/>
+    <path d="M49 80 h22 M48 87 h24 M49 94 h22 M52 100 h16" stroke="#cdb46a" stroke-width="1.5"/>
+    <ellipse cx="46" cy="106" rx="8" ry="5" fill="#2f8a3b" stroke="#0d3a1c" stroke-width="1.5"/><ellipse cx="74" cy="106" rx="8" ry="5" fill="#2f8a3b" stroke="#0d3a1c" stroke-width="1.5"/>
+    <path d="M41 108 l2-3 M45 109 l1-3 M75 109 l-1-3 M79 108 l-2-3" stroke="#fff" stroke-width="1.5"/>
+    <g class="arm"><path d="M42 78 Q34 84 36 92" stroke="#2f8a3b" stroke-width="6" stroke-linecap="round" fill="none"/></g>
+    <path d="M78 78 Q86 84 84 92" stroke="#2f8a3b" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <g class="head">
+      <path d="M46 34 L40 16 L50 30Z M74 34 L80 16 L70 30Z" fill="#f3e2a6" stroke="#a8925a" stroke-width="1.2"/>
+      <ellipse cx="60" cy="44" rx="19" ry="16" fill="url(#drG)" stroke="#0d3a1c" stroke-width="2"/>
+      <ellipse cx="60" cy="54" rx="13" ry="8" fill="#5cc25a" stroke="#0d3a1c" stroke-width="1.5"/>
+      <circle cx="55" cy="53" r="1.6" fill="#0d3a1c"/><circle cx="65" cy="53" r="1.6" fill="#0d3a1c"/>
+      <g class="eyes"><ellipse cx="51" cy="41" rx="4.6" ry="4" fill="#ffd54a"/><ellipse cx="69" cy="41" rx="4.6" ry="4" fill="#ffd54a"/>
+        <ellipse cx="51" cy="41" rx="1.4" ry="3.4" fill="#1a1a1a"/><ellipse cx="69" cy="41" rx="1.4" ry="3.4" fill="#1a1a1a"/></g>
+      <path d="M45 35 L56 38 M75 35 L64 38" stroke="#0d3a1c" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M52 59 l2 3 l2-3 M64 59 l2 3 l2-3" fill="#fff"/>
+      <path d="M60 28 l-3 -6 l3 2 l3 -2z" fill="#f2c94c"/>
+    </g>
+  </g>`, 'big')
+};
+
+// ---- Forest battle background ----
+function pine(x, base, h, c){
+  const w = h*.42;
+  return `<path d="M${x} ${base-h} L${x+w*.55} ${base-h*.55} L${x+w*.3} ${base-h*.55} L${x+w*.75} ${base-h*.22} L${x+w*.4} ${base-h*.22} L${x+w} ${base} L${x-w} ${base} L${x-w*.4} ${base-h*.22} L${x-w*.75} ${base-h*.22} L${x-w*.3} ${base-h*.55} L${x-w*.55} ${base-h*.55}Z" fill="${c}"/>`;
+}
+function forestBG(){
+  let far = '', mid = '', near = '';
+  for(let i=0;i<14;i++) far  += pine(i*31 - 6 + (i%3)*5, 165, 70 + (i*37)%30, '#4c8f57');
+  for(let i=0;i<10;i++) mid  += pine(i*45 + 10 + (i%2)*12, 178, 95 + (i*53)%35, '#2f6b3b');
+  near += pine(-10,250,190,'#1a4526') + pine(410,250,200,'#1a4526') + pine(30,240,140,'#1f5530') + pine(372,236,130,'#1f5530');
+  return `<svg class="bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="fSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d7f0b8"/><stop offset=".45" stop-color="#8cc77a"/><stop offset="1" stop-color="#3d7b45"/></linearGradient>
+      <linearGradient id="fGr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fa043"/><stop offset="1" stop-color="#2b5a24"/></linearGradient>
+      <radialGradient id="fSun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fffbe0" stop-opacity=".95"/><stop offset="1" stop-color="#fffbe0" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="400" height="300" fill="url(#fSky)"/>
+    <circle cx="300" cy="48" r="90" fill="url(#fSun)"/>
+    <g opacity=".7">${far}</g>
+    <path d="M300 0 L230 300 L270 300 L330 0Z M350 0 L320 300 L345 300 L370 0Z" fill="#fffde7" opacity=".1"/>
+    ${mid}
+    <path d="M0 175 Q100 160 200 172 Q300 184 400 168 L400 300 L0 300Z" fill="url(#fGr)"/>
+    <path d="M150 300 Q190 240 230 205 Q260 185 330 178 L350 182 Q280 192 252 214 Q218 244 205 300Z" fill="#a98a5a" opacity=".55"/>
+    <g fill="#3f7f34">
+      <path d="M20 226 q4-10 8 0 q4-12 8 0 q4-9 8 0Z"/><path d="M118 196 q3-8 6 0 q3-10 6 0 q3-7 6 0Z"/>
+      <path d="M300 230 q4-10 8 0 q4-12 8 0 q4-9 8 0Z"/><path d="M250 190 q3-8 6 0 q3-9 6 0Z"/><path d="M80 270 q5-12 10 0 q5-14 10 0Z"/>
+    </g>
+    <g><circle cx="60" cy="262" r="16" fill="#2b6a2e"/><circle cx="80" cy="268" r="13" fill="#357a36"/>
+       <circle cx="350" cy="268" r="17" fill="#2b6a2e"/><circle cx="328" cy="274" r="12" fill="#357a36"/>
+       <circle cx="74" cy="262" r="2.5" fill="#ff8a80"/><circle cx="340" cy="262" r="2.5" fill="#fff59d"/></g>
+    ${near}
+  </svg>`;
+}
+
+// ---- Small icons (UI) ----
+const IC = {
+  coin:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#f2c94c" stroke="#a87b15" stroke-width="2"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 010 3h-3a1.5 1.5 0 000 3h4" stroke="#a87b15" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>',
+  sword:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4h6v6L9 21l-3-3L17 7"/><path d="M5 14l5 5M3 21l3-3"/></svg>',
+  leaf:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 19C5 9 11 4 20 4c0 9-5 15-15 15z"/><path d="M5 19L14 10"/></svg>',
+  heal:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  shield:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>',
+  bag:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 8h12l1 12H5z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>',
+  run:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="14" cy="4.5" r="2"/><path d="M8 21l3-6 3 2v4M6 12l3-4h4l3 4h3M11 15l1-6"/></svg>',
+  home:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-5h4v5"/></svg>',
+  back:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  bed:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 00-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>',
+  gear:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',
+  check:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="#8fd14f" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>',
+  lock:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>',
+  up:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  copy:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/></svg>',
+  star:'<svg class="i" viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.6 5.7 21l1.5-7L2 9.3l7-.8z" fill="#f2c94c" stroke="#a87b15" stroke-width="1.2"/></svg>',
+  bash:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h10v10q0 4-5 6-5-2-5-6z"/><path d="M17 7l4-2M17 11h4M17 15l4 2"/></svg>',
+  charge:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21L17 7M13 5h6v6"/><path d="M3 14l3 3M7 10l3 3"/></svg>',
+  thrust:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h13l3-2v4l-3-2"/><path d="M6 9v6M20 12h2"/></svg>',
+  smash:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v12M9 5h6"/><path d="M3 20c3-3 6-3 9-1s6 2 9-1M5 16l-2-2M19 16l2-2"/></svg>',
+  powder:'<svg class="i" viewBox="0 0 24 24"><path d="M7 9h10l2 10a3 3 0 01-3 3H8a3 3 0 01-3-3z" fill="#7e57c2" stroke="#311b92" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 9q4 3 8 0" fill="none" stroke="#d1c4e9" stroke-width="1.4"/><path d="M9 9l1-3h4l1 3" fill="#b39ddb" stroke="#311b92" stroke-width="1.2"/><circle cx="10" cy="15" r="1.2" fill="#ede7f6"/><circle cx="14" cy="17" r="1" fill="#ede7f6"/><path d="M18 3l.7 1.6L20.3 5l-1.6.7L18 7.3l-.7-1.6L15.7 5l1.6-.7z M5 4l.5 1.1 1.1.5-1.1.5L5 7.2l-.5-1.1L3.4 5.6l1.1-.5z" fill="#ffe082"/></svg>',
+  user:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4-6.5 8-6.5s7 2 8 6.5"/></svg>'
+};
+// Big colourful menu icons
+const TILE = {
+  quest:`<svg viewBox="0 0 48 48"><path d="M12 8h22a4 4 0 014 4v26a4 4 0 01-4 4H14" fill="#f3e2b6" stroke="#8a6a3a" stroke-width="2"/><path d="M12 8a4 4 0 00-4 4v4h8v-4a4 4 0 00-4-4z" fill="#d9c28a" stroke="#8a6a3a" stroke-width="2"/><path d="M16 12v26a4 4 0 01-4 4 4 4 0 01-4-4v-2h8" fill="#e8d39d" stroke="#8a6a3a" stroke-width="2"/><path d="M21 18h12M21 24h12M21 30h8" stroke="#8a6a3a" stroke-width="2.4" stroke-linecap="round"/><circle cx="34" cy="36" r="5" fill="#e5533d" stroke="#8e2a1a" stroke-width="1.5"/></svg>`,
+  story:`<svg viewBox="0 0 48 48"><path d="M6 10l11-4 14 4 11-4v32l-11 4-14-4-11 4z" fill="#cfe8a8" stroke="#3d6b2a" stroke-width="2" stroke-linejoin="round"/><path d="M17 6v32M31 10v32" stroke="#3d6b2a" stroke-width="2"/><path d="M10 30q6-10 12-4t14-10" stroke="#a0522d" stroke-width="2.4" stroke-dasharray="3 3" fill="none"/><path d="M34 12l4 4M38 12l-4 4" stroke="#e5533d" stroke-width="2.6" stroke-linecap="round"/><path d="M12 22l4-6 4 6z" fill="#2e7d32"/></svg>`,
+  shop:`<svg viewBox="0 0 48 48"><path d="M10 18h28l-3 22H13z" fill="#a0522d" stroke="#5a2e12" stroke-width="2" stroke-linejoin="round"/><path d="M16 18v-4a8 8 0 0116 0v4" stroke="#5a2e12" stroke-width="2.4" fill="none"/><circle cx="24" cy="29" r="7" fill="#f2c94c" stroke="#a87b15" stroke-width="2"/><path d="M24 25v8" stroke="#a87b15" stroke-width="2" stroke-linecap="round"/></svg>`,
+  pvp:`<svg viewBox="0 0 48 48"><g stroke-linecap="round"><path d="M10 8l20 20" stroke="#cfd8dc" stroke-width="5"/><path d="M38 8L18 28" stroke="#cfd8dc" stroke-width="5"/><path d="M26 30l-6-6M22 30l6-6" stroke="#f2c94c" stroke-width="4"/><path d="M14 34l-6 6M34 34l6 6" stroke="#8a5a33" stroke-width="5"/><path d="M12 28l8 8M36 28l-8 8" stroke="#f2c94c" stroke-width="4"/></g></svg>`,
+  set:`<svg viewBox="0 0 48 48"><path d="M8 30h28l-4 6H12z" fill="#607d8b" stroke="#263238" stroke-width="2" stroke-linejoin="round"/><path d="M6 24h30a6 6 0 01-6 6H12a6 6 0 01-6-6z" fill="#90a4ae" stroke="#263238" stroke-width="2"/><rect x="14" y="36" width="12" height="6" fill="#455a64" stroke="#263238" stroke-width="2"/><g transform="rotate(35 34 14)"><rect x="31" y="4" width="6" height="22" rx="2" fill="#8a5a33" stroke="#5a2e12" stroke-width="1.6"/><rect x="26" y="2" width="16" height="8" rx="2" fill="#b0bec5" stroke="#263238" stroke-width="1.6"/></g></svg>`,
+  login:`<svg viewBox="0 0 48 48"><rect x="10" y="22" width="28" height="20" rx="4" fill="#f2c94c" stroke="#a87b15" stroke-width="2"/><path d="M16 22v-6a8 8 0 0116 0v6" stroke="#90a4ae" stroke-width="4" fill="none"/><circle cx="24" cy="31" r="3" fill="#5a3e0a"/><path d="M24 33v4" stroke="#5a3e0a" stroke-width="3" stroke-linecap="round"/></svg>`
+};
+// Item & gear icons
+function bottle(c1, c2){ return `<svg class="ii" viewBox="0 0 32 32"><path d="M13 4h6v6l5 6a8 8 0 01-16 0l5-6z" fill="#dfeff7" stroke="#4b5d66" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 17a7 7 0 0013.6 0z" fill="${c1}"/><circle cx="13" cy="20" r="1.6" fill="${c2}"/><rect x="12" y="2" width="8" height="3.5" rx="1" fill="#a0522d"/></svg>`; }
+function swordIc(c){ return `<svg class="ii" viewBox="0 0 32 32"><path d="M22 4h6v6L13 25l-6-6z" fill="${c}" stroke="#37474f" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 17l9 9" stroke="#f2c94c" stroke-width="3" stroke-linecap="round"/><path d="M8 24l-4 4" stroke="#6b4428" stroke-width="3.4" stroke-linecap="round"/></svg>`; }
+function armorIc(c, t){ return `<svg class="ii" viewBox="0 0 32 32"><path d="M8 6l5-2q3 3 6 0l5 2 4 6-4 2v14H8V14l-4-2z" fill="${c}" stroke="#37474f" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 14h8M12 19h8" stroke="${t}" stroke-width="2"/></svg>`; }
+
+// Item icons (stat gear) — detailed, with rarity glow
+const RARITY = { common:'#b0bec5', rare:'#4fc3f7', epic:'#ce93d8', legend:'#ffd54a' };
+function gIcon(t){
+  const glow = (c) => `<radialGradient id="gl-${t}"><stop offset="0" stop-color="${c}" stop-opacity=".55"/><stop offset=".6" stop-color="${c}" stop-opacity=".12"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`;
+  const W = (rar, defs, body) => `<svg class="ii gi" viewBox="0 0 48 48"><defs>${glow(RARITY[rar])}
+    <linearGradient id="stl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#c9d4db"/><stop offset="1" stop-color="#6e7f8a"/></linearGradient>
+    <linearGradient id="gld" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#f2c94c"/><stop offset="1" stop-color="#a8741a"/></linearGradient>
+    ${defs}</defs><circle cx="24" cy="24" r="23" fill="url(#gl-${t})"/>${body}</svg>`;
+  switch(t){
+    case 'chain': return W('common', ``, `
+      <g fill="none" stroke-linecap="round">
+        <g transform="rotate(-45 24 24)">
+          <rect x="4" y="18" width="16" height="12" rx="6" stroke="#37474f" stroke-width="6"/><rect x="4" y="18" width="16" height="12" rx="6" stroke="url(#stl)" stroke-width="3.6"/>
+          <rect x="28" y="18" width="16" height="12" rx="6" stroke="#37474f" stroke-width="6"/><rect x="28" y="18" width="16" height="12" rx="6" stroke="url(#stl)" stroke-width="3.6"/>
+          <rect x="18" y="20" width="12" height="8" rx="4" transform="rotate(90 24 24)" stroke="#37474f" stroke-width="6"/><rect x="18" y="20" width="12" height="8" rx="4" transform="rotate(90 24 24)" stroke="url(#stl)" stroke-width="3.6"/>
+        </g>
+        <path d="M9 30l3-3M30 9l3-3" stroke="#fff" stroke-width="1.6" opacity=".8"/>
+      </g>
+      <circle cx="38" cy="38" r="5.5" fill="#455a64" stroke="#263238" stroke-width="1.4"/><path d="M38 31.5v-2M44.5 38h2M38 44.5v2M31.5 38h-2M42.6 33.4l1.4-1.4M42.6 42.6l1.4 1.4" stroke="#263238" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="36.5" cy="36.5" r="1.6" fill="#b0bec5"/>`);
+    case 'dagger': return W('common', `<linearGradient id="dgb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#d7e0e6"/><stop offset=".51" stop-color="#9eafba"/><stop offset="1" stop-color="#7d8f9b"/></linearGradient>`, `
+      <g transform="rotate(45 24 24)">
+        <path d="M24 2 L29 10 L28 30 L20 30 L19 10Z" fill="url(#dgb)" stroke="#37474f" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M24 6 L24 28" stroke="#5d6f7a" stroke-width="1.2"/>
+        <path d="M14 30 Q24 27 34 30 L33 34 Q24 31.5 15 34Z" fill="url(#gld)" stroke="#6b4a10" stroke-width="1.2"/>
+        <circle cx="14.5" cy="32" r="2" fill="url(#gld)" stroke="#6b4a10" stroke-width="1"/><circle cx="33.5" cy="32" r="2" fill="url(#gld)" stroke="#6b4a10" stroke-width="1"/>
+        <rect x="21.5" y="33.5" width="5" height="9" rx="1.5" fill="#5d3a1f" stroke="#2e1a0b" stroke-width="1"/>
+        <path d="M21.5 36l5 1.5M21.5 39l5 1.5" stroke="#8a5a33" stroke-width="1.2"/>
+        <circle cx="24" cy="44.5" r="3" fill="#e53935" stroke="#7f0000" stroke-width="1.2"/><circle cx="23" cy="43.6" r="1" fill="#ffcdd2"/>
+      </g>`);
+    case 'feather': return W('rare', `<linearGradient id="ftg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".4" stop-color="#b3ecff"/><stop offset="1" stop-color="#0288d1"/></linearGradient>`, `
+      <path d="M6 30 Q14 26 20 30 M4 36 Q14 31 24 36 M10 42 Q18 38 26 41" stroke="#81d4fa" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
+      <path d="M40 4 C22 6 12 18 13 38 C20 35 26 30 30 24 L25 24 L32 20 L28 19 L35 14 L31 13 C35 10 38 7 40 4Z" fill="url(#ftg)" stroke="#01579b" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M13 38 L37 8" stroke="#01579b" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M10 44 L14 37" stroke="#4e342e" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M19 30l-3-4M23 26l-3-5M27 21l-2-5M31 16l-2-4" stroke="#0277bd" stroke-width="1" opacity=".7"/>
+      <circle cx="36" cy="30" r="1.4" fill="#fff"/><circle cx="40" cy="20" r="1" fill="#fff"/>`);
+    case 'eye': return W('rare', `<radialGradient id="eyg" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#e3f2fd"/><stop offset=".35" stop-color="#42a5f5"/><stop offset="1" stop-color="#0d47a1"/></radialGradient>`, `
+      <path d="M17 18 Q6 12 2 18 Q8 18 6 22 Q12 20 11 25 Q15 22 17 24Z M31 18 Q42 12 46 18 Q40 18 42 22 Q36 20 37 25 Q33 22 31 24Z" fill="url(#gld)" stroke="#6b4a10" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M24 4 L26 9 L22 9Z" fill="url(#gld)" stroke="#6b4a10" stroke-width="1"/>
+      <circle cx="24" cy="24" r="13" fill="url(#gld)" stroke="#6b4a10" stroke-width="1.5"/>
+      <circle cx="24" cy="24" r="10" fill="#3e2a05"/>
+      <path d="M15 24 Q24 15 33 24 Q24 33 15 24Z" fill="#fffde7"/>
+      <circle cx="24" cy="24" r="5.4" fill="url(#eyg)"/><circle cx="24" cy="24" r="2.2" fill="#0a1929"/><circle cx="22.2" cy="22.2" r="1.3" fill="#fff"/>
+      <path d="M24 38 L27 44 L24 42.5 L21 44Z" fill="#42a5f5" stroke="#0d47a1" stroke-width="1"/>`);
+    case 'mail': return W('rare', `<linearGradient id="mlg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eceff1"/><stop offset=".5" stop-color="#b0bec5"/><stop offset="1" stop-color="#607d8b"/></linearGradient>`, `
+      <path d="M8 12 Q14 6 19 8 Q24 12 29 8 Q34 6 40 12 L44 22 L37 24 L37 42 Q24 46 11 42 L11 24 L4 22Z" fill="url(#mlg)" stroke="#263238" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M19 8 Q24 15 29 8" fill="none" stroke="url(#gld)" stroke-width="2.4"/>
+      <path d="M11 24 L37 24" stroke="url(#gld)" stroke-width="2"/>
+      <path d="M24 17 L32 20 L31 29 Q28 35 24 37 Q20 35 17 29 L16 20Z" fill="#1565c0" stroke="url(#gld)" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M24 21 L27 26 L24 32 L21 26Z" fill="url(#gld)"/>
+      <path d="M13 30h4M13 34h5M13 38h5M31 30h4M30 34h5M30 38h5" stroke="#78909c" stroke-width="1.3" stroke-dasharray="1.4 1.2"/>
+      <path d="M10 14 Q12 11 15 10" stroke="#fff" stroke-width="1.6" fill="none" opacity=".9" stroke-linecap="round"/>`);
+    case 'elven': return W('epic', `<linearGradient id="elb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f1fff8"/><stop offset=".5" stop-color="#9ef0d0"/><stop offset=".51" stop-color="#4fbf98"/><stop offset="1" stop-color="#2a8a6a"/></linearGradient>`, `
+      <g transform="rotate(40 24 24)">
+        <path d="M24 0 Q30 10 27.5 31 L20.5 31 Q18 12 24 0Z" fill="url(#elb)" stroke="#0b4f3a" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M24 4 Q25.5 16 24 29" stroke="#e8fff6" stroke-width="1.1" fill="none"/>
+        <path d="M24 31 Q14 28 10 33 Q16 32 18 35 Q22 33 24 34 Q26 33 30 35 Q32 32 38 33 Q34 28 24 31Z" fill="#43a047" stroke="#1b5e20" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="M14 32 Q18 31 22 33 M34 32 Q30 31 26 33" stroke="#a5d6a7" stroke-width=".9" fill="none"/>
+        <rect x="22" y="34" width="4" height="9" rx="1.5" fill="#e0c79a" stroke="#6b4a10" stroke-width="1"/>
+        <path d="M22 36.5h4M22 39.5h4" stroke="#a87b15" stroke-width="1"/>
+        <path d="M24 43 l3 3 l-3 2 l-3 -2z" fill="#69f0ae" stroke="#00695c" stroke-width="1"/>
+      </g>
+      <circle cx="12" cy="10" r="1.3" fill="#b9f6ca"/><circle cx="38" cy="36" r="1.1" fill="#b9f6ca"/><circle cx="8" cy="30" r=".9" fill="#fff"/>`);
+    case 'heart': return W('epic', `<linearGradient id="hrg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8a80"/><stop offset=".5" stop-color="#e53935"/><stop offset="1" stop-color="#7f0000"/></linearGradient>`, `
+      <path d="M24 43 C8 32 4 22 8 14 C12 7 21 7 24 15 C27 7 36 7 40 14 C44 22 40 32 24 43Z" fill="url(#hrg)" stroke="#4a0000" stroke-width="1.6"/>
+      <path d="M24 15 L24 43 M8 14 L24 26 L40 14 M12 31 L24 26 L36 31" stroke="#ff5252" stroke-width="1" opacity=".75" fill="none"/>
+      <path d="M12 13 Q15 10 19 12 L14 20Z" fill="#fff" opacity=".55"/>
+      <path d="M4 24 Q2 18 6 12 M44 24 Q46 18 42 12" stroke="url(#gld)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M17 41 Q24 47 31 41" stroke="url(#gld)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <circle cx="24" cy="4" r="2.4" fill="url(#gld)" stroke="#6b4a10" stroke-width=".8"/><path d="M24 6.5 L24 10" stroke="url(#gld)" stroke-width="2"/>`);
+    case 'fang': return W('legend', `<linearGradient id="fgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffdf5"/><stop offset=".55" stop-color="#f3e2c3"/><stop offset="1" stop-color="#b08d57"/></linearGradient>
+      <linearGradient id="flm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff3d00"/><stop offset=".6" stop-color="#ff9100"/><stop offset="1" stop-color="#ffea00" stop-opacity="0"/></linearGradient>`, `
+      <path d="M11 42 Q3 32 11 20 Q12 27 17 28 Q13 16 23 5 Q24 17 29 19 Q31 11 38 9 Q35 19 40 25 Q45 34 38 42 Q24 50 11 42Z" fill="url(#flm)" opacity=".8"/><path d="M16 40 Q12 34 16 28 Q18 32 21 32 Q20 26 25 20 Q26 28 30 29 Q34 33 31 40 Q24 44 16 40Z" fill="#ffd54a" opacity=".55"/>
+      <path d="M14 8 Q36 10 38 30 Q36 40 26 44 Q32 30 14 8Z" fill="url(#fgg)" stroke="#5d4037" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M18 11 Q33 15 34 30" stroke="#fff" stroke-width="1.6" fill="none" opacity=".9" stroke-linecap="round"/>
+      <path d="M27 20 l3 -1 l-1 3 M31 27 l3 0 l-2 2 M30 34 l3 1 l-3 1" stroke="#d50000" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M12 6 Q16 4 20 7 L18 10 Q15 8 13 9Z" fill="url(#gld)" stroke="#6b4a10" stroke-width="1"/>
+      <circle cx="16" cy="7" r="1.6" fill="#d50000"/>`);
+  }
+}
+
+// Potion icons (artifacts)
+function pIcon(t){
+  const W = (c, defs, body) => `<svg class="ii gi" viewBox="0 0 48 48"><defs>
+    <radialGradient id="pg-${t}"><stop offset="0" stop-color="${c}" stop-opacity=".5"/><stop offset=".6" stop-color="${c}" stop-opacity=".1"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="gls" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset=".3" stop-color="#ffffff" stop-opacity=".12"/><stop offset="1" stop-color="#ffffff" stop-opacity=".05"/></linearGradient>
+    <linearGradient id="gld2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#f2c94c"/><stop offset="1" stop-color="#a8741a"/></linearGradient>
+    <linearGradient id="cork" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c58b52"/><stop offset="1" stop-color="#7a4a24"/></linearGradient>
+    ${defs}</defs><circle cx="24" cy="26" r="22" fill="url(#pg-${t})"/>${body}</svg>`;
+  switch(t){
+    case 'potion': return W('#ff5252', `<radialGradient id="liqR" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#ff8a80"/><stop offset=".6" stop-color="#e53935"/><stop offset="1" stop-color="#7f0000"/></radialGradient>`, `
+      <path d="M19 6h10v9q11 4 11 16a16 16 0 01-32 0q0-12 11-16z" fill="#e8f6fb" fill-opacity=".35" stroke="#37474f" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M10.2 29a13.8 13.8 0 0027.6 0q0-2-.6-3.6Q24 22 10.8 25.4q-.6 1.6-.6 3.6z" fill="url(#liqR)"/>
+      <path d="M24 39c-6-4-7-7-5.6-9 1.4-2 4.2-1.6 5.6.6 1.4-2.2 4.2-2.6 5.6-.6 1.4 2 .4 5-5.6 9z" fill="#ffcdd2" opacity=".9"/>
+      <circle cx="16" cy="33" r="1.6" fill="#ffcdd2" opacity=".8"/><circle cx="31" cy="27" r="1.2" fill="#ffcdd2" opacity=".8"/>
+      <path d="M13 26q2-7 9-9" stroke="url(#gls)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <rect x="17.5" y="12.5" width="13" height="3.4" rx="1.4" fill="url(#gld2)" stroke="#6b4a10" stroke-width=".9"/>
+      <path d="M19.5 2.5h9l-1 5h-7z" fill="url(#cork)" stroke="#4a2f1b" stroke-width="1"/>`);
+    case 'power': return W('#ffb300', `<linearGradient id="liqP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe57f"/><stop offset=".5" stop-color="#ffab00"/><stop offset="1" stop-color="#e65100"/></linearGradient>`, `
+      <path d="M20 5h8v11l12 22a4 4 0 01-3.6 6H11.6A4 4 0 018 38l12-22z" fill="#fff8e1" fill-opacity=".3" stroke="#3e2723" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M14.8 27h18.4l5 9.4a3 3 0 01-2.6 4.6H12.4a3 3 0 01-2.6-4.6z" fill="url(#liqP)"/>
+      <path d="M26 24l-6 9h4l-2 7 7-10h-4l2-6z" fill="#fff59d" stroke="#e65100" stroke-width="1" stroke-linejoin="round"/>
+      <path d="M17 22l-5 10" stroke="url(#gls)" stroke-width="3" stroke-linecap="round"/>
+      <rect x="18.5" y="13" width="11" height="3" rx="1.2" fill="url(#gld2)" stroke="#6b4a10" stroke-width=".9"/>
+      <path d="M19.5 1.5h9l-1 4.6h-7z" fill="url(#cork)" stroke="#4a2f1b" stroke-width="1"/>
+      <path d="M38 8l1.2 3 3 1.2-3 1.2L38 16.4l-1.2-3-3-1.2 3-1.2z M8 12l.8 2 2 .8-2 .8L8 17.6l-.8-2-2-.8 2-.8z" fill="#fff59d"/>`);
+    case 'iron': return W('#b0bec5', `<linearGradient id="liqI" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#b0bec5"/><stop offset="1" stop-color="#455a64"/></linearGradient>`, `
+      <path d="M18 5h12v7l6 4v24a4 4 0 01-4 4H16a4 4 0 01-4-4V16l6-4z" fill="#eceff1" fill-opacity=".3" stroke="#263238" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M13.8 24h20.4v16a2.6 2.6 0 01-2.6 2.6H16.4a2.6 2.6 0 01-2.6-2.6z" fill="url(#liqI)"/>
+      <path d="M24 26l7 2.6v5.4q0 5.4-7 8.2-7-2.8-7-8.2v-5.4z" fill="#546e7a" stroke="url(#gld2)" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M24 29v10M20 33h8" stroke="#eceff1" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M15.5 18v20" stroke="url(#gls)" stroke-width="3" stroke-linecap="round"/>
+      <rect x="16.5" y="10.5" width="15" height="3.2" rx="1.2" fill="#78909c" stroke="#263238" stroke-width=".9"/>
+      <path d="M18.5 1.5h11l-1 4.6h-9z" fill="#607d8b" stroke="#263238" stroke-width="1"/>
+      <circle cx="21" cy="3.8" r=".9" fill="#cfd8dc"/><circle cx="27" cy="3.8" r=".9" fill="#cfd8dc"/>`);
+    case 'bomb': return W('#ff6d00', `<radialGradient id="liqF" cx=".4" cy=".6" r=".7"><stop offset="0" stop-color="#ffff8d"/><stop offset=".45" stop-color="#ff9100"/><stop offset="1" stop-color="#bf360c"/></radialGradient>
+      <linearGradient id="fl2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff3d00"/><stop offset=".6" stop-color="#ffab00"/><stop offset="1" stop-color="#ffff8d"/></linearGradient>`, `
+      <circle cx="24" cy="31" r="14" fill="#fff3e0" fill-opacity=".3" stroke="#3e2723" stroke-width="1.8"/>
+      <path d="M11 31a13 13 0 0026 0q0-3-1.2-5.6Q24 30 12.2 25.4Q11 28 11 31z" fill="url(#liqF)"/>
+      <circle cx="19" cy="34" r="1.6" fill="#fff59d"/><circle cx="28" cy="30" r="1.2" fill="#fff59d"/><circle cx="25" cy="38" r="1" fill="#fff59d"/>
+      <path d="M14 26q3-6 9-7" stroke="url(#gls)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M20 12h8v6h-8z" fill="#fff3e0" fill-opacity=".35" stroke="#3e2723" stroke-width="1.6"/>
+      <path d="M19 15.5 Q24 18 29 15.5" stroke="#8d6e63" stroke-width="2.4" fill="none"/>
+      <path d="M24 12 Q25 9 24 7" stroke="#6d4c41" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path class="flame" d="M24 1 Q30 6 26.5 9.5 Q28 6 24.5 4.5 Q25 8 22 9.5 Q18 6 24 1z" fill="url(#fl2)"/>`);
+  }
+}
+
+// ---- Steel Sand desert background ----
+function sandBG(){
+  const gear = (x,y,r,c) => { let t=''; for(let i=0;i<8;i++){ const a=i*Math.PI/4; t+=`<rect x="${x-r*.18}" y="${y-r*1.22}" width="${r*.36}" height="${r*.5}" fill="${c}" transform="rotate(${i*45} ${x} ${y})"/>`; }
+    return t + `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/><circle cx="${x}" cy="${y}" r="${r*.4}" fill="#e9b872"/>`; };
+  return `<svg class="bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="sSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffcf8a"/><stop offset=".5" stop-color="#f7a75c"/><stop offset="1" stop-color="#e08a4a"/></linearGradient>
+      <linearGradient id="sD1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c27a"/><stop offset="1" stop-color="#c98b48"/></linearGradient>
+      <linearGradient id="sD2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7b066"/><stop offset="1" stop-color="#b8763a"/></linearGradient>
+      <linearGradient id="sSteel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6f7f8a"/><stop offset=".5" stop-color="#a9b6bf"/><stop offset="1" stop-color="#5a6873"/></linearGradient>
+      <radialGradient id="sSun"><stop offset="0" stop-color="#fffbe0"/><stop offset=".4" stop-color="#ffe8a8" stop-opacity=".9"/><stop offset="1" stop-color="#ffe8a8" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="400" height="300" fill="url(#sSky)"/>
+    <circle cx="90" cy="70" r="70" fill="url(#sSun)"/><circle cx="90" cy="70" r="24" fill="#fff4cf"/>
+    <path d="M0 160 Q60 130 130 150 Q200 170 260 140 Q330 115 400 145 L400 300 L0 300Z" fill="#e6a868" opacity=".7"/>
+    <g opacity=".85">
+      <rect x="250" y="70" width="16" height="100" fill="url(#sSteel)"/><rect x="246" y="66" width="24" height="8" fill="#7d8b95"/>
+      <path d="M266 90 L310 96 L310 104 L266 98Z" fill="#7d8b95"/><rect x="302" y="96" width="10" height="70" fill="url(#sSteel)"/>
+      <path d="M244 120 L276 112" stroke="#5a6873" stroke-width="3"/>
+      ${gear(330,120,16,'#8a7a66')}
+      <rect x="40" y="110" width="12" height="60" fill="url(#sSteel)" transform="rotate(-12 46 140)"/>
+      <path d="M30 108 L62 104 L60 112 L32 116Z" fill="#7d8b95" transform="rotate(-12 46 140)"/>
+    </g>
+    <path d="M0 190 Q90 160 190 185 Q280 205 400 175 L400 300 L0 300Z" fill="url(#sD1)"/>
+    <path d="M150 300 Q190 240 240 212 Q270 196 330 190 L345 194 Q282 202 258 222 Q222 250 210 300Z" fill="#d79a55" opacity=".6"/>
+    <path d="M0 240 Q70 220 140 238 Q220 258 300 232 Q350 218 400 230 L400 300 L0 300Z" fill="url(#sD2)"/>
+    <g fill="#6b8f3a" stroke="#4a6a25" stroke-width="1.5">
+      <path d="M352 250 v-34 q0-6 6-6 q6 0 6 6 v34z"/><path d="M352 232 h-6 q-4 0-4-4 v-8 q0-4 4-4 q4 0 4 4 v6 h2z"/><path d="M364 226 h6 v-10 q0-4 4-4 q4 0 4 4 v10 q0 4-4 4 h-10z"/>
+    </g>
+    ${gear(60,262,13,'#7a6a58')}
+    <path d="M40 275 l40-6 l2 6 l-40 6z" fill="#8a9aa5" opacity=".8"/>
+    <g fill="#fff3d6" opacity=".5"><circle cx="120" cy="250" r="1.4"/><circle cx="220" cy="270" r="1.2"/><circle cx="300" cy="258" r="1.5"/></g>
+  </svg>`;
+}
+
+// ---- Skill emblems ----
+function sIcon(id){
+  const th = {
+    atk:['#4caf50','#1b5e20'], leaf:['#8bc34a','#1b5e20'], guard:['#26a69a','#004d40'], heal:['#9ccc65','#33691e'],
+    gladius:['#e53935','#6d0f0a'], thrust:['#42a5f5','#0d2f6b'], testudo:['#c62828','#4a0b07'], smash:['#ff9800','#6d2a00']
+  }[id] || ['#607d8b','#263238'];
+  const bg = `<defs><radialGradient id="sb-${id}" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="${th[0]}"/><stop offset="1" stop-color="${th[1]}"/></radialGradient>
+    <linearGradient id="sst" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#cfd8dc"/><stop offset="1" stop-color="#78909c"/></linearGradient>
+    <linearGradient id="sgd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#f2c94c"/><stop offset="1" stop-color="#a8741a"/></linearGradient></defs>
+    <circle cx="24" cy="24" r="22" fill="url(#sb-${id})"/><circle cx="24" cy="24" r="22" fill="none" stroke="url(#sgd)" stroke-width="2.4"/>
+    <circle cx="24" cy="24" r="18.5" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="1"/>
+    <path d="M9 17 A17 17 0 0 1 31 7" stroke="#fff" stroke-opacity=".35" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  const sword = (rot, len=26, col='url(#sst)') => `<g transform="rotate(${rot} 24 24)">
+    <path d="M24 ${24-len/2-6} L27 ${24-len/2-1} L26.6 ${24+len/2-6} L21.4 ${24+len/2-6} L21 ${24-len/2-1}Z" fill="${col}" stroke="#263238" stroke-width="1.1" stroke-linejoin="round"/>
+    <rect x="16.5" y="${24+len/2-7}" width="15" height="3.4" rx="1.6" fill="url(#sgd)" stroke="#5a3e0a" stroke-width=".8"/>
+    <rect x="22.4" y="${24+len/2-3.6}" width="3.2" height="7" rx="1" fill="#5d3a1f"/><circle cx="24" cy="${24+len/2+4.4}" r="2.2" fill="url(#sgd)"/></g>`;
+  const b = {
+    atk: sword(40) + `<path d="M10 34 Q22 30 36 12" stroke="#e8f5e9" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>`,
+    leaf: `<path d="M8 30 Q16 12 38 10 Q30 30 8 30Z" fill="#c5e1a5" opacity=".35"/>` + sword(40, 26, '#b9f6ca') +
+      `<path d="M12 14 q5-4 8 1 q-5 3-8-1z M34 34 q5-4 8 1 q-5 3-8-1z M33 13 q3-5 7-2 q-3 4-7 2z" fill="#aeea00" stroke="#33691e" stroke-width=".8"/>`,
+    guard: `<path d="M24 9 L36 13 V24 Q36 34 24 40 Q12 34 12 24 V13Z" fill="#80cbc4" stroke="#004d40" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M24 12.5 L33 15.6 V24 Q33 31.6 24 36.4Z" fill="#4db6ac"/>
+      <path d="M24 16 Q31 20 24 33 Q17 20 24 16Z" fill="#e0f2f1" stroke="#00695c" stroke-width="1"/><path d="M24 18 V31" stroke="#00695c" stroke-width="1"/>`,
+    heal: `<circle cx="24" cy="24" r="12" fill="#f1f8e9" opacity=".25"/>
+      <path d="M20 11 h8 v9 h9 v8 h-9 v9 h-8 v-9 h-9 v-8 h9z" fill="#f1f8e9" stroke="#33691e" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M22 13 h4 v9 h9 v4" stroke="#ffffff" stroke-width="1.4" fill="none" opacity=".8"/>
+      <circle cx="12" cy="12" r="1.6" fill="#fff"/><circle cx="37" cy="36" r="1.4" fill="#fff"/><circle cx="36" cy="11" r="1" fill="#fff"/>`,
+    gladius: sword(-35, 24) + `<path d="M12 12 l4 4 M36 12 l-4 4 M10 24 h4" stroke="#ffcdd2" stroke-width="2" stroke-linecap="round" opacity=".8"/>`,
+    thrust: `<path d="M5 18 h10 M3 24 h12 M5 30 h10" stroke="#bbdefb" stroke-width="2" stroke-linecap="round" opacity=".85"/>` + sword(90, 28) +
+      `<circle cx="42" cy="24" r="3" fill="#fff" opacity=".9"/><path d="M38 18 l4 6 l-4 6" stroke="#fff" stroke-width="1.6" fill="none" opacity=".7"/>`,
+    testudo: `<path d="M13 10 Q24 7 35 10 L35 38 Q24 41 13 38Z" fill="#d32f2f" stroke="#3e0a07" stroke-width="1.6"/>
+      <path d="M15.5 12.5 Q24 10 32.5 12.5 L32.5 35.5 Q24 38 15.5 35.5Z" fill="none" stroke="url(#sgd)" stroke-width="1.6"/>
+      <circle cx="24" cy="24" r="4.6" fill="url(#sgd)" stroke="#5a3e0a" stroke-width="1"/>
+      <path d="M24 13 l1.8 5 -1.8-1.6 -1.8 1.6z M24 35 l1.8-5 -1.8 1.6 -1.8-1.6z M17 24 h3 M28 24 h3" stroke="#f2c94c" fill="#f2c94c" stroke-width="1.3"/>`,
+    smash: `<path d="M6 38 L14 33 L20 37 L24 32 L28 37 L34 33 L42 38" stroke="#ffe0b2" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <path d="M10 41 Q24 34 38 41" stroke="#ffcc80" stroke-width="2.4" fill="none" opacity=".8"/>` + sword(180, 24) +
+      `<path d="M24 31 l-7 -4 M24 31 l7 -4 M24 31 l-9 3 M24 31 l9 3" stroke="#fff3e0" stroke-width="1.6" stroke-linecap="round"/>`
+  }[id] || '';
+  return `<svg class="si" viewBox="0 0 48 48" aria-hidden="true">${bg}${b}</svg>`;
+}
+
+// ====== GAME DATA (edit names / prices / stats here) ======
+const KEY = 'starquest_save_v1';          // guest save
+const ACC_KEY = 'sq_accounts', CUR_KEY = 'sq_current';
+
+// Characters — base stats (levels do NOT change stats; items do). Every character has 20% crit rate.
+// skills: [normal attack, skill 1 (CD 1), skill 2 (CD 2), skill 3 (CD 5)]
 const CHARS = {
-  pilot: { n:'นักบินอวกาศ', e:'🧑‍🚀', d:'สมดุลทุกด้าน' }
+  pilot:     { n:'Ranger',    art:'hero', d:'Swift forest guardian', hp:80,  atk:16, def:0, spd:15, skills:['atk','leaf','guard','heal'] },
+  valcarile: { n:'Valcarile', art:'valc', d:'Roman legionary',       hp:100, atk:20, def:0, spd:20, skills:['gladius','thrust','testudo','smash'] }
 };
+const CD = [0, 1, 2, 5];    // cooldown (turns) for normal, skill 1, skill 2, skill 3
+// Skills — kind: hit | heal | guard
+// Damage = ATK × mult (e.g. ATK 20, mult 0.5 → 10). Critical hits deal ×2.
+const SKILLS = {
+  // Ranger
+  atk:     { n:'Attack',         kind:'hit',   mult:.9,  icon:'sword',  d:'Sword strike' },
+  leaf:    { n:'Leaf Blade',     kind:'hit',   mult:1,   big:true, fx:'leaf', color:'#8fd14f', icon:'leaf', d:'Nature-charged slash' },
+  guard:   { n:'Guard',          kind:'guard', block:.5, icon:'shield', d:'Reduce the next hit by 50%' },
+  heal:    { n:'Heal',           kind:'heal',  healAtk:2, icon:'heal',  d:'Heal HP equal to 200% ATK' },
+  // Valcarile
+  gladius: { n:'Gladius',        kind:'hit',   mult:1.1, icon:'sword',  d:'Heavy gladius slash' },
+  thrust:  { n:'Gladius Thrust', kind:'hit',   mult:1.2, anim:'thrust', fx:'spark', color:'#e8f4ff', icon:'thrust', cutCd:[3,1], d:'Lightning-fast thrust. Also cuts Skill 3 cooldown by 1 turn' },
+  testudo: { n:'Testudo',        kind:'guard', block:.5, anim:'shield', icon:'shield', resetCd:1, d:'Raise the shield: reduce the next hit by 50% and reset Skill 1 cooldown' },
+  smash:   { n:'Legion Smash',   kind:'hit',   mult:2,   aoe:true, anim:'slam', fx:'spark', color:'#ffb74a', icon:'smash', d:'Leap and slam the ground — hits ALL enemies' }
+};
+const skillDmg = (K, boost=1) => Math.round(atk() * boost * K.mult);
+// Artifacts = buff potions (equip 2 to bring into battle)
 const ITEMS = {
-  potion: { n:'ยาฟื้นพลัง',      e:'🧪', d:'ฟื้น HP 40',                 p:20 },
-  ether:  { n:'แบตเตอรี่พลังงาน', e:'🔋', d:'ฟื้น MP 15',                 p:25 },
-  bomb:   { n:'ระเบิดพลาสมา',    e:'💣', d:'ศัตรูโดน 35 ดาเมจ (ใช้ตอนสู้)', p:40, battleOnly:true }
+  potion: { n:'Health Potion',    icon:()=>pIcon('potion'), d:'Restore 35% HP',                 p:25 },
+  power:  { n:'Power Potion',     icon:()=>pIcon('power'), d:'ATK +50% for 3 turns',           p:35 },
+  iron:   { n:'Iron Skin Potion', icon:()=>pIcon('iron'), d:'Take 50% less damage for 3 turns', p:35 },
+  bomb:   { n:'Fire Flask',       icon:()=>pIcon('bomb'), d:'Throw for 45 damage',            p:40 }
 };
+// Items = stat gear (any character can equip up to 4). s = stats it adds
 const GEAR = {
-  w1: { n:'ปืนเลเซอร์',      e:'🔫', t:'atk', v:5,  p:80  },
-  w2: { n:'ดาบพลาสมา',      e:'🗡️', t:'atk', v:12, p:220 },
-  w3: { n:'ปืนใหญ่ควอนตัม',  e:'☄️', t:'atk', v:22, p:500 },
-  a1: { n:'เกราะนาโน',       e:'🦺', t:'def', v:4,  p:100 },
-  a2: { n:'เกราะไททาเนียม',  e:'🛡️', t:'def', v:9,  p:260 },
-  a3: { n:'โล่พลังงาน',      e:'💠', t:'def', v:16, p:550 }
+  chain:  { n:'Iron Chain',       r:'common', icon:()=>gIcon('chain'),  s:{hp:30},         p:80  },
+  dagger: { n:'Sharp Dagger',     r:'common', icon:()=>gIcon('dagger'), s:{atk:10},        p:100 },
+  feather:{ n:'Wind Feather',     r:'rare', icon:()=>gIcon('feather'),s:{spd:4,atk:5},         p:120 },
+  eye:    { n:"Eagle's Eye",      r:'rare', icon:()=>gIcon('eye'),    s:{crit:10},        p:150 },
+  mail:   { n:'Guardian Mail',    r:'rare', icon:()=>gIcon('mail'),   s:{def:10},         p:200 },
+  elven:  { n:'Elven Blade',      r:'epic', icon:()=>gIcon('elven'),  s:{atk:15,crit:5}, p:250 },
+  heart:  { n:'Titan Heart',      r:'epic', icon:()=>gIcon('heart'),  s:{hp:100},         p:420 },
+  fang:   { n:'Dragon Fang',      r:'legend', icon:()=>gIcon('fang'),   s:{atk:30,crit:20}, p:550 }
 };
+const RAR_N = {common:'Common', rare:'Rare', epic:'Epic', legend:'Legendary'};
+const rarTag = k => `<span class="rar r-${GEAR[k].r}">${RAR_N[GEAR[k].r]}</span>`;
+const STATN = {hp:'HP', atk:'ATK', def:'DEF', spd:'SPEED', crit:'CRIT'};
+const OLD_PRICES = {w1:80,w2:200,w3:350,w4:550,a1:100,a2:260,a3:550};
 const MAX_UP = 10;
 const ENEMIES = [
-  {n:'หุ่นสอดแนม',e:'🤖'},{n:'สไลม์อวกาศ',e:'🦠'},{n:'แมงมุมเหล็ก',e:'🕷️'},
-  {n:'โจรอวกาศ',e:'👾'},{n:'ยานรบไร้คนขับ',e:'🛸'}
+  {n:'Green Slime', art:'slime', spd:8}, {n:'Angry Mushroom', art:'mushroom', spd:11},
+  {n:'Cave Bat', art:'bat', fly:true, spd:24}, {n:'Goblin', art:'goblin', spd:14}
 ];
-const BOSSES = [{n:'ราชาเอเลี่ยน',e:'👽'},{n:'มังกรดวงดาว',e:'🐉'},{n:'AI ผู้พิทักษ์',e:'🧠'}];
+const BOSSES = [{n:'Goblin King', art:'king', spd:16}, {n:'Ancient Treant', art:'treant', spd:9}, {n:'Forest Dragon', art:'dragon', spd:26}];
+// Steel Sand mode: desert enemies (recoloured art) — farm Magic Powder
+const STEEL_ENEMIES = [
+  {n:'Sand Slime',   art:'slime',    spd:10, tint:'hue-rotate(-55deg) saturate(1.4) brightness(1.05)'},
+  {n:'Iron Shroom',  art:'mushroom', spd:12, tint:'grayscale(.85) brightness(1.1) contrast(1.1)'},
+  {n:'Dune Bat',     art:'bat',      spd:26, fly:true, tint:'hue-rotate(150deg) saturate(.9)'},
+  {n:'Scrap Goblin', art:'goblin',   spd:15, tint:'sepia(.7) saturate(1.2) hue-rotate(-12deg)'}
+];
+const STEEL_BOSSES = [
+  {n:'Scrap King', art:'king',   spd:18, tint:'sepia(.55) saturate(1.4) hue-rotate(-15deg)'},
+  {n:'Sand Wyrm',  art:'dragon', spd:27, tint:'hue-rotate(-75deg) saturate(1.2) brightness(1.05)'}
+];
+const POWDER_PER = st => st * 2;         // Magic Powder from Steel Sand stage st (+2 each stage)
+const RAR_MULT = {common:1, rare:1.5, epic:2, legend:3};
 const CHAPTERS = [
-  { n:'ชายแดนดวงดาว', t:'สัญญาณขอความช่วยเหลือดังมาจากชายแดนกาแล็กซี หุ่นสอดแนมปริศนากำลังบุกฐานทัพ คุณคือนักบินคนเดียวที่ยังเหลืออยู่...' },
-  { n:'เนบิวลาสีเลือด', t:'ร่องรอยของศัตรูพาคุณเข้าสู่เนบิวลาสีแดง ที่นี่มีสัตว์ประหลาดที่กลายพันธุ์จากพลังงานดวงดาว และมีบางอย่างตัวใหญ่รออยู่ข้างใน...' },
-  { n:'แกนกลาง AI', t:'เบื้องหลังทุกอย่างคือ AI ที่ควบคุมกองทัพหุ่นยนต์ คุณต้องบุกเข้าไปในแกนกลางของมันเพื่อหยุดการโจมตีให้ได้!' },
-  { n:'ห้วงอวกาศลึก', t:'AI ถูกหยุดแล้ว แต่สัญญาณใหม่ดังมาจากห้วงอวกาศที่ไม่มีใครเคยไป ศัตรูเก่งขึ้นเรื่อย ๆ ...การผจญภัยยังไม่จบ' }
+  { n:'Whispering Woods', t:'Strange creatures have crept out of the old forest and the village is in danger. Grab your sword — the Goblin King is gathering an army among the trees.' },
+  { n:'The Ancient Grove', t:'Beyond the goblin camp lies a grove where the trees themselves have awakened — old, angry and wild. Something ancient guards its heart.' },
+  { n:"Dragon's Hollow", t:'Deep in the forest sleeps a dragon whose dark magic has twisted the woods. Defeat it, and the forest will finally heal.' },
+  { n:'The Endless Wilds', t:'The forest is safe again... for now. But hidden paths lead deeper, where every foe is stronger than the last. The adventure continues!' }
 ];
-// เควส: ทำครบแต่ละขั้นแล้วกดรับรางวัล
+// Quests: finish each tier, then claim the reward
 const QUESTS = [
-  { id:'win',   n:'ชนะการต่อสู้',  s:'wins',   g:[3,10,25,50,100,200], r:t=>({gold:30*(t+1)}) },
-  { id:'boss',  n:'ล้มบอส',        s:'bosses', g:[1,3,5,10,20],        r:t=>({gold:100*(t+1), item:'bomb'}) },
-  { id:'laser', n:'ใช้เลเซอร์',     s:'lasers', g:[5,20,50,100,200],    r:t=>({gold:40*(t+1), item:'ether'}) },
-  { id:'buy',   n:'ซื้อของในร้าน',  s:'buys',   g:[1,5,15,30,60],       r:t=>({gold:30*(t+1), item:'potion'}) },
-  { id:'lv',    n:'เลเวลถึง',       s:'lv',     g:[3,5,10,15,20,30],    r:t=>({gold:80*(t+1)}) }
+  { id:'win',   s:'wins',   g:[3,10,25,50,100,200], l:g=>`Win ${g} battles`,                       r:t=>({gold:30*(t+1)}) },
+  { id:'boss',  s:'bosses', g:[1,3,5,10,20],        l:g=>`Defeat ${g} boss${g>1?'es':''}`,         r:t=>({gold:100*(t+1), item:'bomb'}) },
+  { id:'laser', s:'lasers', g:[5,20,50,100,200],    l:g=>`Use skills ${g} times`,                  r:t=>({gold:40*(t+1), item:'power'}) },
+  { id:'buy',   s:'buys',   g:[1,5,15,30,60],       l:g=>`Buy ${g} item${g>1?'s':''} in the shop`, r:t=>({gold:30*(t+1), item:'potion'}) },
+  { id:'lv',    s:'lv',     g:[3,5,10,15,20,30],    l:g=>`Reach Lv.${g}`,                          r:t=>({gold:80*(t+1)}) }
 ];
 
-// ====== กันการซูมบนมือถือ ======
+// ====== Block zooming on phones ======
 ['gesturestart','gesturechange','gestureend'].forEach(ev =>
   document.addEventListener(ev, e => e.preventDefault(), {passive:false}));
 document.addEventListener('touchmove', e => { if(e.touches.length > 1) e.preventDefault(); }, {passive:false});
 
-// ====== สถานะ & การบันทึก ======
+// ====== Helpers ======
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let storageOK = true;
+function lsGet(k){ try{ return localStorage.getItem(k); } catch(e){ storageOK = false; return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); } catch(e){ storageOK = false; } }
+function lsDel(k){ try{ localStorage.removeItem(k); } catch(e){ storageOK = false; } }
+const artOf = key => key==='king' ? ART.goblin(true) : ART[key]();
+const G = n => `<span class="gold">${IC.coin} ${n}</span>`;
+
+// ====== State & saving ======
 function newGame(){
-  return {char:'pilot',lv:1,exp:0,hp:60,mhp:60,mp:20,mmp:20,batk:10,bdef:3,gold:30,stage:1,best:1,
-          inv:{potion:3,ether:1,bomb:1},gear:[],w:null,a:null,up:{},
+  return {char:'pilot',lv:1,exp:0,hp:80,gold:30,stage:1,best:1,
+          inv:{potion:3,power:1,iron:0,bomb:1},arts:['potion','power'],gear:[],eq:[],up:{},powder:0,ss:1,
           st:{wins:0,bosses:0,lasers:0,buys:0},qt:{}};
 }
 function fix(o){
   const s = Object.assign(newGame(), o);
   if(!o.st) s.st = {wins:o.wins||0, bosses:Math.floor(((o.stage||1)-1)/5), lasers:0, buys:0};
   if(!CHARS[s.char]) s.char = 'pilot';
+  // older saves: mana potions become power potions, armor is gone, weapons only
+  s.inv = Object.assign({potion:0,power:0,iron:0,bomb:0}, s.inv);
+  if(s.inv.ether){ s.inv.power += s.inv.ether; delete s.inv.ether; }
+  // old weapons/armor are refunded as gold
+  (s.gear||[]).forEach(k => { if(!GEAR[k] && OLD_PRICES[k]) s.gold += OLD_PRICES[k]; });
+  s.gear = (s.gear||[]).filter(k => GEAR[k]);
+  s.eq = (s.eq||[]).filter(k => s.gear.includes(k)).slice(0,4);
+  delete s.w; delete s.mhp; delete s.batk; delete s.bdef;
+  if(!Array.isArray(s.arts) || s.arts.length !== 2) s.arts = ['potion','power'];
+  s.arts = s.arts.map(k => ITEMS[k] ? k : 'potion');
+  delete s.mp; delete s.mmp; delete s.a;
   return s;
 }
-function load(){
-  try{ const t = localStorage.getItem(KEY); return t ? fix(JSON.parse(t)) : null; }
-  catch(e){ storageOK = false; return null; }
+// ---- One-time fresh start (new forest version): all progress resets, accounts (ID + password) are kept ----
+const RESET_VER = 'forest-1';
+if(lsGet('sq_reset') !== RESET_VER){
+  try{
+    lsDel(KEY);
+    Object.keys(localStorage).filter(k => k.startsWith('sq_save_')).forEach(k => lsDel(k));
+  }catch(e){}
+  lsSet('sq_reset', RESET_VER);
 }
-function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
-  catch(e){ storageOK = false; }
-}
+function accounts(){ try{ return JSON.parse(lsGet(ACC_KEY) || '{}'); } catch(e){ return {}; } }
+let CUR = lsGet(CUR_KEY);
+if(CUR && !accounts()[CUR.toLowerCase()]) CUR = null;
+const saveKey = () => CUR ? 'sq_save_' + CUR.toLowerCase() : KEY;
+function load(){ const t = lsGet(saveKey()); if(!t) return null; try{ return fix(JSON.parse(t)); } catch(e){ return null; } }
+function save(){ lsSet(saveKey(), JSON.stringify(S)); }
 let S = load() || newGame();
-let B = null, view = 'home', msg = '', resetArm = false;
+S.hp = 0;   // set after helpers load
+let B = null, view = 'cover', msg = '', resetArm = false, pageAnim = true, F = {};
 
-const gearVal = k => GEAR[k].v + Math.ceil(GEAR[k].v*.3) * (S.up[k]||0);
-const upCost  = k => Math.round(GEAR[k].p * .6 * ((S.up[k]||0) + 1));
-const atk = () => S.batk + (S.w ? gearVal(S.w) : 0);
-const def = () => S.bdef + (S.a ? gearVal(S.a) : 0);
+// an item's stats at its upgrade level (+30% of base per level)
+const gearStats = (k, lv = S.up[k]||0) => { const o = {}; for(const st in GEAR[k].s){ const v = GEAR[k].s[st]; o[st] = v + Math.ceil(v*.3)*lv; } return o; };
+const statTxt = o => Object.entries(o).map(([k,v]) => `${STATN[k]} +${v}${(k==='crit'||k==='def')?'%':''}`).join(' · ');
+const itemStat = st => S.eq.reduce((t,k) => t + (gearStats(k)[st]||0), 0);
+const upCost  = k => Math.round(GEAR[k].p * .3 * ((S.up[k]||0) + 1));                      // gold
+const upPowder = k => Math.ceil(4 * ((S.up[k]||0) + 1) * RAR_MULT[GEAR[k].r]);              // magic powder
+const canUp = k => (S.up[k]||0) < MAX_UP && S.gold >= upCost(k) && S.powder >= upPowder(k);
+const P = n => `<span class="powder">${IC.powder} ${n}</span>`;
+const cs = () => CHARS[S.char];
+const MHP = () => cs().hp + itemStat('hp');
+const atk = () => cs().atk + itemStat('atk');
+const def = () => Math.min(80, cs().def + itemStat('def'));   // DEF = % damage reduction (max 80%)
+const spd = () => cs().spd + itemStat('spd');
+const crit = () => 20 + itemStat('crit');
+const LV_GOLD = lv => lv * 40;          // gold reward for reaching a level
+const MODE_LV = { pvp:10 };             // level needed to open a mode
 const expNeed = () => 20 + S.lv * 15;
 const rnd = (a,b) => a + Math.random()*(b-a);
 const dmgCalc = (a,d,m=1) => Math.max(1, Math.round((a*rnd(.85,1.15) - d*.6) * m));
@@ -215,14 +1051,59 @@ const chap = i => CHAPTERS[Math.min(i, CHAPTERS.length-1)];
 const qVal = q => q.s==='lv' ? S.lv : (S.st[q.s]||0);
 const qReady = q => { const t = S.qt[q.id]||0; return t < q.g.length && qVal(q) >= q.g[t]; };
 
-// ====== หน้าจอ ======
-let pageAnim = true;
-function go(v){ view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; render(); window.scrollTo(0,0); }
+S.hp = MHP();
+
+// ====== Screens ======
+function go(v){ view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
 function bar(c,v,m){ return `<div class="bar ${c}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i></div>`; }
-function back(){ return `<button class="full" onclick="go('home')">⬅️ กลับหน้าหลัก</button>`; }
+function back(){ return `<button class="full" onclick="go('home')">${IC.back} Back to Home</button>`; }
 function note(){ return msg ? `<p class="msg">${msg}</p>` : ''; }
 
+// ---- Cover / title screen ----
+function cover(){
+  let embers = '';
+  for(let i=0;i<22;i++) embers += `<i class="ember" style="left:${(i*37)%100}%;animation-delay:-${(i*0.47).toFixed(2)}s;animation-duration:${3+(i%5)*.7}s;--dx:${((i%7)-3)*14}px"></i>`;
+  let trees = '';
+  for(let i=0;i<12;i++) trees += pine(i*36 - 8 + (i%3)*6, 300, 120 + (i*41)%60, '#07100a');
+  return `<div class="cover" onclick="go('home')">
+    <svg class="cv-bg" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="cvSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05030a"/><stop offset=".45" stop-color="#2a0a12"/><stop offset=".75" stop-color="#5a1410"/><stop offset="1" stop-color="#120604"/></linearGradient>
+        <radialGradient id="cvMoon" cx=".45" cy=".4" r=".6"><stop offset="0" stop-color="#ffd6a0"/><stop offset=".55" stop-color="#e8552c"/><stop offset="1" stop-color="#8a1a0e"/></radialGradient>
+        <radialGradient id="cvGlow"><stop offset="0" stop-color="#ff5a2a" stop-opacity=".7"/><stop offset="1" stop-color="#ff5a2a" stop-opacity="0"/></radialGradient>
+        <linearGradient id="cvFog" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a1210" stop-opacity="0"/><stop offset="1" stop-color="#1a0806" stop-opacity=".95"/></linearGradient>
+      </defs>
+      <rect width="400" height="700" fill="url(#cvSky)"/>
+      <g fill="#fff" opacity=".7"><circle cx="40" cy="60" r="1"/><circle cx="120" cy="30" r="1.3"/><circle cx="350" cy="80" r="1"/><circle cx="300" cy="20" r="1.2"/><circle cx="70" cy="140" r=".8"/><circle cx="380" cy="160" r=".9"/></g>
+      <circle cx="200" cy="230" r="170" fill="url(#cvGlow)"/>
+      <circle cx="200" cy="230" r="105" fill="url(#cvMoon)"/>
+      <path d="M150 200 q10-8 20 0 M220 260 q14-6 26 4 M185 290 q8-4 14 2" stroke="#b33a20" stroke-width="5" fill="none" opacity=".5" stroke-linecap="round"/>
+      <path d="M0 380 L60 300 L110 360 L170 280 L230 350 L290 270 L350 340 L400 300 L400 700 L0 700Z" fill="#14070a"/>
+      <g transform="translate(0 260)">${trees}</g>
+      <rect y="470" width="400" height="230" fill="url(#cvFog)"/>
+      <path d="M0 610 Q100 580 200 600 Q300 620 400 590 L400 700 L0 700Z" fill="#0a0403"/>
+    </svg>
+    <div class="cv-dragon">${ART.dragon()}</div>
+    <svg class="cv-eyes" viewBox="0 0 120 120" aria-hidden="true"><defs><radialGradient id="cvE"><stop offset="0" stop-color="#fff6c0"/><stop offset=".35" stop-color="#ff3d00"/><stop offset="1" stop-color="#ff3d00" stop-opacity="0"/></radialGradient></defs>
+      <path d="M45 38 L57 42 L45 44Z M75 38 L63 42 L75 44Z" fill="url(#cvE)"/><circle cx="51" cy="41.5" r="6" fill="url(#cvE)"/><circle cx="69" cy="41.5" r="6" fill="url(#cvE)"/></svg>
+    <div class="cv-flash"></div>
+    ${embers}
+    <div class="cv-title">
+      <div class="cv-pre">— A LEGEND OF THE WILDS —</div>
+      <div class="cv-name"><span>STAR</span><span>QUEST</span></div>
+      <div class="cv-sword"><svg viewBox="0 0 300 30"><path d="M10 15 L250 11 L290 15 L250 19Z" fill="url(#cvBlade)"/><defs><linearGradient id="cvBlade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffd54a" stop-opacity="0"/><stop offset=".5" stop-color="#fff3c4"/><stop offset="1" stop-color="#ffd54a"/></linearGradient></defs></svg></div>
+    </div>
+    <div class="cv-heroes">
+      <div class="cv-h v">${artOf('valc')}</div>
+      <div class="cv-h r">${artOf('hero')}</div>
+    </div>
+    <div class="cv-tap">TAP TO START</div>
+    <div class="cv-ver">${CUR ? 'Welcome back, ' + esc(CUR) : 'Lv.' + S.lv + ' · Stage ' + S.stage}</div>
+  </div>`;
+}
+
 function render(){
+  if(view === 'cover'){ $('app').innerHTML = cover(); return; }
   let h = '';
   if(view==='home') h += heroCard() + menu();
   else if(view==='battle') h += battle();
@@ -230,48 +1111,65 @@ function render(){
     h += topBar();
     if(view==='quest') h += quest();
     else if(view==='story') h += story();
+    else if(view==='modes') h += modes();
+    else if(view==='steel') h += steel();
     else if(view==='shop') h += shop();
     else if(view==='pvp') h += pvp();
     else if(view==='set') h += setView();
     else if(view==='save') h += saveView();
+    else if(view==='account') h += account();
   }
-  document.getElementById('app').innerHTML =
-    `<h1>🚀 STAR QUEST</h1><div class="${pageAnim ? 'page' : ''} v-${view}">${h}</div>`;
+  $('app').innerHTML = `<h1><span class="crest">${IC.star}</span> STAR QUEST</h1><div class="${pageAnim ? 'page' : ''} v-${view}">${h}</div>`;
   pageAnim = false;
   if(view==='battle') refresh();
 }
 
-// การ์ดสเตตัวละคร (หน้าหลัก)
-function heroCard(){
-  const c = ch(), ci = chapIdx(S.stage);
-  return `<div class="card hero">
-    <div class="row" style="justify-content:flex-start">
-      <div class="avatar">${c.e}</div>
-      <div style="flex:1;min-width:0"><b>${c.n}</b><span class="tag">Lv.${S.lv}</span>
-        <div class="small">🗺️ บทที่ ${ci+1} · ด่าน ${S.stage}</div></div>
-      <div class="gold">💰 ${S.gold}</div>
-    </div>
-    <div style="margin-top:10px">
-      <div class="row small"><span>HP</span><span>${S.hp}/${S.mhp}</span></div>${bar('hp',S.hp,S.mhp)}
-      <div class="row small"><span>MP</span><span>${S.mp}/${S.mmp}</span></div>${bar('mp',S.mp,S.mmp)}
-      <div class="row small"><span>EXP</span><span>${S.exp}/${expNeed()}</span></div>${bar('ex',S.exp,expNeed())}
-    </div>
-    <div class="stats">
-      <div class="stat"><b>${atk()}</b><span>⚔️ โจมตี</span></div>
-      <div class="stat"><b>${def()}</b><span>🛡️ ป้องกัน</span></div>
-      <div class="stat"><b>${S.st.wins}</b><span>🏆 ชนะ</span></div>
-      <div class="stat"><b>${S.st.bosses}</b><span>👑 บอส</span></div>
-    </div>
-    <div class="mini">
-      <button onclick="rest()">🛏️ พักฟื้น (10💰)</button>
-      <button onclick="go('save')">⚙️ เซฟ / ตั้งค่า</button>
-    </div>${note()}
-  </div>`;
+// Character card (home) — layout from the sketch
+function slot(inner, label, onclick, extra=''){
+  return `<button class="sl ${extra}" onclick="${onclick}">${inner}${label ? `<span class="sll">${label}</span>` : ''}</button>`;
 }
+function heroCard(){
+  const c = cs();
+  const weapons = [0,1,2,3].map(i => { const k = S.eq[i];
+    return k ? slot(GEAR[k].icon() + `<b class="cnt">+${S.up[k]||0}</b>`, '', `tapItem('${k}')`, 'on r-'+GEAR[k].r)
+             : slot('<span class="plus">+</span>', '', `go('set')`, 'empty'); });
+  const arts = S.arts.map((k,i) => slot(ITEMS[k].icon() + `<b class="cnt">${S.inv[k]||0}</b>`, '', `go('set')`, (S.inv[k]||0) ? '' : 'dim'));
+  const skills = c.skills.map((id,i) => { const k = SKILLS[id];
+    return slot(sIcon(id) + (CD[i] ? `<b class="cnt cd">${CD[i]}T</b>` : ''), i ? `Skill ${i}` : 'Normal', `showSkill('${id}',${i})`, 'sk'); });
+  return `<div class="card cc">
+    <div class="cc-l">
+      <div class="cc-name">${c.n}</div>
+      <button class="portrait" onclick="go('set')">${artOf(c.art)}<span class="swap">Change</span></button>
+      <div class="cc-stats">
+        <div><span>HP</span><b>${MHP()}</b></div>
+        <div><span>ATK</span><b>${atk()}</b></div>
+        <div><span>DEF</span><b>${def()}%</b></div>
+        <div><span>SPEED</span><b>${spd()}</b></div>
+      </div>
+    </div>
+    <div class="cc-r">
+      <div class="row"><span class="tag big">Lv.${S.lv}</span><span class="money">${G(S.gold)}${P(S.powder)}</span></div>
+      <div class="xp">${bar('ex',S.exp,expNeed())}<span>EXP ${S.exp}/${expNeed()}</span></div>
+      <div class="sec">Items</div><div class="s4">${weapons.join('')}</div>
+      <div class="sec">Artifacts</div><div class="s4">${arts.join('')}</div>
+      <div class="sec">Skills</div><div class="s4">${skills.join('')}</div>
+      <div class="crit-row"><span>CRIT RATE</span><b>${crit()}%</b></div>
+    </div>
+  </div>
+  ${msg ? `<div class="card tip">${msg}</div>` : ''}`;
+}
+function showSkill(id, i){
+  const k = SKILLS[id];
+  const val = k.kind==='hit' ? ` · ${Math.round(k.mult*100)}% ATK = <b>${skillDmg(k)}</b> dmg (crit ${skillDmg(k)*2})`
+            : k.kind==='heal' ? ` · heals <b>${Math.round(atk()*k.healAtk)}</b> HP` : '';
+  msg = `<b>${k.n}</b> · ${CD[i] ? `Cooldown ${CD[i]} turn${CD[i]>1?'s':''}` : 'No cooldown'} — ${k.d}${val}`; render();
+}
+function tapItem(k){ msg = `<b>${GEAR[k].n} +${S.up[k]||0}</b> ${rarTag(k)} — ${statTxt(gearStats(k))}`; render(); }
 function topBar(){
-  return `<div class="card"><div class="row"><b>${ch().e} Lv.${S.lv}</b><span class="gold">💰 ${S.gold}</span></div>
-    <div class="row small"><span>HP ${S.hp}/${S.mhp}</span><span>MP ${S.mp}/${S.mmp}</span></div>
-    ${bar('hp',S.hp,S.mhp)}${bar('mp',S.mp,S.mmp)}</div>`;
+  return `<div class="card topbar"><div class="mini-av">${artOf(ch().art)}</div>
+    <div style="flex:1"><div class="row"><b>${ch().n} · Lv.${S.lv}</b><span class="money">${G(S.gold)}${P(S.powder)}</span></div>
+    ${bar('hp',MHP(),MHP())}
+    <div class="row small"><span>HP ${MHP()} · ATK ${atk()} · CRIT ${crit()}%</span><span>SPEED ${spd()}</span></div></div></div>`;
 }
 function tile(v, ic, label, badge){
   return `<button class="tile" onclick="go('${v}')"><span class="ic">${ic}</span><span>${label}</span>${badge||''}</button>`;
@@ -279,31 +1177,25 @@ function tile(v, ic, label, badge){
 function menu(){
   const ready = QUESTS.filter(qReady).length;
   return `<div class="tiles">
-    ${tile('quest','📜','เควส<br>ต่าง ๆ', ready ? `<span class="badge">${ready}</span>` : '')}
-    ${tile('story','🚀','Story<br>Mode', S.stage%5===0 ? '<span class="badge">บอส</span>' : '')}
-    ${tile('shop','🏪','ร้านค้า')}
-    ${tile('pvp','⚔️','สร้างห้อง<br>PVP','<span class="badge soon">เร็ว ๆ นี้</span>')}
-    ${tile('set','🛠️','อัปเกรด /<br>จัดเซ็ต')}
+    ${tile('quest',TILE.quest,'Quests', ready ? `<span class="badge">${ready}</span>` : '')}
+    ${tile('modes',TILE.story,'Story<br>Mode', S.stage%5===0 ? '<span class="badge">BOSS</span>' : '')}
+    ${tile('shop',TILE.shop,'Shop')}
+    ${tile('pvp',TILE.pvp,'Create<br>PVP Room',`<span class="badge soon">Lv.${MODE_LV.pvp}</span>`)}
+    ${tile('set',TILE.set,'Upgrade /<br>Loadout')}
+    ${CUR ? tile('account',`<span class="tile-av">${artOf(ch().art)}</span>`, esc(CUR)) : tile('account',TILE.login,'Login /<br>Sign up')}
   </div>`;
 }
 
-function rest(){
-  if(S.hp===S.mhp && S.mp===S.mmp) msg = 'HP และ MP เต็มอยู่แล้ว';
-  else if(S.gold < 10) msg = 'เงินไม่พอ';
-  else { S.gold -= 10; S.hp = S.mhp; S.mp = S.mmp; msg = '😴 พักผ่อนแล้ว HP/MP เต็ม!'; save(); }
-  render();
-}
-
-// ---- เควส ----
+// ---- Quests ----
 function quest(){
-  let h = '<div class="card"><h2>📜 เควสต่าง ๆ</h2>';
+  let h = `<div class="card"><h2>${IC.check} Quests</h2>`;
   QUESTS.forEach(q => {
     const t = S.qt[q.id]||0, done = t >= q.g.length;
-    if(done){ h += `<div class="item"><div>${q.n}<div class="small">✅ สำเร็จครบทุกขั้นแล้ว</div></div></div>`; return; }
+    if(done){ h += `<div class="item"><div>${q.l(q.g[q.g.length-1])}<div class="small">${IC.check} All tiers complete</div></div></div>`; return; }
     const goal = q.g[t], v = Math.min(qVal(q), goal), r = q.r(t);
-    h += `<div class="item"><div style="flex:1">${q.n} ${goal} ${q.s==='lv'?'':'ครั้ง'} <span class="small">(ขั้น ${t+1}/${q.g.length})</span>
-      ${bar('qb',v,goal)}<div class="small">${v}/${goal} · รางวัล ${r.gold}💰${r.item ? ' + '+ITEMS[r.item].e : ''}</div></div>
-      <button class="${qReady(q)?'ok':''}" onclick="claim('${q.id}')" ${qReady(q)?'':'disabled'}>รับ</button></div>`;
+    h += `<div class="item"><div style="flex:1">${q.l(goal)} <span class="small">(Tier ${t+1}/${q.g.length})</span>
+      ${bar('qb',v,goal)}<div class="small">${v}/${goal} · Reward ${G(r.gold)}${r.item ? ' + '+ITEMS[r.item].icon() : ''}</div></div>
+      <button class="${qReady(q)?'ok':''}" onclick="claim('${q.id}')" ${qReady(q)?'':'disabled'}>Claim</button></div>`;
   });
   return h + note() + back() + '</div>';
 }
@@ -312,149 +1204,296 @@ function claim(id){
   const t = S.qt[id]||0, r = q.r(t);
   S.gold += r.gold; if(r.item) S.inv[r.item] = (S.inv[r.item]||0) + 1;
   S.qt[id] = t + 1;
-  msg = `🎉 ได้รับ ${r.gold}💰${r.item ? ' และ '+ITEMS[r.item].e+' '+ITEMS[r.item].n : ''}`;
+  msg = `Reward claimed: ${r.gold} gold${r.item ? ' and a '+ITEMS[r.item].n : ''}!`;
   save(); render();
 }
 
-// ---- Story Mode ----
+// ---- Story Mode with forest map ----
+const NODES = [[34,128],[100,78],[170,118],[240,66],[306,104]];
+function storyMap(pos){
+  let path = `M${NODES[0][0]} ${NODES[0][1]}`;
+  for(let i=1;i<NODES.length;i++){
+    const [x0,y0] = NODES[i-1], [x1,y1] = NODES[i];
+    path += ` Q${(x0+x1)/2} ${i%2 ? y1-34 : y1+34} ${x1} ${y1}`;
+  }
+  const trees = [[14,60,26],[60,40,30],[140,40,24],[205,30,28],[290,30,26],[330,150,24],[130,160,22],[60,170,20],[270,160,26],[200,170,18],[344,50,22]]
+    .map(([x,y,h]) => pine(x, y+h*.5, h, '#2e6b3a')).join('');
+  const nodes = NODES.map(([x,y],i) => {
+    const boss = i===4, done = i < pos, cur = i === pos;
+    const r = boss ? 17 : 13;
+    return `<g class="node ${cur?'cur':''}" transform="translate(${x} ${y})">
+      ${cur ? `<circle r="${r+8}" fill="#f2c94c" opacity=".35" class="ping"/>` : ''}
+      <circle r="${r}" fill="${done ? '#f2c94c' : cur ? '#8fd14f' : boss ? '#7a2b2b' : '#365a3a'}" stroke="#14291a" stroke-width="3"/>
+      ${done ? '<path d="M-6 0l4 4 8-8" stroke="#14291a" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+        : boss ? '<path d="M-9 4L-9-6L-4-1L0-9L4-1L9-6L9 4Z" fill="#f2c94c" stroke="#14291a" stroke-width="1.5"/>'
+        : `<text y="5" text-anchor="middle" font-size="14" font-weight="800" fill="${cur?'#14291a':'#a9c4a0'}">${i+1}</text>`}
+    </g>`;
+  }).join('');
+  return `<svg class="map" viewBox="0 0 340 180">
+    <defs><linearGradient id="mapG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9a46"/><stop offset="1" stop-color="#2f6b34"/></linearGradient></defs>
+    <rect width="340" height="180" rx="14" fill="url(#mapG)"/>
+    <path d="M250 0 Q238 60 280 90 Q320 120 300 180" stroke="#5aa9c9" stroke-width="10" fill="none" opacity=".55"/>
+    ${trees}
+    <path d="${path}" stroke="#3a2416" stroke-width="9" fill="none" stroke-linecap="round" opacity=".35"/>
+    <path d="${path}" stroke="#e7cf98" stroke-width="5" fill="none" stroke-dasharray="2 8" stroke-linecap="round"/>
+    ${nodes}
+  </svg>`;
+}
+// ---- Mode select (Story / Steel Sand) ----
+function modes(){
+  return `<div class="card"><h2>Choose a Mode</h2>
+    <button class="mode m-story" onclick="go('story')">
+      <span class="mart">${artOf('treant')}</span>
+      <span class="mtx"><b>Story Mode</b><span class="small">Chapter ${chapIdx(S.stage)+1} · Stage ${S.stage}</span><span class="small">Follow the adventure through the forest. Earn gold & EXP.</span></span>
+    </button>
+    <button class="mode m-steel" onclick="go('steel')">
+      <span class="mart"><span class="tintw" style="filter:${STEEL_BOSSES[1].tint}">${artOf('dragon')}</span></span>
+      <span class="mtx"><b>Steel Sand</b><span class="small">Stage ${S.ss} · ${P(POWDER_PER(S.ss))} per clear</span><span class="small">Desert trials. Collect Magic Powder to upgrade your items.</span></span>
+    </button>
+    ${back()}</div>`;
+}
+// ---- Steel Sand ----
+let ssPick = null;
+function steel(){
+  if(ssPick === null || ssPick > S.ss) ssPick = S.ss;
+  const boss = ssPick % 5 === 0;
+  return `<div class="card steel-card"><h2>Steel Sand</h2>
+    <div class="ss-banner">${sandBG()}<div class="ss-over"><b>Stage ${ssPick}</b><span>${boss ? 'BOSS STAGE' : 'Desert trial'}</span></div></div>
+    <div class="story">A sea of burning sand hides old steel ruins — and the Magic Powder used to empower your items. Each stage gives more powder than the last.</div>
+    <div class="ss-pick">
+      <button onclick="ssPick=Math.max(1,ssPick-1);render()" ${ssPick<=1?'disabled':''}>${IC.back}</button>
+      <div><div class="small">Stage</div><b>${ssPick}</b><div class="small">${ssPick < S.ss ? 'Replay (farm)' : 'Newest'}</div></div>
+      <button onclick="ssPick=Math.min(S.ss,ssPick+1);render()" ${ssPick>=S.ss?'disabled':''} style="transform:scaleX(-1)">${IC.back}</button>
+    </div>
+    <div class="row small" style="justify-content:center;gap:14px;margin:6px 0">
+      <span>Reward: ${P(POWDER_PER(ssPick))}</span><span>Best: Stage ${S.ss}</span><span>You have ${P(S.powder)}</span></div>
+    <button class="pri full" onclick="startBattle('steel', ssPick)">${IC.sword} Fight — Stage ${ssPick}</button>
+    <button class="full" onclick="go('modes')">${IC.back} Back to Modes</button></div>`;
+}
 function story(){
   const ci = chapIdx(S.stage), c = chap(ci), pos = (S.stage-1)%5;
-  let dots = '';
-  for(let i=0;i<5;i++) dots += `<i class="${i<=pos?'on':''} ${i===4?'boss':''}"></i>`;
   let past = '';
-  for(let i=0;i<ci;i++) past += `<div class="small">✅ บทที่ ${i+1}: ${chap(i).n}</div>`;
-  return `<div class="card"><h2>🚀 บทที่ ${ci+1}: ${c.n}</h2>
+  for(let i=0;i<ci;i++) past += `<div class="small">${IC.check} Chapter ${i+1}: ${chap(i).n}</div>`;
+  return `<div class="card"><h2>Chapter ${ci+1}: ${c.n}</h2>
+    ${storyMap(pos)}
     <div class="story">${c.t}</div>
-    <div class="row small"><span>ด่าน ${pos+1}/5</span><span>${pos===4?'⚠️ ด่านบอส!':'บอสอยู่ด่านที่ 5'}</span></div>
-    <div class="dots">${dots}</div>
-    <button class="pri full" onclick="startBattle()">⚔️ ออกสู้ ด่าน ${S.stage}</button>
+    <div class="row small"><span>Stage ${pos+1} of 5</span><span>${pos===4?'Boss stage!':'Boss waits at stage 5'}</span></div>
+    <button class="pri full" onclick="startBattle('story')">${IC.sword} Fight — Stage ${S.stage}</button>
     ${past ? `<div style="margin-top:12px">${past}</div>` : ''}
     ${note()}${back()}</div>`;
 }
 
-// ---- ร้านค้า ----
+// ---- Shop ----
 function shop(){
-  let h = '<div class="card"><h2>🏪 ร้านค้า</h2><div class="small">ไอเทม</div>';
-  for(const k in ITEMS){ const it = ITEMS[k];
-    h += `<div class="item"><div>${it.e} ${it.n}<div class="small">${it.d} · มี ${S.inv[k]||0}</div></div>
-      <button onclick="buy('${k}')" ${S.gold<it.p?'disabled':''}>${it.p}💰</button></div>`;
-  }
-  h += '<div class="small" style="margin-top:10px">อุปกรณ์</div>';
+  let h = `<div class="card"><h2>Shop</h2><div class="sub">Items — any character can equip 4</div>`;
   for(const k in GEAR){ const g = GEAR[k], own = S.gear.includes(k);
-    h += `<div class="item"><div>${g.e} ${g.n}<div class="small">${g.t==='atk'?'โจมตี':'ป้องกัน'} +${g.v}</div></div>
-      ${own ? '<span class="small">มีแล้ว</span>' : `<button onclick="buyGear('${k}')" ${S.gold<g.p?'disabled':''}>${g.p}💰</button>`}</div>`;
+    h += `<div class="item"><div class="it">${g.icon()}<div>${g.n} ${rarTag(k)}<div class="small">${statTxt(g.s)}</div></div></div>
+      ${own ? '<span class="small">Owned</span>' : `<button onclick="buyGear('${k}')" ${S.gold<g.p?'disabled':''}>${IC.coin} ${g.p}</button>`}</div>`;
+  }
+  h += '<div class="sub">Potions (Artifacts) — not usable in PVP</div>';
+  for(const k in ITEMS){ const it = ITEMS[k];
+    h += `<div class="item"><div class="it">${it.icon()}<div>${it.n}<div class="small">${it.d} · Owned ${S.inv[k]||0}</div></div></div>
+      <button onclick="buy('${k}')" ${S.gold<it.p?'disabled':''}>${IC.coin} ${it.p}</button></div>`;
   }
   return h + note() + back() + '</div>';
 }
 function buy(k){
   const it = ITEMS[k]; if(S.gold < it.p) return;
   S.gold -= it.p; S.inv[k] = (S.inv[k]||0) + 1; S.st.buys++;
-  msg = `ซื้อ ${it.e} ${it.n} แล้ว`; save(); render();
+  msg = `Bought ${/^[AEIOU]/.test(it.n)?'an':'a'} ${it.n}`; save(); render();
 }
 function buyGear(k){
   const g = GEAR[k]; if(S.gold < g.p || S.gear.includes(k)) return;
   S.gold -= g.p; S.gear.push(k); S.st.buys++;
-  if(g.t==='atk') S.w = k; else S.a = k;
-  msg = `ซื้อและสวม ${g.e} ${g.n} แล้ว`; save(); render();
+  if(S.eq.length < 4){ S.eq.push(k); msg = `Bought and equipped the ${g.n}`; } else msg = `Bought the ${g.n} — equip it in Upgrade / Loadout`;
+  save(); render();
 }
 
-// ---- PVP (ยังไม่เปิด) ----
+// ---- PVP (not open yet) ----
 function pvp(){
-  return `<div class="card"><h2>⚔️ สร้างห้อง PVP</h2>
-    <div class="story">โหมดสร้างห้องเพื่อสู้กับเพื่อนแบบออนไลน์กำลังพัฒนาอยู่ เร็ว ๆ นี้จะได้ส่งรหัสห้องให้เพื่อนแล้วสู้กันแบบเทิร์นได้!</div>
+  return `<div class="card"><h2>Create PVP Room</h2>
+    <div class="pvp-art">${artOf('hero')}<span class="vs">VS</span>${artOf('valc')}</div>
+    <div class="story">Online rooms are under construction. Soon you'll be able to share a room code with a friend and battle turn by turn!</div>
+    <p class="small">PVP rules: Artifacts (potions) can't be used — only your character, items and skills.</p>
     ${back()}</div>`;
 }
 
-// ---- อัปเกรด / จัดเซ็ต ----
+// ---- Upgrade / Loadout ----
 function setView(){
-  let h = '<div class="card"><h2>🧑‍🚀 ตัวละคร</h2><div class="chars">';
+  let h = '<div class="card"><h2>Characters</h2><div class="chars">';
   for(const k in CHARS){ const c = CHARS[k];
-    h += `<div class="ch ${S.char===k?'sel':''}" onclick="pickChar('${k}')"><div class="e">${c.e}</div><b>${c.n}</b><div class="small">${c.d}</div></div>`;
+    h += `<div class="ch ${S.char===k?'sel':''}" onclick="pickChar('${k}')"><div class="e">${artOf(c.art)}</div><b>${c.n}</b><div class="small">${c.d}</div>
+      <div class="chs">HP ${c.hp} · ATK ${c.atk} · SPD ${c.spd} · CRIT 20%</div></div>`;
   }
   for(let i = Object.keys(CHARS).length; i < 3; i++)
-    h += `<div class="ch lock"><div class="e">🔒</div><b>???</b><div class="small">เร็ว ๆ นี้</div></div>`;
+    h += `<div class="ch lock"><div class="e lk">${IC.lock}</div><b>???</b><div class="small">Coming soon</div></div>`;
   h += '</div></div>';
 
-  h += '<div class="card"><h2>🛠️ จัดเซ็ต & อัปเกรด</h2>';
-  h += `<div class="row small"><span>อาวุธ: ${S.w ? GEAR[S.w].e+' '+GEAR[S.w].n+' +'+(S.up[S.w]||0) : 'ไม่มี'}</span>
-        <span>เกราะ: ${S.a ? GEAR[S.a].e+' '+GEAR[S.a].n+' +'+(S.up[S.a]||0) : 'ไม่มี'}</span></div>`;
-  if(!S.gear.length) h += '<p class="small">ยังไม่มีอุปกรณ์ ไปซื้อที่ร้านค้าได้</p>';
+  h += `<div class="card"><h2>Items</h2><p class="small" style="margin:0 0 4px">Equip up to 4 (${S.eq.length}/4). Items only add stats. Upgrades cost gold + Magic Powder (you have ${P(S.powder)}) — farm it in Steel Sand.</p>`;
+  if(!S.gear.length) h += '<p class="small">No items yet — buy some in the Shop.</p>';
   S.gear.forEach(k => {
-    const g = GEAR[k], on = S.w===k || S.a===k, lv = S.up[k]||0, max = lv >= MAX_UP;
-    h += `<div class="item"><div style="flex:1">${g.e} ${g.n} <span class="tag">+${lv}</span>
-        <div class="small">${g.t==='atk'?'โจมตี':'ป้องกัน'} +${gearVal(k)}${max?'':` → +${gearVal(k)+Math.ceil(g.v*.3)}`}</div></div>
-      ${on ? '<span class="small">✅</span>' : `<button onclick="equip('${k}')">สวม</button>`}
-      <button onclick="upgrade('${k}')" ${max||S.gold<upCost(k)?'disabled':''}>${max?'MAX':'⬆️ '+upCost(k)+'💰'}</button></div>`;
+    const g = GEAR[k], on = S.eq.includes(k), lv = S.up[k]||0, max = lv >= MAX_UP;
+    h += `<div class="item"><div class="it" style="flex:1">${g.icon()}<div>${g.n} <span class="tag">+${lv}</span> ${rarTag(k)}
+        <div class="small">${statTxt(gearStats(k))}${max?'':` → next: ${statTxt(gearStats(k, lv+1))}`}</div></div></div>
+      ${on ? `<button class="ok" onclick="unequip('${k}')">On</button>` : `<button onclick="equip('${k}')" ${S.eq.length>=4?'disabled':''}>Equip</button>`}
+      <button class="upb" onclick="upgrade('${k}')" ${canUp(k)?'':'disabled'}>${max?'MAX':`${IC.up}<span>${IC.coin}${upCost(k)}<br>${IC.powder}${upPowder(k)}</span>`}</button></div>`;
   });
   h += '</div>';
 
-  h += '<div class="card"><h2>🎒 ไอเทม</h2>';
-  let any = false;
-  for(const k in ITEMS){ const n = S.inv[k]||0; if(!n) continue; any = true; const it = ITEMS[k];
-    h += `<div class="item"><div>${it.e} ${it.n} x${n}<div class="small">${it.d}</div></div>
-      ${it.battleOnly ? '' : `<button onclick="useItem('${k}')">ใช้</button>`}</div>`;
+  h += `<div class="card"><h2>Artifacts — Potions</h2><p class="small" style="margin:0 0 4px">Pick 2 to bring into battle. Potions work in Story and other PvE modes only — not in PVP.</p>`;
+  for(const k in ITEMS){ const it = ITEMS[k], n = S.inv[k]||0, on = S.arts.includes(k);
+    h += `<div class="item"><div class="it">${it.icon()}<div>${it.n} x${n}<div class="small">${it.d}</div></div></div>
+      ${on ? `<button class="ok" disabled>Equipped</button>` : `<button onclick="equipArt('${k}')">Equip</button>`}</div>`;
   }
-  if(!any) h += '<p class="small">ไม่มีไอเทม</p>';
   return h + note() + back() + '</div>';
 }
-function pickChar(k){ if(!CHARS[k]) return; S.char = k; save(); render(); }
-function equip(k){
-  if(GEAR[k].t==='atk') S.w = k; else S.a = k;
-  msg = `สวม ${GEAR[k].e} ${GEAR[k].n} แล้ว`; save(); render();
+function pickChar(k){ if(!CHARS[k]) return; S.char = k; S.hp = MHP(); msg = `${CHARS[k].n} is ready for battle!`; save(); render(); }
+function equip(k){ if(S.eq.includes(k) || S.eq.length >= 4) return; S.eq.push(k); msg = `Equipped the ${GEAR[k].n}`; save(); render(); }
+function unequip(k){ S.eq = S.eq.filter(x => x !== k); msg = `Took off the ${GEAR[k].n}`; save(); render(); }
+function equipArt(k){
+  if(S.arts.includes(k)) return;
+  S.arts = [S.arts[1], k];          // newest replaces the oldest slot
+  msg = `${ITEMS[k].n} added to your artifacts`; save(); render();
 }
 function upgrade(k){
-  const lv = S.up[k]||0, c = upCost(k);
-  if(lv >= MAX_UP || S.gold < c) return;
-  S.gold -= c; S.up[k] = lv + 1;
-  msg = `⬆️ ${GEAR[k].e} ${GEAR[k].n} เป็น +${lv+1} แล้ว!`; save(); render();
-}
-function applyItem(k){
-  if(k==='potion'){ const b = S.hp; S.hp = Math.min(S.mhp, S.hp+40); return `ฟื้น HP ${S.hp-b}`; }
-  if(k==='ether'){ const b = S.mp; S.mp = Math.min(S.mmp, S.mp+15); return `ฟื้น MP ${S.mp-b}`; }
-}
-function useItem(k){
-  if(!S.inv[k] || ITEMS[k].battleOnly) return;
-  S.inv[k]--; msg = ITEMS[k].e + ' ' + applyItem(k); save(); render();
+  const lv = S.up[k]||0;
+  if(!canUp(k)) return;
+  S.gold -= upCost(k); S.powder -= upPowder(k); S.up[k] = lv + 1;
+  msg = `${GEAR[k].n} upgraded to +${lv+1}!`; save(); render();
 }
 
-// ====== ระบบต่อสู้แบบเทิร์น (มีแอนิเมชัน) ======
+// ---- Account (login / sign up) ----
+function account(){
+  if(CUR){
+    return `<div class="card"><h2>Account</h2>
+      <div class="row" style="justify-content:flex-start;gap:12px;margin:6px 0 10px">
+        <div class="avatar">${artOf(ch().art)}</div>
+        <div><div class="small">Signed in as</div><b style="font-size:18px">${esc(CUR)}</b>
+          <div class="small">Lv.${S.lv} · Stage ${S.stage} · ${S.gold} gold</div></div></div>
+      <p class="small">Your progress saves to this account automatically.</p>
+      <button class="warn full" onclick="logout()">Log out</button>
+      ${note()}${back()}</div>`;
+  }
+  const m = F.mode || 'login', isNew = m === 'create';
+  return `<div class="card"><h2>${isNew ? 'Create Account' : 'Login'}</h2>
+    <div class="btns" style="margin-bottom:10px">
+      <button class="${!isNew?'pri':''}" onclick="F={mode:'login',u:F.u};msg='';render()">Login</button>
+      <button class="${isNew?'pri':''}" onclick="F={mode:'create',u:F.u};msg='';render()">Create account</button>
+    </div>
+    <form onsubmit="event.preventDefault();${isNew ? 'createAccount()' : 'login()'}">
+      <label class="lbl" for="u">Username</label>
+      <input id="u" maxlength="16" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="e.g. ForestHero99" value="${esc(F.u||'')}">
+      <label class="lbl" for="p">Password</label>
+      <input id="p" type="password" autocomplete="${isNew?'new-password':'current-password'}" placeholder="Password">
+      ${isNew ? `<label class="lbl" for="p2">Confirm password</label>
+        <input id="p2" type="password" autocomplete="new-password" placeholder="Type it again">
+        <label class="check"><input type="checkbox" id="carry" checked> Keep my current progress (Lv.${S.lv}, Stage ${S.stage})</label>` : ''}
+      <button class="pri full" type="submit">${isNew ? 'Create account' : 'Login'}</button>
+    </form>
+    ${note()}
+    <p class="small" style="margin-top:10px">Accounts are stored on this device. Online accounts that work on any device are coming soon.</p>
+    ${back()}</div>`;
+}
+async function hashPw(pw, salt){
+  const data = new TextEncoder().encode(salt + ':' + pw);
+  if(window.crypto && crypto.subtle){
+    const b = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join('');
+  }
+  let h = 5381; for(const c of data) h = ((h * 33) ^ c) >>> 0; return 'x' + h.toString(16);
+}
+function formErr(t){ msg = t; render(); }
+async function createAccount(){
+  const u = $('u').value.trim(), p = $('p').value, p2 = $('p2').value, carry = $('carry').checked;
+  F = {mode:'create', u};
+  if(!/^[A-Za-z0-9_]{3,16}$/.test(u)) return formErr('Username must be 3–16 letters, numbers or _');
+  if(p.length < 4) return formErr('Password must be at least 4 characters');
+  if(p !== p2) return formErr('Passwords do not match');
+  const A = accounts(), id = u.toLowerCase();
+  if(A[id]) return formErr('That username is already taken on this device');
+  const salt = Math.random().toString(36).slice(2, 10);
+  A[id] = { name:u, salt, h: await hashPw(p, salt) };
+  lsSet(ACC_KEY, JSON.stringify(A));
+  const start = carry ? JSON.parse(JSON.stringify(S)) : newGame();
+  save();
+  CUR = u; lsSet(CUR_KEY, u);
+  S = fix(start); save();
+  F = {}; msg = `Welcome, ${esc(u)}! Your account is ready.`; render();
+}
+async function login(){
+  const u = $('u').value.trim(), p = $('p').value;
+  F = {mode:'login', u};
+  if(!u || !p) return formErr('Enter your username and password');
+  const a = accounts()[u.toLowerCase()];
+  if(!a || await hashPw(p, a.salt) !== a.h) return formErr('Wrong username or password');
+  save();
+  CUR = a.name; lsSet(CUR_KEY, CUR);
+  S = load() || newGame();
+  F = {}; msg = `Logged in as ${esc(CUR)}`; render();
+}
+function logout(){
+  save(); CUR = null; lsDel(CUR_KEY);
+  S = load() || newGame();
+  F = {}; msg = 'Logged out — now playing as Guest.'; render();
+}
+
+// ====== TURN-BASED BATTLE (animated) ======
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const $ = id => document.getElementById(id);
 const wait = ms => new Promise(r => setTimeout(r, RM ? 0 : ms));
 const an = (el, kf, opt) => el ? el.animate(kf, RM ? {...opt, duration:1} : opt).finished : Promise.resolve();
 const pct = (v,m) => Math.max(0, Math.min(100, v/m*100)) + '%';
 
-function makeEnemy(){
-  const st = S.stage, boss = st % 5 === 0;
-  const base = boss ? BOSSES[(st/5 - 1) % BOSSES.length] : ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
-  const hp = Math.round((30 + st*10) * (boss ? 1.8 : 1));
-  return { n:(boss?'👑 ':'') + base.n, e:base.e, hp, mhp:hp, boss,
-    atk: Math.round((5 + st*2.2) * (boss ? 1.15 : 1)),
-    def: Math.round((1 + st*1.2) * (boss ? 1.2 : 1)),
+function makeEnemy(mode, st){
+  const boss = st % 5 === 0, steelM = mode === 'steel';
+  const list = steelM ? STEEL_ENEMIES : ENEMIES, bl = steelM ? STEEL_BOSSES : BOSSES;
+  const base = boss ? bl[(st/5 - 1) % bl.length] : list[Math.floor(Math.random()*list.length)];
+  const hp = Math.round((steelM ? 55 + st*13 : 45 + st*11) * (boss ? 1.8 : 1));
+  return { n:base.n, art:base.art, fly:!!base.fly, tint:base.tint||'', hp, mhp:hp, boss,
+    spd: base.spd + Math.floor(st*.5),
+    atk: Math.round((7 + st*2) * (boss ? 1.15 : 1)),
+    def: Math.round((2 + st*1) * (boss ? 1.2 : 1)),
     gold: Math.round((10 + st*6) * (boss ? 2 : 1)),
     exp:  Math.round((10 + st*6) * (boss ? 2 : 1)) };
 }
-function startBattle(){
-  if(S.hp <= 0) S.hp = 1;
+async function startBattle(mode = 'story', st){
+  if(!st) st = mode === 'steel' ? S.ss : S.stage;
+  S.hp = MHP();
   view = 'battle'; msg = ''; pageAnim = true;
-  B = { en:makeEnemy(), log:[], defend:false, menu:false, over:false, busy:false };
-  B.log.push(`${B.en.e} ${B.en.n} ปรากฏตัว!`);
+  B = { mode, stage:st, en:makeEnemy(mode, st), log:[], defend:0, stun:false, menu:false, over:false, busy:true, cd:{}, buff:{atk:0,iron:0}, turn:1 };
+  const e = B.en, first = e.spd > spd();
+  B.log.push(`A wild ${e.n} appears!`);
+  B.log.push(first ? `${e.n} is faster (SPEED ${e.spd} vs ${spd()}) and attacks first!`
+                   : e.spd === spd() ? `Equal speed (${spd()}) — you move first!` : `You are faster (SPEED ${spd()} vs ${e.spd}) — you move first!`);
   render(); window.scrollTo(0,0);
+  await wait(950);
+  if(first){
+    await enemyTurn($('pl'), $('en'));
+    if(S.hp <= 0){ await fallFx(); lose(); }
+  }
+  B.busy = false; refresh();
 }
-
-// โครงฉาก (สร้างครั้งเดียว แล้วอัปเดตด้วย refresh)
+function ambient(){
+  let h = '';
+  if(B && B.mode === 'steel'){
+    for(let i=0;i<10;i++) h += `<i class="sand" style="top:${20+(i*37)%70}%;animation-delay:-${i*0.6}s;animation-duration:${2.2+(i%4)*.5}s"></i>`;
+    return h;
+  }
+  for(let i=0;i<7;i++) h += `<i class="ff" style="left:${8+i*13}%;top:${30+(i*23)%45}%;animation-delay:-${i*0.9}s;animation-duration:${5+i%3}s"></i>`;
+  for(let i=0;i<4;i++) h += `<i class="lf" style="left:${10+i*24}%;animation-delay:-${i*2.2}s;animation-duration:${8+i}s"></i>`;
+  return h;
+}
+// Scene layout (built once, then updated by refresh)
 function battle(){
   const e = B.en;
   return `<div class="scene" id="scene">
-      <div class="stars"></div><div class="stars s2"></div>
-      <div class="plate e"><div class="row"><b>${e.n}</b><span>ด่าน ${S.stage}</span></div>
+      ${B.mode==='steel' ? sandBG() : forestBG()}${ambient()}
+      <div class="plate e"><div class="row"><b>${e.boss?'BOSS · ':''}${e.n}</b><span>SPD ${e.spd}</span></div>
         <div class="bar hp"><i id="enhp"></i></div><div class="small" id="enhpt"></div></div>
-      <div class="pad pe"></div><div class="pad pp"></div>
-      <div class="ent en ${e.boss?'boss':''}" id="en"><span class="spr">${e.e}</span></div>
-      <div class="ent pl" id="pl"><span class="spr">${ch().e}</span></div>
-      <div class="plate p"><div class="row"><b>${ch().n}</b><span>Lv.${S.lv}</span></div>
-        <div class="bar hp"><i id="plhp"></i></div>
-        <div class="bar mp"><i id="plmp"></i></div><div class="small" id="plt"></div></div>
+      <div class="shadow se ${e.boss?'big':''} ${e.fly?'fly':''}"></div><div class="shadow sp"></div>
+      <div class="ent en ${e.boss?'boss':''} ${e.fly?'flyer':''}" id="en"><div class="tintw" style="${e.tint ? 'filter:'+e.tint : ''}">${artOf(e.art)}</div></div>
+      <div class="ent pl" id="pl">${artOf(ch().art)}</div>
+      <div class="plate p"><div class="row"><b>${ch().n}</b><span>SPD ${spd()}</span></div>
+        <div class="bar hp"><i id="plhp"></i></div><div class="small" id="plt"></div><div class="buffs" id="buffs"></div></div>
     </div>
     <div class="card" id="log"></div>
     <div class="card" id="ctrl"></div>`;
@@ -463,11 +1502,11 @@ function refresh(){
   if(view !== 'battle' || !B || !$('scene')) return;
   const e = B.en;
   $('enhp').style.width = pct(e.hp, e.mhp);
-  $('enhpt').textContent = `HP ${Math.max(0,e.hp)}/${e.mhp}`;
-  $('plhp').style.width = pct(S.hp, S.mhp);
-  $('plmp').style.width = pct(S.mp, S.mmp);
-  $('plt').textContent = `HP ${S.hp}/${S.mhp} · MP ${S.mp}/${S.mmp}`;
-  $('pl').classList.toggle('guard', B.defend);
+  $('enhpt').textContent = `HP ${Math.max(0,e.hp)}/${e.mhp}${B.stun ? ' · Stunned' : ''}`;
+  $('plhp').style.width = pct(S.hp, MHP());
+  $('plt').textContent = `HP ${S.hp}/${MHP()}`;
+  $('buffs').innerHTML = (B.buff.atk ? `<span class="bf atkb">ATK↑ ${Math.min(3,B.buff.atk)}</span>` : '') + (B.buff.iron ? `<span class="bf ironb">DEF↑ ${Math.min(3,B.buff.iron)}</span>` : '');
+  $('pl').classList.toggle('guard', !!B.defend);
   const lg = $('log');
   lg.innerHTML = B.log.slice(-30).map(l => `<div>${l}</div>`).join('');
   lg.scrollTop = lg.scrollHeight;
@@ -475,27 +1514,28 @@ function refresh(){
 }
 function controls(){
   const e = B.en, dis = B.busy ? 'disabled' : '';
-  if(B.over) return `<div class="btns"><button onclick="go('home')">🏠 หน้าหลัก</button>
-      <button class="pri" onclick="startBattle()">⚔️ สู้ต่อ ด่าน ${S.stage}</button></div>`;
+  if(B.over) return `<div class="btns"><button onclick="go('home')">${IC.home} Home</button>
+      ${B.mode==='steel'
+        ? `<button class="pri" onclick="startBattle('steel', ${B.won ? 'S.ss' : B.stage})">${IC.sword} ${B.won ? 'Next — Stage '+S.ss : 'Retry — Stage '+B.stage}</button></div>`
+        : `<button class="pri" onclick="startBattle('story')">${IC.sword} Next — Stage ${S.stage}</button></div>`}`;
   if(B.menu){
-    let h = '', any = false;
-    for(const k in ITEMS){ const n = S.inv[k]||0; if(!n) continue; any = true;
-      h += `<div class="item"><div>${ITEMS[k].e} ${ITEMS[k].n} x${n}<div class="small">${ITEMS[k].d}</div></div>
-        <button onclick="act('item','${k}')" ${dis}>ใช้</button></div>`;
-    }
-    if(!any) h += '<p class="small">ไม่มีไอเทม</p>';
-    return h + `<button class="full" onclick="B.menu=false;refresh()" ${dis}>⬅️ ย้อนกลับ</button>`;
+    let h = '<div class="small" style="margin-bottom:4px">Artifacts</div>';
+    S.arts.forEach(k => { const n = S.inv[k]||0;
+      h += `<div class="item"><div class="it">${ITEMS[k].icon()}<div>${ITEMS[k].n} x${n}<div class="small">${ITEMS[k].d}</div></div></div>
+        <button onclick="act('item','${k}')" ${dis || (n ? '' : 'disabled')}>Use</button></div>`;
+    });
+    return h + `<button class="full" onclick="B.menu=false;refresh()" ${dis}>${IC.back} Back</button>`;
   }
-  return `<div class="btns">
-    <button onclick="act('atk')" ${dis}>⚔️ โจมตี</button>
-    <button onclick="act('laser')" ${dis || (S.mp<6?'disabled':'')}>⚡ เลเซอร์ (6MP)</button>
-    <button onclick="act('fix')" ${dis || (S.mp<8?'disabled':'')}>🔧 ซ่อมแซม (8MP)</button>
-    <button onclick="act('guard')" ${dis}>🛡️ ป้องกัน</button>
-    <button onclick="B.menu=true;refresh()" ${dis}>🎒 ไอเทม</button>
-    <button class="warn" onclick="act('run')" ${dis || (e.boss?'disabled':'')}>🏃 หนี</button></div>`;
+  const sk = cs().skills.map((id,i) => { const k = SKILLS[id], cd = B.cd[id]||0;
+    return `<button class="${cd?'cooling':''}" onclick="act('skill','${id}')" ${dis || (cd?'disabled':'')}>${sIcon(id)} ${k.n}${
+      cd ? ` <small class="cdc">${cd}</small>` : (CD[i] ? ` <small class="cdt">${CD[i]}T</small>` : '')}</button>`; }).join('');
+  return `<div class="btns">${sk}
+    ${B.mode==='pvp' ? `<button disabled title="Not allowed in PVP">${IC.bag} No potions (PVP)</button>`
+                     : `<button onclick="B.menu=true;refresh()" ${dis}>${IC.bag} Artifacts</button>`}
+    <button class="warn" onclick="act('run')" ${dis || (e.boss?'disabled':'')}>${IC.run} Run</button></div>`;
 }
 
-// ---- ตัวช่วยเอฟเฟกต์ ----
+// ---- Effect helpers ----
 function center(el){
   const s = $('scene').getBoundingClientRect(), r = el.getBoundingClientRect();
   return { x:r.left - s.left + r.width/2, y:r.top - s.top + r.height/2 };
@@ -511,52 +1551,56 @@ function floatText(el, t, cls=''){
          {transform:'translate(-50%,-70px) scale(1)',opacity:0}],
      {duration:1100,easing:'ease-out'}).then(() => d.remove());
 }
-function burst(el, emo, n=6, spread=70){
+// particles: kind = spark | leaf | coin | fire
+function burst(el, kind, n=6, spread=70, color){
   const c = center(el);
   for(let i=0;i<n;i++){
     const a = Math.random()*Math.PI*2, r = spread*(.5+Math.random()*.7);
-    const d = spawn('pt', emo, c.x, c.y);
-    an(d, [{transform:'translate(-50%,-50%) scale(.4)',opacity:1},
-           {transform:`translate(calc(-50% + ${Math.cos(a)*r}px),calc(-50% + ${Math.sin(a)*r}px)) scale(1.1)`,opacity:0}],
+    const d = spawn('pt ' + kind, '', c.x, c.y);
+    if(color) d.style.setProperty('--c', color);
+    an(d, [{transform:'translate(-50%,-50%) scale(.4) rotate(0)',opacity:1},
+           {transform:`translate(calc(-50% + ${Math.cos(a)*r}px),calc(-50% + ${Math.sin(a)*r}px)) scale(1.1) rotate(${Math.random()*360}deg)`,opacity:0}],
        {duration:600+Math.random()*300,easing:'cubic-bezier(.2,.8,.3,1)'}).then(() => d.remove());
   }
 }
-function sparkle(el, emo, n=8){
+function rise(el, kind, n=8, color){
   const c = center(el);
   for(let i=0;i<n;i++){
-    const x = c.x + (Math.random()-.5)*70, d = spawn('pt sm', emo, x, c.y + 25);
+    const x = c.x + (Math.random()-.5)*70, d = spawn('pt ' + kind, kind==='plus' ? '+' : '', x, c.y + 25);
+    if(color) d.style.setProperty('--c', color);
     an(d, [{transform:'translate(-50%,0) scale(.5)',opacity:0},
            {transform:'translate(-50%,-30px) scale(1)',opacity:1,offset:.3},
            {transform:`translate(-50%,-${70+Math.random()*30}px) scale(.6)`,opacity:0}],
        {duration:900,delay:i*70,easing:'ease-out'}).then(() => d.remove());
   }
 }
-const lunge = (el, dir, big) => an(el, [
+function slash(el, color, big){
+  const c = center(el), s = big ? 150 : 110;
+  const d = spawn('slash', `<svg viewBox="0 0 100 100" width="${s}" height="${s}"><path d="M15 80 Q30 20 90 12 Q45 35 22 86Z" fill="${color}"/><path d="M22 76 Q38 30 84 16" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`, c.x, c.y);
+  return an(d, [{transform:'translate(-50%,-50%) rotate(-40deg) scale(.5)',opacity:0},
+                {transform:'translate(-50%,-50%) rotate(0) scale(1.05)',opacity:1,offset:.35},
+                {transform:'translate(-50%,-50%) rotate(15deg) scale(1.15)',opacity:0}],
+     {duration:420,easing:'ease-out'}).then(() => d.remove());
+}
+function swing(el, ms=450){ el.classList.add('atk'); setTimeout(() => el.classList.remove('atk'), RM ? 0 : ms); }
+const lunge = (el, dir, big) => { swing(el, big ? 520 : 440); return an(el, [
   {transform:'translate(0,0) scale(1)'},
   {transform:`translate(${-14*dir}px,${8*dir}px) scale(.95)`, offset:.25},
-  {transform:`translate(${(big?110:80)*dir}px,${-(big?60:45)*dir}px) scale(${big?1.25:1.12})`, offset:.55},
-  {transform:'translate(0,0) scale(1)'}], {duration:big?520:420, easing:'ease-in-out'});
-const hitFx = el => an(el, [
-  {filter:'brightness(4) saturate(0)',transform:'translateX(0)'},
+  {transform:`translate(${(big?110:80)*dir}px,${-(big?60:45)*dir}px) scale(${big?1.2:1.1})`, offset:.55},
+  {transform:'translate(0,0) scale(1)'}], {duration:big?520:440, easing:'ease-in-out'}); };
+const hitFx = el => { el.classList.add('hurt'); setTimeout(() => el.classList.remove('hurt'), 380); return an(el, [
+  {filter:'brightness(3) saturate(.3)',transform:'translateX(0)'},
   {transform:'translateX(-10px)'},{transform:'translateX(10px)'},{transform:'translateX(-5px)'},
-  {filter:'brightness(1)',transform:'translateX(0)'}], {duration:360});
+  {filter:'brightness(1)',transform:'translateX(0)'}], {duration:360}); };
 const charge = (el, col) => an(el, [
   {filter:`drop-shadow(0 0 0 ${col})`,transform:'scale(1)'},
-  {filter:`drop-shadow(0 0 22px ${col}) brightness(1.5)`,transform:'scale(1.1)',offset:.7},
+  {filter:`drop-shadow(0 0 16px ${col}) brightness(1.3)`,transform:'scale(1.08)',offset:.7},
   {filter:`drop-shadow(0 0 0 ${col})`,transform:'scale(1)'}], {duration:520});
 const shakeScene = () => an($('scene'), [
   {transform:'translate(0,0)'},{transform:'translate(-7px,4px)'},{transform:'translate(6px,-4px)'},
   {transform:'translate(-4px,2px)'},{transform:'translate(0,0)'}], {duration:320});
-async function beam(from, to){
-  const a = center(from), b = center(to), ang = Math.atan2(b.y-a.y, b.x-a.x), len = Math.hypot(b.x-a.x, b.y-a.y);
-  const d = spawn('beam', '', a.x, a.y - 5); d.style.width = len + 'px';
-  const r = `rotate(${ang}rad)`;
-  await an(d, [{transform:`${r} scaleX(0)`,opacity:1},{transform:`${r} scaleX(1)`,opacity:1,offset:.35},
-               {transform:`${r} scaleX(1) scaleY(.2)`,opacity:0}], {duration:480,easing:'ease-out'});
-  d.remove();
-}
-async function throwArc(from, to, emo){
-  const a = center(from), b = center(to), d = spawn('pt big', emo, a.x, a.y);
+async function throwArc(from, to, html){
+  const a = center(from), b = center(to), d = spawn('pt big', html, a.x, a.y);
   const dx = b.x-a.x, dy = b.y-a.y;
   await an(d, [{transform:'translate(-50%,-50%) rotate(0)'},
                {transform:`translate(calc(-50% + ${dx/2}px),calc(-50% + ${dy/2-90}px)) rotate(360deg)`},
@@ -564,158 +1608,232 @@ async function throwArc(from, to, emo){
      {duration:600,easing:'ease-in'});
   d.remove();
 }
-const deathFx = el => { burst(el,'💥',8,90); return an(el, [
+const deathFx = el => { burst(el,'spark',10,90,'#fff59d'); burst(el,'leaf',6,80); return an(el, [
   {transform:'scale(1) rotate(0)',opacity:1},
-  {transform:'scale(1.3) rotate(15deg)',filter:'brightness(4)',opacity:1,offset:.3},
-  {transform:'scale(0) rotate(-200deg)',opacity:0}], {duration:750,easing:'ease-in',fill:'forwards'}); };
+  {transform:'scale(1.2) rotate(8deg)',filter:'brightness(3)',opacity:1,offset:.3},
+  {transform:'scale(.2) translateY(40px) rotate(-30deg)',opacity:0}], {duration:750,easing:'ease-in',fill:'forwards'}); };
 
-// ---- เทิร์นของผู้เล่น + ศัตรู ----
+// ---- Skill animations ----
+function cls(el, c, ms){ el.classList.add(c); setTimeout(() => el.classList.remove(c), RM ? 0 : ms); }
+async function thrustAnim(P, E){
+  await charge(P, '#e8f4ff');
+  cls(P, 'thrust', 520);
+  const run = an(P, [{transform:'translate(0,0)'},{transform:'translate(-16px,4px)',offset:.25},
+    {transform:'translate(135px,-50px)',offset:.55},{transform:'translate(135px,-50px)',offset:.7},{transform:'translate(0,0)'}],
+    {duration:620,easing:'ease-in-out'});
+  await wait(320);
+  const c = center(E), d = spawn('stab', '', c.x - 70, c.y + 4);
+  an(d, [{transform:'scaleX(0)',opacity:1},{transform:'scaleX(1)',opacity:1,offset:.4},{transform:'scaleX(1.2) scaleY(.2)',opacity:0}],
+     {duration:360,easing:'ease-out'}).then(() => d.remove());
+  await run;
+}
+async function slamAnim(P, els){
+  cls(P, 'slam', 760);
+  const leap = an(P, [{transform:'translate(0,0)'},{transform:'translate(-10px,6px) scale(1.05,.92)',offset:.15},
+    {transform:'translate(70px,-95px) rotate(-6deg)',offset:.5},{transform:'translate(110px,-20px) rotate(4deg)',offset:.72},
+    {transform:'translate(110px,-20px) scale(1.08,.94)',offset:.8},{transform:'translate(0,0)'}], {duration:900,easing:'ease-in-out'});
+  await wait(640);
+  shakeScene();
+  els.forEach(el => {
+    const c = center(el);
+    const w = spawn('wave', '', c.x, c.y + el.offsetHeight*.42);
+    an(w, [{transform:'translate(-50%,-50%) scale(.2)',opacity:1},{transform:'translate(-50%,-50%) scale(2.6)',opacity:0}],
+       {duration:600,easing:'ease-out'}).then(() => w.remove());
+    burst(el, 'dust', 10, 90);
+  });
+  const sc = $('scene'), f = spawn('flash', '', 0, 0);
+  an(f, [{opacity:.55},{opacity:0}], {duration:300}).then(() => f.remove());
+  await leap;
+}
+
+// ---- Player turn + enemy turn ----
+const fallFx = () => an($('pl'), [{opacity:1,transform:'none'},{opacity:.3,transform:'rotate(-80deg) translate(-10px,20px)'}], {duration:650,fill:'forwards'});
 async function act(type, k){
   if(!B || B.over || B.busy) return;
-  const e = B.en;
-  if((type==='laser' && S.mp<6) || (type==='fix' && S.mp<8) || (type==='item' && !S.inv[k]) || (type==='run' && e.boss)) return;
-  B.busy = true; B.defend = false; B.menu = false; refresh();
+  const e = B.en, K = type==='skill' ? SKILLS[k] : null;
+  if((K && B.cd[k]) || (type==='item' && (!S.inv[k] || B.mode==='pvp')) || (type==='run' && e.boss)) return;
+  B.busy = true; B.defend = 0; B.menu = false; refresh();
   const P = $('pl'), E = $('en');
+  const slotIdx = K ? cs().skills.indexOf(k) : -1;
 
-  if(type==='atk'){
-    const crit = Math.random() < .12, d = dmgCalc(atk(), e.def, crit ? 1.7 : 1);
-    await lunge(P, 1);
-    e.hp -= d; hitFx(E); burst(E, crit?'💥':'✦', crit?6:3, 50);
-    floatText(E, crit ? `CRIT -${d}` : `-${d}`, crit ? 'crit' : '');
-    if(crit) shakeScene();
-    B.log.push(crit ? `💥 คริติคอล! คุณโจมตี ${d} ดาเมจ` : `⚔️ คุณโจมตี ${d} ดาเมจ`);
-  } else if(type==='laser'){
-    S.mp -= 6; S.st.lasers++; refresh();
-    const d = dmgCalc(atk()*1.8, e.def*.5);
-    await charge(P, '#5ef2ff'); await beam(P, E);
-    e.hp -= d; hitFx(E); burst(E, '⚡', 6, 60); shakeScene();
-    floatText(E, `-${d}`, 'crit');
-    B.log.push(`⚡ ยิงเลเซอร์ทะลวง ${d} ดาเมจ!`);
-  } else if(type==='fix'){
-    S.mp -= 8;
-    const b = S.hp; S.hp = Math.min(S.mhp, S.hp + Math.round(S.mhp*.4));
-    charge(P, '#9ef01a'); sparkle(P, '✨', 10); floatText(P, `+${S.hp-b}`, 'heal');
-    B.log.push(`🔧 ซ่อมแซมตัวเอง ฟื้น HP ${S.hp-b}`);
+  if(K && K.kind==='hit'){
+    if(slotIdx > 0) S.st.lasers++;
+    const targets = [{e, el:E}];               // AOE skills hit every enemy (more enemies can be added later)
+    if(K.anim==='thrust') await thrustAnim(P, E);
+    else if(K.anim==='slam') await slamAnim(P, targets.map(t => t.el));
+    else {
+      if(slotIdx > 0) await charge(P, K.color || '#fff');
+      await lunge(P, 1, K.big);
+    }
+    const boost = B.buff.atk ? 1.5 : 1;
+    for(const t of targets){
+      const isCrit = Math.random()*100 < crit();
+      const d = skillDmg(K, boost) * (isCrit ? 2 : 1);
+      if(!K.anim) slash(t.el, K.color || (isCrit ? '#ffd54a' : '#ffffffcc'), K.big || isCrit);
+      t.e.hp -= d; hitFx(t.el);
+      burst(t.el, K.fx || 'spark', slotIdx>0 ? 10 : (isCrit?8:4), slotIdx>0 ? 80 : 55, isCrit ? '#ffd54a' : (K.color || '#fff'));
+      floatText(t.el, isCrit ? `CRIT -${d}` : `-${d}`, (isCrit || slotIdx>0) ? 'crit' : '');
+      if(isCrit || K.big) shakeScene();
+      B.log.push(`${isCrit ? 'Critical! ' : ''}${slotIdx>0 ? K.n : 'You'} ${slotIdx>0 ? 'hits' : 'strike'} ${K.aoe ? t.e.n+' ' : ''}for ${d} damage${slotIdx>0?'!':''}`);
+    }
+  } else if(K && K.kind==='heal'){
+    S.st.lasers++;
+    const b = S.hp; S.hp = Math.min(MHP(), S.hp + Math.round(atk()*K.healAtk));
+    charge(P, '#8fd14f'); rise(P, 'plus', 9, '#b8ff5a'); floatText(P, `+${S.hp-b}`, 'heal');
+    B.log.push(`${K.n} restores ${S.hp-b} HP`);
     await wait(500);
-  } else if(type==='guard'){
-    B.defend = true; S.mp = Math.min(S.mmp, S.mp+3);
-    floatText(P, '+3 MP', 'mp');
-    B.log.push('🛡️ ตั้งท่าป้องกัน (+3 MP)');
+  } else if(K && K.kind==='guard'){
+    S.st.lasers++;
+    B.defend = K.block;
+    if(K.anim==='shield'){ cls(P, 'shieldup', 600); burst(P, 'spark', 8, 60, '#ffd54a'); }
+    floatText(P, 'GUARD', 'mp');
+    B.log.push(`${K.n}! You brace for the next hit`);
     refresh(); await wait(400);
   } else if(type==='item'){
     S.inv[k]--;
     if(k==='bomb'){
-      await throwArc(P, E, '💣');
-      e.hp -= 35; hitFx(E); burst(E, '💥', 8, 80); shakeScene();
-      floatText(E, '-35', 'crit');
-      B.log.push('💣 ระเบิดพลาสมาใส่ศัตรู 35 ดาเมจ!');
-    } else {
-      const t = applyItem(k);
-      sparkle(P, k==='potion' ? '💚' : '🔷', 8);
-      floatText(P, t.replace(/\D+/g,'') ? '+' + t.replace(/\D+/g,'') : '+0', k==='potion' ? 'heal' : 'mp');
-      B.log.push(ITEMS[k].e + ' ' + t);
+      await throwArc(P, E, ITEMS.bomb.icon());
+      e.hp -= 45; hitFx(E); burst(E, 'fire', 12, 85); shakeScene();
+      floatText(E, '-45', 'crit');
+      B.log.push('The Fire Flask explodes for 45 damage!');
+    } else if(k==='potion'){
+      const b = S.hp; S.hp = Math.min(MHP(), S.hp + Math.round(MHP()*.35));
+      rise(P, 'plus', 8, '#ff8a80'); floatText(P, '+' + (S.hp-b), 'heal');
+      B.log.push(`Health Potion restores ${S.hp-b} HP`);
+      await wait(500);
+    } else if(k==='power'){
+      B.buff.atk = 4; charge(P, '#f2a51c'); rise(P, 'star', 8); floatText(P, 'ATK UP', 'big');
+      B.log.push('Power Potion! ATK +50% for 3 turns');
+      await wait(500);
+    } else if(k==='iron'){
+      B.buff.iron = 4; charge(P, '#b0bec5'); rise(P, 'plus', 8, '#e6eef2'); floatText(P, 'DEF UP', 'mp');
+      B.log.push('Iron Skin! You take 50% less damage for 3 turns');
       await wait(500);
     }
   } else if(type==='run'){
     if(Math.random() < .5){
       await an(P, [{transform:'translateX(0)'},{transform:'translateX(-30px) scaleX(-1)',offset:.2},
                    {transform:'translateX(-360px) scaleX(-1)'}], {duration:600,easing:'ease-in',fill:'forwards'});
-      B.log.push('🏃 หนีสำเร็จ!'); B.over = true; B.busy = false; save(); refresh(); return;
+      B.log.push('You got away safely!'); B.over = true; refill(); B.busy = false; save(); refresh(); return;
     }
     await an(P, [{transform:'translateX(0)'},{transform:'translateX(-30px) rotate(-12deg)'},{transform:'translateX(0)'}], {duration:400});
-    floatText(P, 'หนีไม่พ้น!', '');
-    B.log.push('🏃 หนีไม่สำเร็จ!');
+    floatText(P, "Can't escape!", '');
+    B.log.push("Couldn't escape!");
   }
+  if(K && CD[slotIdx]) B.cd[k] = CD[slotIdx] + 1;   // +1 because this turn's tick happens below
+  if(K && K.cutCd){ const id = cs().skills[K.cutCd[0]];
+    if(B.cd[id] > 0){ B.cd[id] = Math.max(0, B.cd[id] - K.cutCd[1]); B.log.push(`${SKILLS[id].n} cooldown -${K.cutCd[1]}`); } }
+  if(K && K.resetCd){ const id = cs().skills[K.resetCd];
+    if(B.cd[id] > 0){ B.cd[id] = 0; B.log.push(`${SKILLS[id].n} is ready again!`); } }
   refresh();
 
   if(e.hp <= 0){
     await wait(250); await deathFx(E);
-    burst(E, '💰', 6, 60);
+    burst(E, 'coin', 7, 60);
     const lv0 = S.lv; win(); refresh();
-    if(S.lv > lv0){ await wait(300); floatText(P, 'LEVEL UP!', 'big'); sparkle(P, '⭐', 12); charge(P, '#ffd60a'); }
+    if(S.lv > lv0){ await wait(300); floatText(P, 'LEVEL UP!', 'big'); rise(P, 'star', 10); charge(P, '#ffd54a'); }
     B.busy = false; save(); refresh(); return;
   }
 
   await wait(450);
   await enemyTurn(P, E);
-  if(S.hp <= 0){
-    await wait(250);
-    await an(P, [{opacity:1,transform:'none'},{opacity:.25,transform:'rotate(-90deg) translate(-10px,10px)'}],
-       {duration:650,fill:'forwards'});
-    lose();
-  }
+  if(S.hp <= 0){ await wait(250); await fallFx(); lose(); B.busy = false; save(); refresh(); return; }
+  // end of round: cooldowns and buffs tick down
+  for(const id in B.cd) if(B.cd[id] > 0) B.cd[id]--;
+  if(B.buff.atk) B.buff.atk--;
+  if(B.buff.iron) B.buff.iron--;
+  B.turn++;
   B.busy = false; save(); refresh();
 }
 async function enemyTurn(P, E){
-  const e = B.en, heavy = Math.random() < (e.boss ? .3 : .18);
-  let d = dmgCalc(e.atk, def(), heavy ? 1.5 : 1);
-  if(B.defend) d = Math.max(1, Math.round(d/2));
-  if(heavy){ floatText(E, '!!', 'crit'); await charge(E, '#ff4d6d'); }
+  const e = B.en;
+  if(B.stun){
+    B.stun = false;
+    an(E, [{transform:'rotate(0)'},{transform:'rotate(-8deg)'},{transform:'rotate(8deg)'},{transform:'rotate(0)'}], {duration:500});
+    floatText(E, 'Stunned!', 'mp'); B.log.push(`${e.n} is stunned and can't move!`);
+    refresh(); await wait(600); return;
+  }
+  const heavy = Math.random() < (e.boss ? .3 : .18);
+  if(heavy){ floatText(E, '!!', 'crit'); await charge(E, '#ff5a4a'); }
   await lunge(E, -1, heavy);
+  let d = Math.max(1, Math.round(e.atk * rnd(.9,1.1) * (heavy ? 1.5 : 1) * (1 - def()/100)));
+  if(B.defend) d = Math.max(1, Math.round(d * (1 - B.defend)));
+  if(B.buff.iron) d = Math.max(1, Math.round(d * .5));
   S.hp = Math.max(0, S.hp - d);
-  hitFx(P); burst(P, B.defend ? '🛡️' : '✦', 3, 45);
+  hitFx(P); burst(P, 'spark', 4, 45, (B.defend || B.buff.iron) ? '#8fd14f' : '#ff8a80');
   floatText(P, `-${d}`, heavy ? 'crit' : '');
   if(heavy) shakeScene();
-  B.log.push(heavy ? `🔥 ${e.n} ใช้ท่าโจมตีหนัก! คุณโดน ${d}${B.defend?' (ป้องกันไว้ครึ่งหนึ่ง)':''}`
-                   : `${e.e} ${e.n} โจมตี คุณโดน ${d}${B.defend?' (ป้องกันไว้ครึ่งหนึ่ง)':''}`);
+  const g = (B.defend || B.buff.iron) ? ' (blocked some)' : '';
+  B.log.push(heavy ? `${e.n} unleashes a heavy attack! You take ${d}${g}` : `${e.n} attacks! You take ${d}${g}`);
+  B.defend = 0;
   refresh();
   await wait(300);
 }
 function win(){
   const e = B.en; B.over = true;
   S.gold += e.gold; S.exp += e.exp; S.st.wins++; if(e.boss) S.st.bosses++;
-  B.log.push(`🏆 ชนะ! ได้ ${e.gold}💰 และ ${e.exp} EXP`);
+  B.log.push(`Victory! +${e.gold} gold and +${e.exp} EXP`);
   if(Math.random() < (e.boss ? 1 : .3)){
     const ks = Object.keys(ITEMS), d = ks[Math.floor(Math.random()*ks.length)];
     S.inv[d] = (S.inv[d]||0) + 1;
-    B.log.push(`🎁 ได้รับ ${ITEMS[d].e} ${ITEMS[d].n}`);
+    B.log.push(`Found ${/^[AEIOU]/.test(ITEMS[d].n)?'an':'a'} ${ITEMS[d].n}!`);
   }
-  if(e.boss) B.log.push(`📖 จบบทที่ ${chapIdx(S.stage)+1}! เรื่องราวบทใหม่ปลดล็อกแล้ว`);
-  S.stage++; S.best = Math.max(S.best, S.stage);
+  B.won = true;
+  if(B.mode === 'steel'){
+    const pw = POWDER_PER(B.stage); S.powder += pw;
+    B.log.push(`Collected ${pw} Magic Powder! (you have ${S.powder})`);
+    if(B.stage === S.ss){ S.ss++; B.log.push(`Steel Sand stage ${S.ss} unlocked!`); }
+  } else {
+    if(e.boss) B.log.push(`Chapter ${chapIdx(S.stage)+1} complete! A new chapter is unlocked.`);
+    S.stage++; S.best = Math.max(S.best, S.stage);
+  }
   while(S.exp >= expNeed()){
-    S.exp -= expNeed(); S.lv++;
-    S.mhp += 12; S.mmp += 4; S.batk += 3; S.bdef += 2; S.hp = S.mhp; S.mp = S.mmp;
-    B.log.push(`⭐ เลเวลอัป! ตอนนี้ Lv.${S.lv} (HP/MP เต็ม)`);
+    S.exp -= expNeed(); S.lv++; S.gold += LV_GOLD(S.lv);
+    B.log.push(`Level up! You are now Lv.${S.lv} (+${LV_GOLD(S.lv)} gold)`);
   }
+  refill();
 }
+// after every fight: HP back to full
+function refill(){ S.hp = MHP(); B.log.push('HP fully restored.'); }
 function lose(){
   B.over = true;
-  const lost = Math.floor(S.gold/2); S.gold -= lost; S.hp = S.mhp; S.mp = S.mmp;
-  B.log.push(`💀 คุณแพ้... เสีย ${lost}💰 และถูกส่งกลับฐาน`);
+  const lost = Math.floor(S.gold/2); S.gold -= lost;
+  B.log.push(`You were defeated... lost ${lost} gold and returned to camp.`);
+  refill();
 }
 
-// ====== เซฟ / โหลดด้วยรหัส ======
+// ====== Save / load with a code ======
 function exportCode(){ return btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
 function saveView(){
-  return `<div class="card"><h2>⚙️ เซฟ / ตั้งค่า</h2>
-    <p class="small">${storageOK ? '✅ เกมบันทึกอัตโนมัติในเครื่องนี้ทุกครั้งที่เล่น' : '⚠️ เบราว์เซอร์นี้ไม่ให้บันทึกอัตโนมัติ ใช้รหัสเซฟด้านล่างแทน'}</p>
-    <p class="small">รหัสเซฟ: คัดลอกเก็บไว้ ใช้โหลดในเครื่องอื่น หรือตอนที่ข้อมูลหาย</p>
+  return `<div class="card"><h2>Save / Settings</h2>
+    <p class="small">${storageOK ? `Auto-saves on this device every time you play${CUR ? ` (account: ${esc(CUR)})` : ' (Guest)'}.` : 'This browser blocks auto-save. Use the save code below instead.'}</p>
+    <p class="small">Save code: copy and keep it to load your progress on another device or if your data is lost.</p>
     <textarea id="code" readonly onclick="this.select()">${exportCode()}</textarea>
-    <button class="full" onclick="copyCode()">📋 คัดลอกรหัส</button>
-    <p class="small" style="margin-top:12px">โหลดจากรหัสเซฟ:</p>
-    <textarea id="imp" placeholder="วางรหัสเซฟที่นี่"></textarea>
+    <button class="full" onclick="copyCode()">${IC.copy} Copy code</button>
+    <p class="small" style="margin-top:12px">Load from a save code:</p>
+    <textarea id="imp" placeholder="Paste a save code here"></textarea>
     <div class="btns" style="margin-top:6px">
-      <button onclick="importCode()">📥 โหลด</button>
-      <button class="warn" onclick="resetGame()">${resetArm ? '⚠️ กดอีกครั้งเพื่อยืนยัน' : '🗑️ เริ่มใหม่'}</button>
+      <button onclick="importCode()">Load</button>
+      <button class="warn" onclick="resetGame()">${resetArm ? 'Tap again to confirm' : 'New game'}</button>
     </div>${note()}${back()}</div>`;
 }
 function copyCode(){
-  const t = document.getElementById('code'); t.select();
-  const done = () => { msg = '📋 คัดลอกแล้ว!'; render(); };
+  const t = $('code'); t.select();
+  const done = () => { msg = 'Copied!'; render(); };
   if(navigator.clipboard) navigator.clipboard.writeText(t.value).then(done, () => { document.execCommand('copy'); done(); });
   else { document.execCommand('copy'); done(); }
 }
 function importCode(){
   try{
-    const o = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('imp').value.trim()))));
+    const o = JSON.parse(decodeURIComponent(escape(atob($('imp').value.trim()))));
     if(typeof o.lv !== 'number' || !o.inv) throw 0;
-    S = fix(o); save(); msg = '✅ โหลดเซฟสำเร็จ!';
-  } catch(e){ msg = '❌ รหัสเซฟไม่ถูกต้อง'; }
+    S = fix(o); save(); msg = 'Save loaded!';
+  } catch(e){ msg = 'Invalid save code'; }
   render();
 }
 function resetGame(){
   if(!resetArm){ resetArm = true; msg = ''; render(); return; }
-  S = newGame(); save(); resetArm = false; msg = 'เริ่มเกมใหม่แล้ว'; render();
+  S = newGame(); save(); resetArm = false; msg = 'Started a new game.'; render();
 }
 
 render();
