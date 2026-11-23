@@ -381,6 +381,10 @@ h1{position:relative}
 .dlg-wrap{position:fixed;inset:0;z-index:100;background:#000a;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeUp .2s ease-out}
 .dlg{width:100%;max-width:340px;background:linear-gradient(180deg,#24472d,#152b1b);border:1px solid #4b8a4f;border-radius:18px;padding:18px;text-align:center;box-shadow:0 10px 30px #000c}
 .dlg h2{justify-content:center}
+.sound{position:absolute;left:0;top:50%;transform:translateY(-50%);width:38px;height:38px;padding:0;border-radius:50%;font-size:16px;
+  background:linear-gradient(180deg,#24472d,#16301d);border-color:#3f7347}
+.sound:active{transform:translateY(-50%) scale(.92)}
+.sound.cv{position:fixed;z-index:60;top:max(12px,env(safe-area-inset-top));left:12px;transform:none;background:#0008;border-color:#ffffff44}
 </style>
 </head>
 <body>
@@ -1017,6 +1021,65 @@ let storageOK = true;
 function lsGet(k){ try{ return localStorage.getItem(k); } catch(e){ storageOK = false; return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); } catch(e){ storageOK = false; } }
 function lsDel(k){ try{ localStorage.removeItem(k); } catch(e){ storageOK = false; } }
+// ====== SOUND EFFECTS (made with Web Audio — no sound files needed) ======
+const SFX = (() => {
+  let ctx = null, on = lsGet('sq_sound') !== 'off';
+  const ac = () => {
+    if(!ctx){ try{ ctx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; } }
+    if(ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  };
+  function tone(f, dur, type='square', vol=.12, slide=1, delay=0){
+    const c = ctx, t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if(slide !== 1) o.frequency.exponentialRampToValueAtTime(Math.max(30, f*slide), t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + .02);
+  }
+  function noise(dur, vol=.2, freq=1200, ftype='lowpass', delay=0, sweep=1){
+    const c = ctx, t = c.currentTime + delay, n = Math.floor(c.sampleRate*dur), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i] = Math.random()*2 - 1;
+    const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = buf; f.type = ftype; f.frequency.setValueAtTime(freq, t);
+    if(sweep !== 1) f.frequency.exponentialRampToValueAtTime(Math.max(40, freq*sweep), t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    s.connect(f).connect(g).connect(c.destination); s.start(t); s.stop(t + dur);
+  }
+  const arp = (notes, step=.09, type='triangle', vol=.12, len=.18) => notes.forEach((f,i) => tone(f, len, type, vol, 1, i*step));
+  const P = {
+    click:   () => tone(720, .045, 'square', .04),
+    swing:   () => noise(.16, .22, 2500, 'bandpass', 0, .35),
+    swingBig:() => { noise(.26, .3, 3000, 'bandpass', 0, .25); tone(220, .2, 'sawtooth', .04, .5); },
+    hit:     () => { noise(.1, .35, 900); tone(160, .1, 'square', .1, .5); },
+    crit:    () => { noise(.16, .45, 1400); tone(240, .16, 'sawtooth', .14, .4); tone(1200, .12, 'square', .05, .6, .03); },
+    hurt:    () => { noise(.12, .3, 700); tone(110, .14, 'square', .1, .6); },
+    charge:  () => tone(300, .45, 'sawtooth', .05, 3),
+    stab:    () => { noise(.08, .3, 4000, 'highpass'); tone(1400, .08, 'square', .05, .5); },
+    boom:    () => { noise(.6, .6, 500, 'lowpass', 0, .15); tone(80, .5, 'sine', .35, .4); },
+    heal:    () => arp([523, 659, 784, 1047], .08, 'sine', .1, .3),
+    guard:   () => { tone(880, .25, 'triangle', .1, .98); tone(1320, .2, 'sine', .06, 1, .02); noise(.05, .2, 5000, 'highpass'); },
+    potion:  () => { [0,.07,.14].forEach(d => tone(400 + Math.random()*300, .08, 'sine', .1, 1.8, d)); },
+    power:   () => { tone(200, .35, 'sawtooth', .07, 4); arp([392, 523, 659], .1, 'square', .05, .15); },
+    throw:   () => noise(.3, .15, 1800, 'bandpass', 0, .4),
+    poof:    () => { noise(.35, .3, 1600, 'lowpass', 0, .2); tone(500, .25, 'triangle', .08, .3); },
+    coin:    () => { tone(988, .08, 'square', .07); tone(1319, .25, 'square', .07, 1, .07); },
+    upgrade: () => { tone(220, .08, 'square', .1); noise(.06, .3, 6000, 'highpass', .02); arp([784, 988, 1175, 1568], .07, 'triangle', .08, .2); },
+    win:     () => arp([523, 659, 784, 1047, 784, 1047], .11, 'square', .07, .22),
+    lose:    () => arp([392, 349, 311, 262], .2, 'triangle', .1, .35),
+    levelup: () => arp([523, 659, 784, 1047, 1319, 1568], .07, 'square', .06, .2),
+    run:     () => [0,.08,.16].forEach(d => noise(.06, .15, 1500, 'bandpass', d)),
+    start:   () => { tone(65, .9, 'sawtooth', .12, .7); noise(.8, .25, 400, 'lowpass', 0, .3); arp([262, 392, 523, 784], .12, 'triangle', .08, .4); },
+    miss:    () => noise(.2, .12, 3000, 'bandpass', 0, .3)
+  };
+  return {
+    play(n){ if(!on || !ac()) return; try{ P[n] && P[n](); }catch(e){} },
+    toggle(){ on = !on; lsSet('sq_sound', on ? 'on' : 'off'); if(on){ ac(); P.coin(); } return on; },
+    get on(){ return on; }
+  };
+})();
+document.addEventListener('click', e => { const b = e.target.closest('button'); if(b && !b.disabled && !b.classList.contains('nosfx')) SFX.play('click'); }, true);
+const soundBtn = (c='') => `<button class="sound nosfx ${c}" onclick="event.stopPropagation();SFX.toggle();render()" aria-label="Sound">${SFX.on ? '🔊' : '🔇'}</button>`;
+
 const artOf = key => key==='king' ? ART.goblin(true) : ART[key]();
 const G = n => `<span class="gold">${IC.coin} ${n}</span>`;
 
@@ -1120,7 +1183,7 @@ function cover(){
   for(let i=0;i<22;i++) embers += `<i class="ember" style="left:${(i*37)%100}%;animation-delay:-${(i*0.47).toFixed(2)}s;animation-duration:${3+(i%5)*.7}s;--dx:${((i%7)-3)*14}px"></i>`;
   let trees = '';
   for(let i=0;i<12;i++) trees += pine(i*36 - 8 + (i%3)*6, 300, 120 + (i*41)%60, '#07100a');
-  return `<div class="cover" onclick="go('home')">
+  return `<div class="cover" onclick="SFX.play('start');go('home')">
     <svg class="cv-bg" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs>
         <linearGradient id="cvSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05030a"/><stop offset=".45" stop-color="#2a0a12"/><stop offset=".75" stop-color="#5a1410"/><stop offset="1" stop-color="#120604"/></linearGradient>
@@ -1158,7 +1221,7 @@ function cover(){
 }
 
 function render(){
-  if(view === 'cover'){ $('app').innerHTML = cover() + exitBtn('cv'); return; }
+  if(view === 'cover'){ $('app').innerHTML = cover() + soundBtn('cv') + exitBtn('cv'); return; }
   let h = '';
   if(view==='home') h += heroCard() + menu();
   else if(view==='battle') h += battle();
@@ -1174,7 +1237,7 @@ function render(){
     else if(view==='save') h += saveView();
     else if(view==='account') h += account();
   }
-  $('app').innerHTML = `<h1><span class="crest">${IC.star}</span> STAR QUEST${exitBtn()}</h1><div class="${pageAnim ? 'page' : ''} v-${view}">${h}</div>`;
+  $('app').innerHTML = `<h1><span class="crest">${IC.star}</span> STAR QUEST${soundBtn()}${exitBtn()}</h1><div class="${pageAnim ? 'page' : ''} v-${view}">${h}</div>`;
   pageAnim = false;
   if(view==='battle') refresh();
 }
@@ -1257,7 +1320,7 @@ function quest(){
 function claim(id){
   const q = QUESTS.find(x => x.id===id); if(!q || !qReady(q)) return;
   const t = S.qt[id]||0, r = q.r(t);
-  S.gold += r.gold; if(r.item) S.inv[r.item] = (S.inv[r.item]||0) + 1;
+  S.gold += r.gold; SFX.play('coin'); if(r.item) S.inv[r.item] = (S.inv[r.item]||0) + 1;
   S.qt[id] = t + 1;
   msg = `Reward claimed: ${r.gold} gold${r.item ? ' and a '+ITEMS[r.item].n : ''}!`;
   save(); render();
@@ -1354,12 +1417,12 @@ function shop(){
 }
 function buy(k){
   const it = ITEMS[k]; if(S.gold < it.p) return;
-  S.gold -= it.p; S.inv[k] = (S.inv[k]||0) + 1; S.st.buys++;
+  S.gold -= it.p; S.inv[k] = (S.inv[k]||0) + 1; S.st.buys++; SFX.play('coin');
   msg = `Bought ${/^[AEIOU]/.test(it.n)?'an':'a'} ${it.n}`; save(); render();
 }
 function buyGear(k){
   const g = GEAR[k]; if(S.gold < g.p || S.gear.includes(k)) return;
-  S.gold -= g.p; S.gear.push(k); S.st.buys++;
+  S.gold -= g.p; S.gear.push(k); S.st.buys++; SFX.play('coin');
   if(S.eq.length < 4){ S.eq.push(k); msg = `Bought and equipped the ${g.n}`; } else msg = `Bought the ${g.n} — equip it in Upgrade / Loadout`;
   save(); render();
 }
@@ -1411,7 +1474,7 @@ function pickChar(k){ if(!CHARS[k]) return;
 function buyChar(k){
   const c = CHARS[k]; if(!c || S.chars.includes(k)) return;
   if(S.gold < c.price){ msg = `Not enough gold — ${c.n} costs ${c.price} gold.`; render(); return; }
-  S.gold -= c.price; S.chars.push(k); S.char = k; S.hp = MHP();
+  S.gold -= c.price; S.chars.push(k); SFX.play('levelup'); S.char = k; S.hp = MHP();
   msg = `You recruited ${c.n}! Now in your party.`; save(); render();
 }
 function equip(k){ if(S.eq.includes(k) || S.eq.length >= 4) return; S.eq.push(k); msg = `Equipped the ${GEAR[k].n}`; save(); render(); }
@@ -1424,7 +1487,7 @@ function equipArt(k){
 function upgrade(k){
   const lv = S.up[k]||0;
   if(!canUp(k)) return;
-  S.gold -= upCost(k); S.powder -= upPowder(k); S.up[k] = lv + 1;
+  S.gold -= upCost(k); S.powder -= upPowder(k); S.up[k] = lv + 1; SFX.play('upgrade');
   msg = `${GEAR[k].n} upgraded to +${lv+1}!`; save(); render();
 }
 
@@ -1650,7 +1713,7 @@ function slash(el, color, big){
      {duration:420,easing:'ease-out'}).then(() => d.remove());
 }
 function swing(el, ms=450){ el.classList.add('atk'); setTimeout(() => el.classList.remove('atk'), RM ? 0 : ms); }
-const lunge = (el, dir, big) => { swing(el, big ? 520 : 440); return an(el, [
+const lunge = (el, dir, big) => { swing(el, big ? 520 : 440); SFX.play(big ? 'swingBig' : 'swing'); return an(el, [
   {transform:'translate(0,0) scale(1)'},
   {transform:`translate(${-14*dir}px,${8*dir}px) scale(.95)`, offset:.25},
   {transform:`translate(${(big?110:80)*dir}px,${-(big?60:45)*dir}px) scale(${big?1.2:1.1})`, offset:.55},
@@ -1659,10 +1722,10 @@ const hitFx = el => { el.classList.add('hurt'); setTimeout(() => el.classList.re
   {filter:'brightness(3) saturate(.3)',transform:'translateX(0)'},
   {transform:'translateX(-10px)'},{transform:'translateX(10px)'},{transform:'translateX(-5px)'},
   {filter:'brightness(1)',transform:'translateX(0)'}], {duration:360}); };
-const charge = (el, col) => an(el, [
+const charge = (el, col) => (SFX.play('charge'), an(el, [
   {filter:`drop-shadow(0 0 0 ${col})`,transform:'scale(1)'},
   {filter:`drop-shadow(0 0 16px ${col}) brightness(1.3)`,transform:'scale(1.08)',offset:.7},
-  {filter:`drop-shadow(0 0 0 ${col})`,transform:'scale(1)'}], {duration:520});
+  {filter:`drop-shadow(0 0 0 ${col})`,transform:'scale(1)'}], {duration:520}));
 const shakeScene = () => an($('scene'), [
   {transform:'translate(0,0)'},{transform:'translate(-7px,4px)'},{transform:'translate(6px,-4px)'},
   {transform:'translate(-4px,2px)'},{transform:'translate(0,0)'}], {duration:320});
@@ -1675,7 +1738,7 @@ async function throwArc(from, to, html){
      {duration:600,easing:'ease-in'});
   d.remove();
 }
-const deathFx = el => { burst(el,'spark',10,90,'#fff59d'); burst(el,'leaf',6,80); return an(el, [
+const deathFx = el => { SFX.play('poof'); burst(el,'spark',10,90,'#fff59d'); burst(el,'leaf',6,80); return an(el, [
   {transform:'scale(1) rotate(0)',opacity:1},
   {transform:'scale(1.2) rotate(8deg)',filter:'brightness(3)',opacity:1,offset:.3},
   {transform:'scale(.2) translateY(40px) rotate(-30deg)',opacity:0}], {duration:750,easing:'ease-in',fill:'forwards'}); };
@@ -1688,7 +1751,7 @@ async function thrustAnim(P, E){
   const run = an(P, [{transform:'translate(0,0)'},{transform:'translate(-16px,4px)',offset:.25},
     {transform:'translate(135px,-50px)',offset:.55},{transform:'translate(135px,-50px)',offset:.7},{transform:'translate(0,0)'}],
     {duration:620,easing:'ease-in-out'});
-  await wait(320);
+  await wait(320); SFX.play('stab');
   const c = center(E), d = spawn('stab', '', c.x - 70, c.y + 4);
   an(d, [{transform:'scaleX(0)',opacity:1},{transform:'scaleX(1)',opacity:1,offset:.4},{transform:'scaleX(1.2) scaleY(.2)',opacity:0}],
      {duration:360,easing:'ease-out'}).then(() => d.remove());
@@ -1700,7 +1763,7 @@ async function slamAnim(P, els){
     {transform:'translate(70px,-95px) rotate(-6deg)',offset:.5},{transform:'translate(110px,-20px) rotate(4deg)',offset:.72},
     {transform:'translate(110px,-20px) scale(1.08,.94)',offset:.8},{transform:'translate(0,0)'}], {duration:900,easing:'ease-in-out'});
   await wait(640);
-  shakeScene();
+  SFX.play('boom'); shakeScene();
   els.forEach(el => {
     const c = center(el);
     const w = spawn('wave', '', c.x, c.y + el.offsetHeight*.42);
@@ -1737,7 +1800,7 @@ async function act(type, k){
       const isCrit = Math.random()*100 < crit();
       const d = skillDmg(K, boost) * (isCrit ? 2 : 1);
       if(!K.anim) slash(t.el, K.color || (isCrit ? '#ffd54a' : '#ffffffcc'), K.big || isCrit);
-      t.e.hp -= d; hitFx(t.el);
+      t.e.hp -= d; hitFx(t.el); SFX.play(isCrit ? 'crit' : 'hit');
       burst(t.el, K.fx || 'spark', slotIdx>0 ? 10 : (isCrit?8:4), slotIdx>0 ? 80 : 55, isCrit ? '#ffd54a' : (K.color || '#fff'));
       floatText(t.el, isCrit ? `CRIT -${d}` : `-${d}`, (isCrit || slotIdx>0) ? 'crit' : '');
       if(isCrit || K.big) shakeScene();
@@ -1746,12 +1809,13 @@ async function act(type, k){
   } else if(K && K.kind==='heal'){
     S.st.lasers++;
     const b = S.hp; S.hp = Math.min(MHP(), S.hp + Math.round(atk()*K.healAtk));
-    charge(P, '#8fd14f'); rise(P, 'plus', 9, '#b8ff5a'); floatText(P, `+${S.hp-b}`, 'heal');
+    charge(P, '#8fd14f'); SFX.play('heal'); rise(P, 'plus', 9, '#b8ff5a'); floatText(P, `+${S.hp-b}`, 'heal');
     B.log.push(`${K.n} restores ${S.hp-b} HP`);
     await wait(500);
   } else if(K && K.kind==='guard'){
     S.st.lasers++;
     B.defend = K.block;
+    SFX.play('guard');
     if(K.anim==='shield'){ cls(P, 'shieldup', 600); burst(P, 'spark', 8, 60, '#ffd54a'); }
     floatText(P, 'GUARD', 'mp');
     B.log.push(`${K.n}! You brace for the next hit`);
@@ -1759,21 +1823,21 @@ async function act(type, k){
   } else if(type==='item'){
     S.inv[k]--;
     if(k==='bomb'){
-      await throwArc(P, E, ITEMS.bomb.icon());
-      e.hp -= 45; hitFx(E); burst(E, 'fire', 12, 85); shakeScene();
+      SFX.play('throw'); await throwArc(P, E, ITEMS.bomb.icon());
+      SFX.play('boom'); e.hp -= 45; hitFx(E); burst(E, 'fire', 12, 85); shakeScene();
       floatText(E, '-45', 'crit');
       B.log.push('The Fire Flask explodes for 45 damage!');
     } else if(k==='potion'){
       const b = S.hp; S.hp = Math.min(MHP(), S.hp + Math.round(MHP()*.35));
-      rise(P, 'plus', 8, '#ff8a80'); floatText(P, '+' + (S.hp-b), 'heal');
+      SFX.play('potion'); rise(P, 'plus', 8, '#ff8a80'); floatText(P, '+' + (S.hp-b), 'heal');
       B.log.push(`Health Potion restores ${S.hp-b} HP`);
       await wait(500);
     } else if(k==='power'){
-      B.buff.atk = 4; charge(P, '#f2a51c'); rise(P, 'star', 8); floatText(P, 'ATK UP', 'big');
+      B.buff.atk = 4; SFX.play('power'); charge(P, '#f2a51c'); rise(P, 'star', 8); floatText(P, 'ATK UP', 'big');
       B.log.push('Power Potion! ATK +50% for 3 turns');
       await wait(500);
     } else if(k==='iron'){
-      B.buff.iron = 4; charge(P, '#b0bec5'); rise(P, 'plus', 8, '#e6eef2'); floatText(P, 'DEF UP', 'mp');
+      B.buff.iron = 4; SFX.play('guard'); charge(P, '#b0bec5'); rise(P, 'plus', 8, '#e6eef2'); floatText(P, 'DEF UP', 'mp');
       B.log.push('Iron Skin! You take 50% less damage for 3 turns');
       await wait(500);
     }
@@ -1781,7 +1845,7 @@ async function act(type, k){
     if(Math.random() < .5){
       await an(P, [{transform:'translateX(0)'},{transform:'translateX(-30px) scaleX(-1)',offset:.2},
                    {transform:'translateX(-360px) scaleX(-1)'}], {duration:600,easing:'ease-in',fill:'forwards'});
-      B.log.push('You got away safely!'); B.over = true; refill(); B.busy = false; save(); refresh(); return;
+      SFX.play('run'); B.log.push('You got away safely!'); B.over = true; refill(); B.busy = false; save(); refresh(); return;
     }
     await an(P, [{transform:'translateX(0)'},{transform:'translateX(-30px) rotate(-12deg)'},{transform:'translateX(0)'}], {duration:400});
     floatText(P, "Can't escape!", '');
@@ -1797,8 +1861,8 @@ async function act(type, k){
   if(e.hp <= 0){
     await wait(250); await deathFx(E);
     burst(E, 'coin', 7, 60);
-    const lv0 = S.lv; win(); refresh();
-    if(S.lv > lv0){ await wait(300); floatText(P, 'LEVEL UP!', 'big'); rise(P, 'star', 10); charge(P, '#ffd54a'); }
+    const lv0 = S.lv; win(); refresh(); SFX.play('win');
+    if(S.lv > lv0){ await wait(700); SFX.play('levelup'); floatText(P, 'LEVEL UP!', 'big'); rise(P, 'star', 10); charge(P, '#ffd54a'); }
     B.busy = false; save(); refresh(); return;
   }
 
@@ -1827,7 +1891,7 @@ async function enemyTurn(P, E){
   if(B.defend) d = Math.max(1, Math.round(d * (1 - B.defend)));
   if(B.buff.iron) d = Math.max(1, Math.round(d * .5));
   S.hp = Math.max(0, S.hp - d);
-  hitFx(P); burst(P, 'spark', 4, 45, (B.defend || B.buff.iron) ? '#8fd14f' : '#ff8a80');
+  hitFx(P); SFX.play((B.defend || B.buff.iron) ? 'guard' : heavy ? 'crit' : 'hurt'); burst(P, 'spark', 4, 45, (B.defend || B.buff.iron) ? '#8fd14f' : '#ff8a80');
   floatText(P, `-${d}`, heavy ? 'crit' : '');
   if(heavy) shakeScene();
   const g = (B.defend || B.buff.iron) ? ' (blocked some)' : '';
@@ -1863,7 +1927,7 @@ function win(){
 // after every fight: HP back to full
 function refill(){ S.hp = MHP(); B.log.push('HP fully restored.'); }
 function lose(){
-  B.over = true;
+  B.over = true; SFX.play('lose');
   const lost = Math.floor(S.gold/2); S.gold -= lost;
   B.log.push(`You were defeated... lost ${lost} gold and returned to camp.`);
   refill();
