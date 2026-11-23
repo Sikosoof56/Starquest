@@ -392,6 +392,11 @@ h1{position:relative}
 .bye h2{font-size:24px;justify-content:center}
 .bye .full{max-width:260px}
 .exit,.sound{z-index:5}
+.pw{position:relative}
+.pw input{padding-right:52px}
+.eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;height:40px;padding:0;border-radius:10px;font-size:18px;background:transparent;border:none;box-shadow:none}
+.eye{z-index:2}
+.eye:active{transform:translateY(-50%) scale(.9);box-shadow:none}
 </style>
 </head>
 <body>
@@ -1530,9 +1535,10 @@ function account(){
       <label class="lbl" for="u">Username</label>
       <input id="u" maxlength="16" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="e.g. ForestHero99" value="${esc(F.u||'')}">
       <label class="lbl" for="p">Password</label>
-      <input id="p" type="password" autocomplete="${isNew?'new-password':'current-password'}" placeholder="Password">
+      <div class="pw"><input id="p" type="password" autocomplete="${isNew?'new-password':'current-password'}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Password">
+        <button type="button" class="eye nosfx" onclick="togglePw()" aria-label="Show password">👁</button></div>
       ${isNew ? `<label class="lbl" for="p2">Confirm password</label>
-        <input id="p2" type="password" autocomplete="new-password" placeholder="Type it again">
+        <input id="p2" type="password" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type it again">
         <label class="check"><input type="checkbox" id="carry" checked> Keep my current progress (Lv.${S.lv}, Stage ${S.stage})</label>` : ''}
       <button class="pri full" type="submit">${isNew ? 'Create account' : 'Login'}</button>
     </form>
@@ -1540,6 +1546,8 @@ function account(){
     <p class="small" style="margin-top:10px">Accounts are stored on this device. Online accounts that work on any device are coming soon.</p>
     ${back()}</div>`;
 }
+let pwT = 0;
+function togglePw(){ if(Date.now() - pwT < 400) return; pwT = Date.now(); ['p','p2'].forEach(id => { const el = $(id); if(el) el.type = el.type === 'password' ? 'text' : 'password'; }); }
 async function hashPw(pw, salt){
   const data = new TextEncoder().encode(salt + ':' + pw);
   if(window.crypto && crypto.subtle){
@@ -1550,7 +1558,7 @@ async function hashPw(pw, salt){
 }
 function formErr(t){ msg = t; render(); }
 async function createAccount(){
-  const u = $('u').value.trim(), p = $('p').value, p2 = $('p2').value, carry = $('carry').checked;
+  const u = $('u').value.trim(), p = $('p').value.trim(), p2 = $('p2').value.trim(), carry = $('carry').checked;
   F = {mode:'create', u};
   if(!/^[A-Za-z0-9_]{3,16}$/.test(u)) return formErr('Username must be 3–16 letters, numbers or _');
   if(p.length < 4) return formErr('Password must be at least 4 characters');
@@ -1567,11 +1575,12 @@ async function createAccount(){
   F = {}; msg = `Welcome, ${esc(u)}! Your account is ready.`; render();
 }
 async function login(){
-  const u = $('u').value.trim(), p = $('p').value;
+  const u = $('u').value.trim(), p = $('p').value.trim();
   F = {mode:'login', u};
   if(!u || !p) return formErr('Enter your username and password');
   const a = accounts()[u.toLowerCase()];
-  if(!a || await hashPw(p, a.salt) !== a.h) return formErr('Wrong username or password');
+  if(!a) return formErr(`No account named "${esc(u)}" on this device/browser. Accounts are saved only where they were created.`);
+  if(await hashPw(p, a.salt) !== a.h) return formErr('Wrong password — tap 👁 to check what you typed.');
   save();
   CUR = a.name; lsSet(CUR_KEY, CUR);
   S = load() || newGame();
