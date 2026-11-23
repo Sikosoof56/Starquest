@@ -56,10 +56,62 @@ button.ok{background:#0d5c44;border-color:#06d6a0}
 .badge{position:absolute;top:6px;right:6px;background:#ff4d6d;color:#fff;border-radius:10px;font-size:11px;padding:1px 6px}
 .badge.soon{background:#334;color:#9fb3d9}
 /* ต่อสู้ */
-#log{height:130px;overflow-y:auto;font-size:14px;line-height:1.6}
-.enemy{text-align:center;font-size:60px;margin:6px 0}
-.shake{animation:sh .35s}
-@keyframes sh{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+#log{height:110px;overflow-y:auto;font-size:14px;line-height:1.6}
+/* ฉากต่อสู้ */
+.scene{position:relative;height:300px;border-radius:16px;overflow:hidden;margin-bottom:10px;border:1px solid #2d5a9e;
+  background:radial-gradient(ellipse at 75% 15%,#2a3f80 0%,#121d42 45%,#070b1a 80%)}
+.v-battle .scene::after{content:'';position:absolute;left:0;right:0;bottom:0;height:38%;
+  background:linear-gradient(180deg,transparent,#0b1a3a 40%,#0f2550);border-top:1px solid #5ef2ff22;z-index:0}
+.stars{position:absolute;inset:0;opacity:.7;background-size:180px 180px;animation:drift 30s linear infinite;
+  background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 90px 80px,#cfe,transparent),
+  radial-gradient(2px 2px at 150px 20px,#fff,transparent),radial-gradient(1px 1px at 60px 140px,#fff,transparent),radial-gradient(1.5px 1.5px at 130px 120px,#9ef,transparent)}
+.stars.s2{background-size:260px 260px;opacity:.4;animation-duration:55s}
+@keyframes drift{to{background-position:-360px 0}}
+.ent{position:absolute;z-index:2;line-height:1;text-align:center}
+.ent .spr{display:inline-block;animation:bob 2.4s ease-in-out infinite}
+.en{right:11%;top:66px;animation:inR .7s cubic-bezier(.2,.9,.3,1.2) backwards}
+.pl{left:9%;bottom:44px;animation:inL .7s cubic-bezier(.2,.9,.3,1.2) .15s backwards}
+.en .spr{font-size:76px;animation-delay:-1.2s}
+.pl .spr{font-size:66px}
+.boss .spr{font-size:100px;filter:drop-shadow(0 0 16px #ff4d6d)}
+.boss{top:44px}
+.pad{position:absolute;z-index:1;width:130px;height:28px;border-radius:50%;background:radial-gradient(#5ef2ff40,transparent 70%)}
+.pe{right:calc(11% - 18px);top:140px}.v-battle .boss~.pad{}
+.pp{left:calc(9% - 22px);bottom:30px}
+.ent.guard::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:3px solid #5ef2ff;
+  box-shadow:0 0 18px #5ef2ff,inset 0 0 18px #5ef2ff66;animation:pulse 1s ease-in-out infinite}
+.plate{position:absolute;z-index:3;width:48%;background:#0b1430e6;border:1px solid #2d5a9e;border-radius:10px;padding:6px 8px;font-size:12px}
+.plate .bar{height:7px;margin:3px 0}
+.plate.e{left:8px;top:8px}.plate.p{right:8px;bottom:8px}
+.ft{position:absolute;z-index:6;pointer-events:none;white-space:nowrap;font-weight:900;font-size:24px;color:#fff;
+  text-shadow:0 2px 0 #000,0 0 10px #ff4d6d}
+.ft.crit{font-size:32px;color:#ffd60a;text-shadow:0 2px 0 #000,0 0 12px #ff8800}
+.ft.heal{color:#b8ff5a;text-shadow:0 2px 0 #000,0 0 10px #06d6a0}
+.ft.mp{color:#7ff7ff;text-shadow:0 2px 0 #000,0 0 10px #3a86ff}
+.ft.big{font-size:30px;color:#ffd60a;text-shadow:0 2px 0 #000,0 0 16px #ffd60a}
+.pt{position:absolute;z-index:5;pointer-events:none;font-size:22px;transform:translate(-50%,-50%)}
+.pt.sm{font-size:16px}.pt.big{font-size:34px}
+.beam{position:absolute;z-index:4;height:10px;border-radius:5px;transform-origin:0 50%;pointer-events:none;
+  background:linear-gradient(90deg,#fff,#5ef2ff 30%,#3a86ff);box-shadow:0 0 12px #5ef2ff,0 0 28px #3a86ff}
+@keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes pulse{50%{transform:scale(1.06);opacity:.7}}
+@keyframes inR{from{transform:translateX(160px);opacity:0}}
+@keyframes inL{from{transform:translateX(-160px);opacity:0}}
+/* แอนิเมชันหน้าเมนู */
+.page{animation:fadeUp .35s ease-out}
+.page .tile{animation:pop .45s cubic-bezier(.2,.9,.3,1.3) backwards}
+.page .tile:nth-child(2){animation-delay:.05s}.page .tile:nth-child(3){animation-delay:.1s}
+.page .tile:nth-child(4){animation-delay:.15s}.page .tile:nth-child(5){animation-delay:.2s}
+.avatar{animation:bob 2.6s ease-in-out infinite}
+.tile .ic{display:inline-block;transition:transform .2s}
+.tile:active .ic{transform:scale(1.25) rotate(-8deg)}
+.hero{position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,#ffffff14,transparent);animation:shine 5s ease-in-out infinite}
+@keyframes shine{0%,60%{left:-60%}100%{left:130%}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 .item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #1f3a66}
 .item:last-child{border:0}
 .item button{padding:8px 12px;font-size:14px;white-space:nowrap}
@@ -164,14 +216,16 @@ const qVal = q => q.s==='lv' ? S.lv : (S.st[q.s]||0);
 const qReady = q => { const t = S.qt[q.id]||0; return t < q.g.length && qVal(q) >= q.g[t]; };
 
 // ====== หน้าจอ ======
-function go(v){ view = v; msg = ''; resetArm = false; if(v !== 'battle') B = null; render(); window.scrollTo(0,0); }
+let pageAnim = true;
+function go(v){ view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; render(); window.scrollTo(0,0); }
 function bar(c,v,m){ return `<div class="bar ${c}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i></div>`; }
 function back(){ return `<button class="full" onclick="go('home')">⬅️ กลับหน้าหลัก</button>`; }
 function note(){ return msg ? `<p class="msg">${msg}</p>` : ''; }
 
 function render(){
-  let h = '<h1>🚀 STAR QUEST</h1>';
+  let h = '';
   if(view==='home') h += heroCard() + menu();
+  else if(view==='battle') h += battle();
   else {
     h += topBar();
     if(view==='quest') h += quest();
@@ -180,11 +234,11 @@ function render(){
     else if(view==='pvp') h += pvp();
     else if(view==='set') h += setView();
     else if(view==='save') h += saveView();
-    else if(view==='battle') h += battle();
   }
-  document.getElementById('app').innerHTML = h;
-  const lg = document.getElementById('log'); if(lg) lg.scrollTop = lg.scrollHeight;
-  if(B) B.shake = false;
+  document.getElementById('app').innerHTML =
+    `<h1>🚀 STAR QUEST</h1><div class="${pageAnim ? 'page' : ''} v-${view}">${h}</div>`;
+  pageAnim = false;
+  if(view==='battle') refresh();
 }
 
 // การ์ดสเตตัวละคร (หน้าหลัก)
@@ -357,14 +411,19 @@ function upgrade(k){
 function applyItem(k){
   if(k==='potion'){ const b = S.hp; S.hp = Math.min(S.mhp, S.hp+40); return `ฟื้น HP ${S.hp-b}`; }
   if(k==='ether'){ const b = S.mp; S.mp = Math.min(S.mmp, S.mp+15); return `ฟื้น MP ${S.mp-b}`; }
-  if(k==='bomb'){ B.en.hp -= 35; B.shake = true; return 'ระเบิดใส่ศัตรู 35 ดาเมจ!'; }
 }
 function useItem(k){
   if(!S.inv[k] || ITEMS[k].battleOnly) return;
   S.inv[k]--; msg = ITEMS[k].e + ' ' + applyItem(k); save(); render();
 }
 
-// ====== ระบบต่อสู้แบบเทิร์น ======
+// ====== ระบบต่อสู้แบบเทิร์น (มีแอนิเมชัน) ======
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, RM ? 0 : ms));
+const an = (el, kf, opt) => el ? el.animate(kf, RM ? {...opt, duration:1} : opt).finished : Promise.resolve();
+const pct = (v,m) => Math.max(0, Math.min(100, v/m*100)) + '%';
+
 function makeEnemy(){
   const st = S.stage, boss = st % 5 === 0;
   const base = boss ? BOSSES[(st/5 - 1) % BOSSES.length] : ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
@@ -377,76 +436,230 @@ function makeEnemy(){
 }
 function startBattle(){
   if(S.hp <= 0) S.hp = 1;
-  view = 'battle'; msg = '';
-  B = { en:makeEnemy(), log:[], defend:false, menu:false, over:false, shake:false };
+  view = 'battle'; msg = ''; pageAnim = true;
+  B = { en:makeEnemy(), log:[], defend:false, menu:false, over:false, busy:false };
   B.log.push(`${B.en.e} ${B.en.n} ปรากฏตัว!`);
   render(); window.scrollTo(0,0);
 }
+
+// โครงฉาก (สร้างครั้งเดียว แล้วอัปเดตด้วย refresh)
 function battle(){
   const e = B.en;
-  let h = `<div class="card"><div class="row"><b>${e.n} <span class="small">ด่าน ${S.stage}</span></b>
-    <span class="small">HP ${Math.max(0,e.hp)}/${e.mhp}</span></div>${bar('hp',e.hp,e.mhp)}
-    <div class="enemy ${B.shake?'shake':''}">${e.hp>0 ? e.e : '💥'}</div></div>
-    <div class="card" id="log">${B.log.map(l=>`<div>${l}</div>`).join('')}</div><div class="card">`;
-  if(B.over){
-    h += `<div class="btns"><button onclick="go('home')">🏠 หน้าหลัก</button>
+  return `<div class="scene" id="scene">
+      <div class="stars"></div><div class="stars s2"></div>
+      <div class="plate e"><div class="row"><b>${e.n}</b><span>ด่าน ${S.stage}</span></div>
+        <div class="bar hp"><i id="enhp"></i></div><div class="small" id="enhpt"></div></div>
+      <div class="pad pe"></div><div class="pad pp"></div>
+      <div class="ent en ${e.boss?'boss':''}" id="en"><span class="spr">${e.e}</span></div>
+      <div class="ent pl" id="pl"><span class="spr">${ch().e}</span></div>
+      <div class="plate p"><div class="row"><b>${ch().n}</b><span>Lv.${S.lv}</span></div>
+        <div class="bar hp"><i id="plhp"></i></div>
+        <div class="bar mp"><i id="plmp"></i></div><div class="small" id="plt"></div></div>
+    </div>
+    <div class="card" id="log"></div>
+    <div class="card" id="ctrl"></div>`;
+}
+function refresh(){
+  if(view !== 'battle' || !B || !$('scene')) return;
+  const e = B.en;
+  $('enhp').style.width = pct(e.hp, e.mhp);
+  $('enhpt').textContent = `HP ${Math.max(0,e.hp)}/${e.mhp}`;
+  $('plhp').style.width = pct(S.hp, S.mhp);
+  $('plmp').style.width = pct(S.mp, S.mmp);
+  $('plt').textContent = `HP ${S.hp}/${S.mhp} · MP ${S.mp}/${S.mmp}`;
+  $('pl').classList.toggle('guard', B.defend);
+  const lg = $('log');
+  lg.innerHTML = B.log.slice(-30).map(l => `<div>${l}</div>`).join('');
+  lg.scrollTop = lg.scrollHeight;
+  $('ctrl').innerHTML = controls();
+}
+function controls(){
+  const e = B.en, dis = B.busy ? 'disabled' : '';
+  if(B.over) return `<div class="btns"><button onclick="go('home')">🏠 หน้าหลัก</button>
       <button class="pri" onclick="startBattle()">⚔️ สู้ต่อ ด่าน ${S.stage}</button></div>`;
-  } else if(B.menu){
-    let any = false;
+  if(B.menu){
+    let h = '', any = false;
     for(const k in ITEMS){ const n = S.inv[k]||0; if(!n) continue; any = true;
       h += `<div class="item"><div>${ITEMS[k].e} ${ITEMS[k].n} x${n}<div class="small">${ITEMS[k].d}</div></div>
-        <button onclick="act('item','${k}')">ใช้</button></div>`;
+        <button onclick="act('item','${k}')" ${dis}>ใช้</button></div>`;
     }
     if(!any) h += '<p class="small">ไม่มีไอเทม</p>';
-    h += `<button class="full" onclick="B.menu=false;render()">⬅️ ย้อนกลับ</button>`;
-  } else {
-    h += `<div class="btns">
-      <button onclick="act('atk')">⚔️ โจมตี</button>
-      <button onclick="act('laser')" ${S.mp<6?'disabled':''}>⚡ เลเซอร์ (6MP)</button>
-      <button onclick="act('fix')" ${S.mp<8?'disabled':''}>🔧 ซ่อมแซม (8MP)</button>
-      <button onclick="act('guard')">🛡️ ป้องกัน</button>
-      <button onclick="B.menu=true;render()">🎒 ไอเทม</button>
-      <button class="warn" onclick="act('run')" ${e.boss?'disabled':''}>🏃 หนี</button></div>`;
+    return h + `<button class="full" onclick="B.menu=false;refresh()" ${dis}>⬅️ ย้อนกลับ</button>`;
   }
-  return h + '</div>';
+  return `<div class="btns">
+    <button onclick="act('atk')" ${dis}>⚔️ โจมตี</button>
+    <button onclick="act('laser')" ${dis || (S.mp<6?'disabled':'')}>⚡ เลเซอร์ (6MP)</button>
+    <button onclick="act('fix')" ${dis || (S.mp<8?'disabled':'')}>🔧 ซ่อมแซม (8MP)</button>
+    <button onclick="act('guard')" ${dis}>🛡️ ป้องกัน</button>
+    <button onclick="B.menu=true;refresh()" ${dis}>🎒 ไอเทม</button>
+    <button class="warn" onclick="act('run')" ${dis || (e.boss?'disabled':'')}>🏃 หนี</button></div>`;
 }
-function act(type, k){
-  if(!B || B.over) return;
-  const e = B.en; B.defend = false; B.menu = false;
+
+// ---- ตัวช่วยเอฟเฟกต์ ----
+function center(el){
+  const s = $('scene').getBoundingClientRect(), r = el.getBoundingClientRect();
+  return { x:r.left - s.left + r.width/2, y:r.top - s.top + r.height/2 };
+}
+function spawn(cls, html, x, y){
+  const d = document.createElement('div'); d.className = cls; d.innerHTML = html;
+  d.style.left = x + 'px'; d.style.top = y + 'px'; $('scene').appendChild(d); return d;
+}
+function floatText(el, t, cls=''){
+  const c = center(el), d = spawn('ft ' + cls, t, c.x, c.y - 40);
+  an(d, [{transform:'translate(-50%,0) scale(.5)',opacity:0},
+         {transform:'translate(-50%,-18px) scale(1.25)',opacity:1,offset:.2},
+         {transform:'translate(-50%,-70px) scale(1)',opacity:0}],
+     {duration:1100,easing:'ease-out'}).then(() => d.remove());
+}
+function burst(el, emo, n=6, spread=70){
+  const c = center(el);
+  for(let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2, r = spread*(.5+Math.random()*.7);
+    const d = spawn('pt', emo, c.x, c.y);
+    an(d, [{transform:'translate(-50%,-50%) scale(.4)',opacity:1},
+           {transform:`translate(calc(-50% + ${Math.cos(a)*r}px),calc(-50% + ${Math.sin(a)*r}px)) scale(1.1)`,opacity:0}],
+       {duration:600+Math.random()*300,easing:'cubic-bezier(.2,.8,.3,1)'}).then(() => d.remove());
+  }
+}
+function sparkle(el, emo, n=8){
+  const c = center(el);
+  for(let i=0;i<n;i++){
+    const x = c.x + (Math.random()-.5)*70, d = spawn('pt sm', emo, x, c.y + 25);
+    an(d, [{transform:'translate(-50%,0) scale(.5)',opacity:0},
+           {transform:'translate(-50%,-30px) scale(1)',opacity:1,offset:.3},
+           {transform:`translate(-50%,-${70+Math.random()*30}px) scale(.6)`,opacity:0}],
+       {duration:900,delay:i*70,easing:'ease-out'}).then(() => d.remove());
+  }
+}
+const lunge = (el, dir, big) => an(el, [
+  {transform:'translate(0,0) scale(1)'},
+  {transform:`translate(${-14*dir}px,${8*dir}px) scale(.95)`, offset:.25},
+  {transform:`translate(${(big?110:80)*dir}px,${-(big?60:45)*dir}px) scale(${big?1.25:1.12})`, offset:.55},
+  {transform:'translate(0,0) scale(1)'}], {duration:big?520:420, easing:'ease-in-out'});
+const hitFx = el => an(el, [
+  {filter:'brightness(4) saturate(0)',transform:'translateX(0)'},
+  {transform:'translateX(-10px)'},{transform:'translateX(10px)'},{transform:'translateX(-5px)'},
+  {filter:'brightness(1)',transform:'translateX(0)'}], {duration:360});
+const charge = (el, col) => an(el, [
+  {filter:`drop-shadow(0 0 0 ${col})`,transform:'scale(1)'},
+  {filter:`drop-shadow(0 0 22px ${col}) brightness(1.5)`,transform:'scale(1.1)',offset:.7},
+  {filter:`drop-shadow(0 0 0 ${col})`,transform:'scale(1)'}], {duration:520});
+const shakeScene = () => an($('scene'), [
+  {transform:'translate(0,0)'},{transform:'translate(-7px,4px)'},{transform:'translate(6px,-4px)'},
+  {transform:'translate(-4px,2px)'},{transform:'translate(0,0)'}], {duration:320});
+async function beam(from, to){
+  const a = center(from), b = center(to), ang = Math.atan2(b.y-a.y, b.x-a.x), len = Math.hypot(b.x-a.x, b.y-a.y);
+  const d = spawn('beam', '', a.x, a.y - 5); d.style.width = len + 'px';
+  const r = `rotate(${ang}rad)`;
+  await an(d, [{transform:`${r} scaleX(0)`,opacity:1},{transform:`${r} scaleX(1)`,opacity:1,offset:.35},
+               {transform:`${r} scaleX(1) scaleY(.2)`,opacity:0}], {duration:480,easing:'ease-out'});
+  d.remove();
+}
+async function throwArc(from, to, emo){
+  const a = center(from), b = center(to), d = spawn('pt big', emo, a.x, a.y);
+  const dx = b.x-a.x, dy = b.y-a.y;
+  await an(d, [{transform:'translate(-50%,-50%) rotate(0)'},
+               {transform:`translate(calc(-50% + ${dx/2}px),calc(-50% + ${dy/2-90}px)) rotate(360deg)`},
+               {transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) rotate(720deg)`}],
+     {duration:600,easing:'ease-in'});
+  d.remove();
+}
+const deathFx = el => { burst(el,'💥',8,90); return an(el, [
+  {transform:'scale(1) rotate(0)',opacity:1},
+  {transform:'scale(1.3) rotate(15deg)',filter:'brightness(4)',opacity:1,offset:.3},
+  {transform:'scale(0) rotate(-200deg)',opacity:0}], {duration:750,easing:'ease-in',fill:'forwards'}); };
+
+// ---- เทิร์นของผู้เล่น + ศัตรู ----
+async function act(type, k){
+  if(!B || B.over || B.busy) return;
+  const e = B.en;
+  if((type==='laser' && S.mp<6) || (type==='fix' && S.mp<8) || (type==='item' && !S.inv[k]) || (type==='run' && e.boss)) return;
+  B.busy = true; B.defend = false; B.menu = false; refresh();
+  const P = $('pl'), E = $('en');
+
   if(type==='atk'){
     const crit = Math.random() < .12, d = dmgCalc(atk(), e.def, crit ? 1.7 : 1);
-    e.hp -= d; B.shake = true;
+    await lunge(P, 1);
+    e.hp -= d; hitFx(E); burst(E, crit?'💥':'✦', crit?6:3, 50);
+    floatText(E, crit ? `CRIT -${d}` : `-${d}`, crit ? 'crit' : '');
+    if(crit) shakeScene();
     B.log.push(crit ? `💥 คริติคอล! คุณโจมตี ${d} ดาเมจ` : `⚔️ คุณโจมตี ${d} ดาเมจ`);
   } else if(type==='laser'){
-    if(S.mp < 6) return; S.mp -= 6; S.st.lasers++;
-    const d = dmgCalc(atk()*1.8, e.def*.5); e.hp -= d; B.shake = true;
+    S.mp -= 6; S.st.lasers++; refresh();
+    const d = dmgCalc(atk()*1.8, e.def*.5);
+    await charge(P, '#5ef2ff'); await beam(P, E);
+    e.hp -= d; hitFx(E); burst(E, '⚡', 6, 60); shakeScene();
+    floatText(E, `-${d}`, 'crit');
     B.log.push(`⚡ ยิงเลเซอร์ทะลวง ${d} ดาเมจ!`);
   } else if(type==='fix'){
-    if(S.mp < 8) return; S.mp -= 8;
+    S.mp -= 8;
     const b = S.hp; S.hp = Math.min(S.mhp, S.hp + Math.round(S.mhp*.4));
+    charge(P, '#9ef01a'); sparkle(P, '✨', 10); floatText(P, `+${S.hp-b}`, 'heal');
     B.log.push(`🔧 ซ่อมแซมตัวเอง ฟื้น HP ${S.hp-b}`);
+    await wait(500);
   } else if(type==='guard'){
     B.defend = true; S.mp = Math.min(S.mmp, S.mp+3);
+    floatText(P, '+3 MP', 'mp');
     B.log.push('🛡️ ตั้งท่าป้องกัน (+3 MP)');
+    refresh(); await wait(400);
   } else if(type==='item'){
-    if(!S.inv[k]) return; S.inv[k]--;
-    B.log.push(ITEMS[k].e + ' ' + applyItem(k));
+    S.inv[k]--;
+    if(k==='bomb'){
+      await throwArc(P, E, '💣');
+      e.hp -= 35; hitFx(E); burst(E, '💥', 8, 80); shakeScene();
+      floatText(E, '-35', 'crit');
+      B.log.push('💣 ระเบิดพลาสมาใส่ศัตรู 35 ดาเมจ!');
+    } else {
+      const t = applyItem(k);
+      sparkle(P, k==='potion' ? '💚' : '🔷', 8);
+      floatText(P, t.replace(/\D+/g,'') ? '+' + t.replace(/\D+/g,'') : '+0', k==='potion' ? 'heal' : 'mp');
+      B.log.push(ITEMS[k].e + ' ' + t);
+      await wait(500);
+    }
   } else if(type==='run'){
-    if(e.boss) return;
-    if(Math.random() < .5){ B.log.push('🏃 หนีสำเร็จ!'); B.over = true; save(); render(); return; }
+    if(Math.random() < .5){
+      await an(P, [{transform:'translateX(0)'},{transform:'translateX(-30px) scaleX(-1)',offset:.2},
+                   {transform:'translateX(-360px) scaleX(-1)'}], {duration:600,easing:'ease-in',fill:'forwards'});
+      B.log.push('🏃 หนีสำเร็จ!'); B.over = true; B.busy = false; save(); refresh(); return;
+    }
+    await an(P, [{transform:'translateX(0)'},{transform:'translateX(-30px) rotate(-12deg)'},{transform:'translateX(0)'}], {duration:400});
+    floatText(P, 'หนีไม่พ้น!', '');
     B.log.push('🏃 หนีไม่สำเร็จ!');
   }
-  if(e.hp <= 0){ win(); save(); render(); return; }
-  enemyTurn();
-  if(S.hp <= 0) lose();
-  save(); render();
+  refresh();
+
+  if(e.hp <= 0){
+    await wait(250); await deathFx(E);
+    burst(E, '💰', 6, 60);
+    const lv0 = S.lv; win(); refresh();
+    if(S.lv > lv0){ await wait(300); floatText(P, 'LEVEL UP!', 'big'); sparkle(P, '⭐', 12); charge(P, '#ffd60a'); }
+    B.busy = false; save(); refresh(); return;
+  }
+
+  await wait(450);
+  await enemyTurn(P, E);
+  if(S.hp <= 0){
+    await wait(250);
+    await an(P, [{opacity:1,transform:'none'},{opacity:.25,transform:'rotate(-90deg) translate(-10px,10px)'}],
+       {duration:650,fill:'forwards'});
+    lose();
+  }
+  B.busy = false; save(); refresh();
 }
-function enemyTurn(){
+async function enemyTurn(P, E){
   const e = B.en, heavy = Math.random() < (e.boss ? .3 : .18);
   let d = dmgCalc(e.atk, def(), heavy ? 1.5 : 1);
   if(B.defend) d = Math.max(1, Math.round(d/2));
+  if(heavy){ floatText(E, '!!', 'crit'); await charge(E, '#ff4d6d'); }
+  await lunge(E, -1, heavy);
   S.hp = Math.max(0, S.hp - d);
-  B.log.push(heavy ? `🔥 ${e.n} ใช้ท่าโจมตีหนัก! คุณโดน ${d}` : `${e.e} ${e.n} โจมตี คุณโดน ${d}`);
+  hitFx(P); burst(P, B.defend ? '🛡️' : '✦', 3, 45);
+  floatText(P, `-${d}`, heavy ? 'crit' : '');
+  if(heavy) shakeScene();
+  B.log.push(heavy ? `🔥 ${e.n} ใช้ท่าโจมตีหนัก! คุณโดน ${d}${B.defend?' (ป้องกันไว้ครึ่งหนึ่ง)':''}`
+                   : `${e.e} ${e.n} โจมตี คุณโดน ${d}${B.defend?' (ป้องกันไว้ครึ่งหนึ่ง)':''}`);
+  refresh();
+  await wait(300);
 }
 function win(){
   const e = B.en; B.over = true;
