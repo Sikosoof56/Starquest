@@ -372,6 +372,15 @@ button.cooling .si{filter:grayscale(1) brightness(.7)}
 .chb.on{color:var(--gold);border-color:var(--gold)}
 button.chb{padding:5px 8px;font-size:12px;gap:3px}
 button.chb .i{width:13px;height:13px}
+*{touch-action:manipulation}
+h1{position:relative}
+.exit{position:absolute;right:0;top:50%;transform:translateY(-50%);width:38px;height:38px;padding:0;border-radius:50%;font-size:16px;font-family:system-ui;
+  background:linear-gradient(180deg,#5a2418,#3a140c);border-color:#a8392b;color:#ffd7cc;box-shadow:0 2px 0 #1a0805}
+.exit:active{transform:translateY(-50%) scale(.92)}
+.exit.cv{position:fixed;z-index:60;top:max(12px,env(safe-area-inset-top));right:12px;transform:none;background:#0008;border-color:#ffffff44;color:#fff}
+.dlg-wrap{position:fixed;inset:0;z-index:100;background:#000a;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeUp .2s ease-out}
+.dlg{width:100%;max-width:340px;background:linear-gradient(180deg,#24472d,#152b1b);border:1px solid #4b8a4f;border-radius:18px;padding:18px;text-align:center;box-shadow:0 10px 30px #000c}
+.dlg h2{justify-content:center}
 </style>
 </head>
 <body>
@@ -988,6 +997,18 @@ const QUESTS = [
 ['gesturestart','gesturechange','gestureend'].forEach(ev =>
   document.addEventListener(ev, e => e.preventDefault(), {passive:false}));
 document.addEventListener('touchmove', e => { if(e.touches.length > 1) e.preventDefault(); }, {passive:false});
+// stop double-tap zoom: a second quick tap is turned into a normal click instead of a zoom
+let lastTap = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if(now - lastTap < 350 && !e.target.closest('input,textarea,select,label')){
+    e.preventDefault();
+    const t = e.target.closest('button,[onclick]');
+    if(t && !t.disabled) t.click();
+  }
+  lastTap = now;
+}, {passive:false});
+document.addEventListener('dblclick', e => e.preventDefault(), {passive:false});
 
 // ====== Helpers ======
 const $ = id => document.getElementById(id);
@@ -1076,6 +1097,23 @@ function bar(c,v,m){ return `<div class="bar ${c}"><i style="width:${Math.max(0,
 function back(){ return `<button class="full" onclick="go('home')">${IC.back} Back to Home</button>`; }
 function note(){ return msg ? `<p class="msg">${msg}</p>` : ''; }
 
+// ---- Exit game (top-right X) ----
+const exitBtn = (c='') => `<button class="exit ${c}" onclick="event.stopPropagation();askExit()" aria-label="Exit game">✕</button>`;
+function askExit(){
+  if(B && B.busy) return;
+  const d = document.createElement('div'); d.className = 'dlg-wrap'; d.id = 'dlg';
+  d.innerHTML = `<div class="dlg"><h2>Exit STAR QUEST?</h2><p class="small">Your progress is saved automatically.</p>
+    <div class="btns"><button onclick="$('dlg').remove()">Stay</button><button class="warn" onclick="exitGame()">Exit</button></div></div>`;
+  d.onclick = e => { if(e.target === d) d.remove(); };
+  document.body.appendChild(d);
+}
+function exitGame(){
+  save();
+  try{ window.close(); }catch(e){}
+  // browsers only let a page close itself if a script opened it — otherwise leave the link
+  setTimeout(() => location.replace('about:blank'), 250);
+}
+
 // ---- Cover / title screen ----
 function cover(){
   let embers = '';
@@ -1120,7 +1158,7 @@ function cover(){
 }
 
 function render(){
-  if(view === 'cover'){ $('app').innerHTML = cover(); return; }
+  if(view === 'cover'){ $('app').innerHTML = cover() + exitBtn('cv'); return; }
   let h = '';
   if(view==='home') h += heroCard() + menu();
   else if(view==='battle') h += battle();
@@ -1136,7 +1174,7 @@ function render(){
     else if(view==='save') h += saveView();
     else if(view==='account') h += account();
   }
-  $('app').innerHTML = `<h1><span class="crest">${IC.star}</span> STAR QUEST</h1><div class="${pageAnim ? 'page' : ''} v-${view}">${h}</div>`;
+  $('app').innerHTML = `<h1><span class="crest">${IC.star}</span> STAR QUEST${exitBtn()}</h1><div class="${pageAnim ? 'page' : ''} v-${view}">${h}</div>`;
   pageAnim = false;
   if(view==='battle') refresh();
 }
@@ -1475,10 +1513,11 @@ function makeEnemy(mode, st){
   const boss = st % 5 === 0, steelM = mode === 'steel';
   const list = steelM ? STEEL_ENEMIES : ENEMIES, bl = steelM ? STEEL_BOSSES : BOSSES;
   const base = boss ? bl[(st/5 - 1) % bl.length] : list[Math.floor(Math.random()*list.length)];
-  const hp = Math.round((steelM ? 55 + st*13 : 45 + st*11) * (boss ? 1.8 : 1));
+  const EASE = .8;   // monsters are 20% weaker (HP and ATK)
+  const hp = Math.round((steelM ? 55 + st*13 : 45 + st*11) * (boss ? 1.8 : 1) * EASE);
   return { n:base.n, art:base.art, fly:!!base.fly, tint:base.tint||'', hp, mhp:hp, boss,
     spd: base.spd + Math.floor(st*.5),
-    atk: Math.round((7 + st*2) * (boss ? 1.15 : 1)),
+    atk: Math.round((7 + st*2) * (boss ? 1.15 : 1) * EASE),
     def: Math.round((2 + st*1) * (boss ? 1.2 : 1)),
     gold: Math.round((10 + st*6) * (boss ? 2 : 1)),
     exp:  Math.round((10 + st*6) * (boss ? 2 : 1)) };
