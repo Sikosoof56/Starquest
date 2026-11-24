@@ -930,6 +930,17 @@ function sIcon(id){
 // ====== GAME DATA (edit names / prices / stats here) ======
 const KEY = 'starquest_save_v1';          // guest save
 const ACC_KEY = 'sq_accounts', CUR_KEY = 'sq_current';
+// Firebase (online accounts + cloud saves). This config is public by design — security comes from Firestore rules.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDAxIvn7dntesrV1Gwh_VjAjuKT0iGHrWM",
+  authDomain: "starquest-810d4.firebaseapp.com",
+  projectId: "starquest-810d4",
+  storageBucket: "starquest-810d4.firebasestorage.app",
+  messagingSenderId: "941150332647",
+  appId: "1:941150332647:web:d38ec63f3be300ac6ce442"
+};
+const FB_VER = '10.14.1';
+const userEmail = u => u.toLowerCase() + '@players.starquest.game';   // usernames become hidden e-mails for Firebase
 
 // Characters — base stats (levels do NOT change stats; items do). Every character has 20% crit rate.
 // skills: [normal attack, skill 1 (CD 1), skill 2 (CD 2), skill 3 (CD 5)]
@@ -1130,11 +1141,10 @@ if(lsGet('sq_reset') !== RESET_VER){
   lsSet('sq_reset', RESET_VER);
 }
 function accounts(){ try{ return JSON.parse(lsGet(ACC_KEY) || '{}'); } catch(e){ return {}; } }
-let CUR = lsGet(CUR_KEY);
-if(CUR && !accounts()[CUR.toLowerCase()]) CUR = null;
+let CUR = lsGet(CUR_KEY);      // name of the signed-in online account (Firebase confirms it on load)
 const saveKey = () => CUR ? 'sq_save_' + CUR.toLowerCase() : KEY;
 function load(){ const t = lsGet(saveKey()); if(!t) return null; try{ return fix(JSON.parse(t)); } catch(e){ return null; } }
-function save(){ lsSet(saveKey(), JSON.stringify(S)); }
+function save(){ lsSet(saveKey(), JSON.stringify(S)); cloudSave(); }
 let S = load() || newGame();
 S.hp = 0;   // set after helpers load
 let B = null, view = 'cover', msg = '', resetArm = false, pageAnim = true, F = {};
@@ -1513,82 +1523,131 @@ function upgrade(k){
   msg = `${GEAR[k].n} upgraded to +${lv+1}!`; save(); render();
 }
 
-// ---- Account (login / sign up) ----
+// ---- Online accounts (Firebase Auth + Firestore) ----
+const FB = { ok:false, loading:true, user:null, pendingName:null, pendingStart:null };
+async function fbInit(){
+  try{
+    const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
+    const [appM, authM, fsM] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')]);
+    const app = appM.initializeApp(FIREBASE_CONFIG);
+    FB.A = authM; FB.F = fsM; FB.auth = authM.getAuth(app); FB.db = fsM.getFirestore(app);
+    FB.ok = true;
+    authM.onAuthStateChanged(FB.auth, onUser);
+  }catch(e){ FB.ok = false; FB.err = e; }
+  FB.loading = false;
+  if(view === 'account') render();
+}
+function safeRender(){ if(view === 'battle' && B && !B.over) return; render(); }
+async function onUser(user){
+  FB.user = user;
+  if(user){
+    const name = FB.pendingName || user.displayName || user.email.split('@')[0];
+    if(CUR !== name){ CUR = name; lsSet(CUR_KEY, name); S = load() || newGame(); }
+    try{
+      const ref = FB.F.doc(FB.db, 'saves', user.uid), snap = await FB.F.getDoc(ref);
+      if(snap.exists() && !FB.pendingStart){ S = fix(JSON.parse(snap.data().data)); lsSet(saveKey(), JSON.stringify(S)); }
+      else { if(FB.pendingStart) S = fix(FB.pendingStart); lsSet(saveKey(), JSON.stringify(S)); await cloudSave(true); }
+    }catch(e){ msg = 'Signed in, but the cloud save could not be reached. Playing with the copy on this device.'; }
+    FB.pendingStart = null; FB.pendingName = null;
+  } else if(CUR){
+    CUR = null; lsDel(CUR_KEY); S = load() || newGame();
+  }
+  S.hp = MHP();
+  safeRender();
+}
+let cloudT = null;
+function cloudSave(now){
+  if(!FB.ok || !FB.user) return Promise.resolve();
+  clearTimeout(cloudT);
+  const go = () => FB.F.setDoc(FB.F.doc(FB.db, 'saves', FB.user.uid), { name: CUR, data: JSON.stringify(S), updated: Date.now() }).catch(() => {});
+  if(now) return go();
+  cloudT = setTimeout(go, 1500); return Promise.resolve();
+}
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'hidden') cloudSave(true); });
+const fbMsg = e => {
+  const c = (e && e.code) || '';
+  if(c.includes('email-already-in-use')) return 'That username is already taken — try another one.';
+  if(c.includes('weak-password')) return 'Password must be at least 6 characters.';
+  if(c.includes('invalid-credential') || c.includes('wrong-password') || c.includes('user-not-found') || c.includes('invalid-email'))
+    return 'Wrong username or password — tap 👁 to check what you typed.';
+  if(c.includes('too-many-requests')) return 'Too many tries. Please wait a minute and try again.';
+  if(c.includes('network')) return 'No internet connection — check your network and try again.';
+  if(c.includes('operation-not-allowed')) return 'Online login is not switched on yet (Email/Password in Firebase).';
+  if(c.includes('unauthorized-domain')) return 'This website is not allowed yet in Firebase (Authorized domains).';
+  return 'Something went wrong (' + (c || 'unknown') + '). Please try again.';
+};
+
 function account(){
-  if(CUR){
+  if(CUR && FB.user){
     return `<div class="card"><h2>Account</h2>
       <div class="row" style="justify-content:flex-start;gap:12px;margin:6px 0 10px">
         <div class="avatar">${artOf(ch().art)}</div>
         <div><div class="small">Signed in as</div><b style="font-size:18px">${esc(CUR)}</b>
           <div class="small">Lv.${S.lv} · Stage ${S.stage} · ${S.gold} gold</div></div></div>
-      <p class="small">Your progress saves to this account automatically.</p>
+      <p class="small">☁️ Online account — your progress is saved to the cloud. Log in with the same name and password on any phone or browser.</p>
       <button class="warn full" onclick="logout()">Log out</button>
       ${note()}${back()}</div>`;
   }
-  const m = F.mode || 'login', isNew = m === 'create';
+  if(FB.loading) return `<div class="card"><h2>Account</h2><p class="small">Connecting to the server…</p>${back()}</div>`;
+  if(!FB.ok) return `<div class="card"><h2>Account</h2><p class="small">Can't reach the login server right now. Check your internet, then reopen the game. You can still play as Guest.</p>
+    <button class="full" onclick="FB.loading=true;render();fbInit()">Try again</button>${back()}</div>`;
+  const m = F.mode || 'login', isNew = m === 'create', busy = F.busy ? 'disabled' : '';
   return `<div class="card"><h2>${isNew ? 'Create Account' : 'Login'}</h2>
     <div class="btns" style="margin-bottom:10px">
-      <button class="${!isNew?'pri':''}" onclick="F={mode:'login',u:F.u};msg='';render()">Login</button>
-      <button class="${isNew?'pri':''}" onclick="F={mode:'create',u:F.u};msg='';render()">Create account</button>
+      <button class="${!isNew?'pri':''}" onclick="F={mode:'login',u:F.u};msg='';render()" ${busy}>Login</button>
+      <button class="${isNew?'pri':''}" onclick="F={mode:'create',u:F.u};msg='';render()" ${busy}>Create account</button>
     </div>
     <form onsubmit="event.preventDefault();${isNew ? 'createAccount()' : 'login()'}">
       <label class="lbl" for="u">Username</label>
-      <input id="u" maxlength="16" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="e.g. ForestHero99" value="${esc(F.u||'')}">
-      <label class="lbl" for="p">Password</label>
+      <input id="u" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="e.g. ForestHero99" value="${esc(F.u||'')}">
+      <label class="lbl" for="p">Password${isNew ? ' (at least 6 characters)' : ''}</label>
       <div class="pw"><input id="p" type="password" autocomplete="${isNew?'new-password':'current-password'}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Password">
         <button type="button" class="eye nosfx" onclick="togglePw()" aria-label="Show password">👁</button></div>
       ${isNew ? `<label class="lbl" for="p2">Confirm password</label>
         <input id="p2" type="password" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type it again">
         <label class="check"><input type="checkbox" id="carry" checked> Keep my current progress (Lv.${S.lv}, Stage ${S.stage})</label>` : ''}
-      <button class="pri full" type="submit">${isNew ? 'Create account' : 'Login'}</button>
+      <button class="pri full" type="submit" ${busy}>${F.busy ? 'Please wait…' : isNew ? 'Create account' : 'Login'}</button>
     </form>
     ${note()}
-    <p class="small" style="margin-top:10px">Accounts are stored on this device. Online accounts that work on any device are coming soon.</p>
+    <p class="small" style="margin-top:10px">☁️ Online accounts: log in on any phone or browser and your progress follows you.</p>
     ${back()}</div>`;
 }
 let pwT = 0;
 function togglePw(){ if(Date.now() - pwT < 400) return; pwT = Date.now(); ['p','p2'].forEach(id => { const el = $(id); if(el) el.type = el.type === 'password' ? 'text' : 'password'; }); }
-async function hashPw(pw, salt){
-  const data = new TextEncoder().encode(salt + ':' + pw);
-  if(window.crypto && crypto.subtle){
-    const b = await crypto.subtle.digest('SHA-256', data);
-    return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join('');
-  }
-  let h = 5381; for(const c of data) h = ((h * 33) ^ c) >>> 0; return 'x' + h.toString(16);
-}
-function formErr(t){ msg = t; render(); }
+function formErr(t){ F.busy = false; msg = t; render(); }
 async function createAccount(){
+  if(!FB.ok || F.busy) return;
   const u = $('u').value.trim(), p = $('p').value.trim(), p2 = $('p2').value.trim(), carry = $('carry').checked;
   F = {mode:'create', u};
   if(!/^[A-Za-z0-9_]{3,16}$/.test(u)) return formErr('Username must be 3–16 letters, numbers or _');
-  if(p.length < 4) return formErr('Password must be at least 4 characters');
+  if(p.length < 6) return formErr('Password must be at least 6 characters');
   if(p !== p2) return formErr('Passwords do not match');
-  const A = accounts(), id = u.toLowerCase();
-  if(A[id]) return formErr('That username is already taken on this device');
-  const salt = Math.random().toString(36).slice(2, 10);
-  A[id] = { name:u, salt, h: await hashPw(p, salt) };
-  lsSet(ACC_KEY, JSON.stringify(A));
-  const start = carry ? JSON.parse(JSON.stringify(S)) : newGame();
-  save();
-  CUR = u; lsSet(CUR_KEY, u);
-  S = fix(start); save();
-  F = {}; msg = `Welcome, ${esc(u)}! Your account is ready.`; render();
+  F.busy = true; msg = ''; render();
+  save();                                                   // keep the guest copy as it is
+  FB.pendingName = u;
+  FB.pendingStart = carry ? JSON.parse(JSON.stringify(S)) : newGame();
+  try{
+    const cred = await FB.A.createUserWithEmailAndPassword(FB.auth, userEmail(u), p);
+    try{ await FB.A.updateProfile(cred.user, { displayName: u }); }catch(e){}
+    F = {}; msg = `Welcome, ${esc(u)}! Your online account is ready.`; SFX.play('levelup'); render();
+  }catch(e){ FB.pendingName = null; FB.pendingStart = null; formErr(fbMsg(e)); }
 }
 async function login(){
+  if(!FB.ok || F.busy) return;
   const u = $('u').value.trim(), p = $('p').value.trim();
   F = {mode:'login', u};
   if(!u || !p) return formErr('Enter your username and password');
-  const a = accounts()[u.toLowerCase()];
-  if(!a) return formErr(`No account named "${esc(u)}" on this device/browser. Accounts are saved only where they were created.`);
-  if(await hashPw(p, a.salt) !== a.h) return formErr('Wrong password — tap 👁 to check what you typed.');
+  F.busy = true; msg = ''; render();
   save();
-  CUR = a.name; lsSet(CUR_KEY, CUR);
-  S = load() || newGame();
-  F = {}; msg = `Logged in as ${esc(CUR)}`; render();
+  try{
+    await FB.A.signInWithEmailAndPassword(FB.auth, userEmail(u), p);
+    F = {}; msg = `Logged in as ${esc(u)}`; SFX.play('coin'); render();
+  }catch(e){ formErr(fbMsg(e)); }
 }
-function logout(){
-  save(); CUR = null; lsDel(CUR_KEY);
-  S = load() || newGame();
+async function logout(){
+  await cloudSave(true);
+  try{ await FB.A.signOut(FB.auth); }catch(e){}
+  CUR = null; lsDel(CUR_KEY); S = load() || newGame(); S.hp = MHP();
   F = {}; msg = 'Logged out — now playing as Guest.'; render();
 }
 
@@ -2001,6 +2060,7 @@ function resetGame(){
 }
 
 render();
+fbInit();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
