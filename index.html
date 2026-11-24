@@ -25,6 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Nunito:wght@400;700;800;900&display=swap">
 <style>
+
 :root{--bg:#0d1d12;--card:#152b1b;--card2:#1c3824;--line:#2f5a37;--leaf:#8fd14f;--leaf2:#4caf50;--gold:#f2c94c;
   --ink:#eef6e6;--mute:#a9c4a0;--red:#e5533d;--blue:#3f8fd8}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -417,6 +418,16 @@ body.locked #app *:not(.sound){pointer-events:none!important}
 button.sellb{background:linear-gradient(180deg,#6b4a10,#4a3208);border-color:#c99a1e;line-height:1.15}
 button.sellb span{font-size:10px;color:#ffe08a}
 button.sellb.arm{background:linear-gradient(180deg,#a8392b,#7a2418);border-color:#e5533d}
+
+.roomcode{font-family:Cinzel,serif;font-size:44px;font-weight:900;letter-spacing:10px;color:var(--gold);margin:8px 0;text-shadow:0 3px 0 #5a3e0a}
+.joinrow{display:flex;gap:8px;margin:10px 0}
+.joinrow input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:6px;font-size:20px;font-weight:900;text-align:center}
+.joinrow button{width:auto;padding:0 22px}
+table.lb{width:100%;border-collapse:collapse;font-size:14px}
+table.lb th{color:var(--mute);font-size:12px;text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+table.lb td{padding:8px 4px;border-bottom:1px solid #20402a}
+table.lb td.rk{width:34px;text-align:center;font-weight:900}
+table.lb tr.me td{background:#2a4a1e;color:var(--gold);font-weight:800}
 </style>
 </head>
 <body>
@@ -946,7 +957,283 @@ function sIcon(id){
   }[id] || '';
   return `<svg class="si" viewBox="0 0 48 48" aria-hidden="true">${bg}${b}</svg>`;
 }
+// ---- PVP: online rooms with a room code (Firebase Firestore) ----
+// Room document rooms/{CODE}:
+//  { code, status:'waiting'|'playing'|'done', created, p1:{uid,name,st}, p2:{...}|null,
+//    hp:{p1,p2}, cd:{p1:{},p2:{}}, guard:{p1:0,p2:0}, turn:'p1'|'p2', deadline, seq, last:{...}, winner, rewarded:{} }
+const PVP_TURN_MS = 30000;
+const PV = { code:null, me:null, room:null, unsub:null, seqSeen:0, joinCode:'', err:'', anim:false, timer:null, log:[] };
+const LB = { list:null, err:'' };
+const lbRef = () => FB.F.doc(FB.db, 'rooms', '_leaderboard');
+const pvpStats = () => ({ char:S.char, hp:MHP(), atk:atk(), def:def(), spd:spd(), crit:crit() });
+const opp = me => me === 'p1' ? 'p2' : 'p1';
+function pvpCodeGen(){ const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = ''; for(let i=0;i<4;i++) c += A[Math.floor(Math.random()*A.length)]; return c; }
+const roomRef = c => FB.F.doc(FB.db, 'rooms', c);
 
+function pvp(){
+  if(PV.room && PV.room.status !== 'waiting' && view === 'pvp'){ view = 'pvpb'; return pvpBattle(); }
+  let h = `<div class="card"><h2>PVP Arena</h2>
+    <div class="pvp-art">${artOf(ch().art)}<span class="vs">VS</span>${artOf(S.char === 'valcarile' ? 'hero' : 'valc')}</div>`;
+  if(!FB.ok || !FB.user){
+    return h + `<div class="story">Log in to your online account to battle friends.</div>
+      <button class="pri full" onclick="go('account')">${IC.user} Login / Sign up</button>${back()}</div>`;
+  }
+  if(PV.room && PV.room.status === 'waiting'){
+    return h + `<div class="story" style="text-align:center">Room code<div class="roomcode">${PV.code}</div>Send this code to your friend. Waiting for them to join…</div>
+      <button class="full" onclick="copyRoom()">${IC.copy} Copy code</button>
+      <button class="warn full" onclick="pvpLeave()">Cancel room</button></div>`;
+  }
+  return h + `<div class="story">Make a room and send the code to a friend, or type their code to join. You fight with your own character, items and skills.
+      <b>Potions are not allowed.</b> Faster SPEED moves first. Each turn has 30 seconds. Wins and losses go on the leaderboard.</div>
+    <button class="pri full" onclick="pvpCreate()" ${PV.busy?'disabled':''}>${IC.sword} Create room</button>
+    <form onsubmit="event.preventDefault();pvpJoin()" class="joinrow">
+      <input id="rc" maxlength="4" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="CODE" value="${esc(PV.joinCode)}">
+      <button type="submit" ${PV.busy?'disabled':''}>Join</button>
+    </form>
+    ${PV.err ? `<p class="msg">${PV.err}</p>` : ''}
+    <button class="full" onclick="go('lb')">🏆 Leaderboard</button>${back()}</div>`;
+}
+function copyRoom(){ try{ navigator.clipboard.writeText(PV.code); msg = 'Code copied!'; }catch(e){} render(); }
+
+async function pvpCreate(){
+  if(!FB.ok || !FB.user || PV.busy) return;
+  PV.busy = true; PV.err = ''; render();
+  try{
+    let code, tries = 0;
+    do{ code = pvpCodeGen(); tries++; } while(tries < 5 && (await FB.F.getDoc(roomRef(code))).exists() && (await FB.F.getDoc(roomRef(code))).data().status !== 'done');
+    await FB.F.setDoc(roomRef(code), { code, status:'waiting', created:Date.now(), p1:{ uid:FB.user.uid, name:CUR, st:pvpStats() }, p2:null, seq:0 });
+    pvpListen(code, 'p1');
+  }catch(e){ PV.err = 'Could not create a room — check your internet.'; }
+  PV.busy = false; render();
+}
+async function pvpJoin(){
+  if(!FB.ok || !FB.user || PV.busy) return;
+  const code = ($('rc').value || '').trim().toUpperCase(); PV.joinCode = code;
+  if(code.length !== 4){ PV.err = 'Room codes have 4 characters.'; render(); return; }
+  PV.busy = true; PV.err = ''; render();
+  try{
+    await FB.F.runTransaction(FB.db, async tx => {
+      const snap = await tx.get(roomRef(code));
+      if(!snap.exists()) throw new Error('No room with that code.');
+      const r = snap.data();
+      if(r.p1.uid === FB.user.uid) throw new Error("That's your own room — send the code to a friend.");
+      if(r.status !== 'waiting' || r.p2) throw new Error('That room is already full or finished.');
+      const me = pvpStats(), first = me.spd > r.p1.st.spd ? 'p2' : 'p1';
+      tx.update(roomRef(code), { p2:{ uid:FB.user.uid, name:CUR, st:me }, status:'playing',
+        hp:{ p1:r.p1.st.hp, p2:me.hp }, cd:{ p1:{}, p2:{} }, guard:{ p1:0, p2:0 }, turn:first, deadline:Date.now() + PVP_TURN_MS, seq:1,
+        last:{ seq:1, text:`${first === 'p1' ? r.p1.name : CUR} is faster and moves first!` } });
+    });
+    pvpListen(code, 'p2');
+  }catch(e){ PV.err = e.message && !e.code ? e.message : 'Could not join — check the code and your internet.'; }
+  PV.busy = false; render();
+}
+function pvpListen(code, me){
+  pvpStop();
+  PV.code = code; PV.me = me; PV.seqSeen = 0; PV.log = [];
+  PV.unsub = FB.F.onSnapshot(roomRef(code), snap => {
+    if(PV.code !== code || !snap.exists()) return;
+    const prev = PV.room; PV.room = snap.data();
+    if(PV.room.status !== 'waiting' && (view === 'pvp' || view === 'pvpb')){
+      if(view !== 'pvpb' || !prev || prev.status === 'waiting'){ view = 'pvpb'; pageAnim = true; render(); }
+      pvpOnUpdate();
+    } else if(view === 'pvp') render();
+  });
+  clearInterval(PV.timer); PV.timer = setInterval(pvpTick, 1000);
+}
+function pvpStop(){ if(PV.unsub) PV.unsub(); PV.unsub = null; clearInterval(PV.timer); PV.timer = null; }
+async function pvpLeave(silent){
+  const r = PV.room, me = PV.me;
+  if(r && FB.ok){
+    try{
+      if(r.status === 'waiting') await FB.F.updateDoc(roomRef(PV.code), { status:'done', winner:null });
+      else if(r.status === 'playing') await FB.F.updateDoc(roomRef(PV.code), { status:'done', winner:opp(me), seq:r.seq+1,
+        last:{ seq:r.seq+1, text:`${r[me].name} left the battle.` } });
+      if(r.status === 'playing') await pvpRecord(PV.code);
+    }catch(e){}
+  }
+  pvpStop(); PV.room = null; PV.code = null; PV.me = null;
+  document.body.classList.remove('locked'); if(!silent){ view = 'pvp'; render(); }
+}
+
+// ---- PVP battle screen ----
+function pvpBattle(){
+  const r = PV.room, me = PV.me, o = opp(me), O = r[o], M = r[me];
+  return `<div class="scene" id="scene">${forestBG()}${ambient()}
+      <div class="plate e"><div class="row"><b>${esc(O.name)}</b><span>SPD ${O.st.spd} · DEF ${O.st.def}%</span></div>
+        <div class="bar hp"><i id="enhp"></i></div><div class="small" id="enhpt"></div></div>
+      <div class="shadow se"></div><div class="shadow sp"></div>
+      <div class="ent en" id="en"><div class="tintw" style="transform:scaleX(-1)">${artOf(CHARS[O.st.char].art)}</div></div>
+      <div class="ent pl" id="pl">${artOf(CHARS[M.st.char].art)}</div>
+      <div class="plate p"><div class="row"><b>${esc(M.name)}</b><span>SPD ${M.st.spd}</span></div>
+        <div class="bar hp"><i id="plhp"></i></div><div class="small" id="plt"></div></div>
+    </div>
+    <div class="card" id="log"></div>
+    <div class="card" id="ctrl"></div>`;
+}
+function pvpRefresh(){
+  const r = PV.room; if(!r || view !== 'pvpb' || !$('scene')) return;
+  const me = PV.me, o = opp(me);
+  $('enhp').style.width = pct(r.hp[o], r[o].st.hp); $('enhpt').textContent = `HP ${Math.max(0, r.hp[o])}/${r[o].st.hp}`;
+  $('plhp').style.width = pct(r.hp[me], r[me].st.hp); $('plt').textContent = `HP ${Math.max(0, r.hp[me])}/${r[me].st.hp}`;
+  $('pl').classList.toggle('guard', !!r.guard[me]); $('en').classList.toggle('guard', !!r.guard[o]);
+  const lg = $('log'); lg.innerHTML = PV.log.slice(-30).map(l => `<div>${l}</div>`).join(''); lg.scrollTop = lg.scrollHeight;
+  $('ctrl').innerHTML = pvpControls();
+  document.body.classList.toggle('locked', PV.anim);
+}
+function pvpControls(){
+  const r = PV.room, me = PV.me;
+  if(r.status === 'done'){
+    const won = r.winner === me;
+    return `<div class="turnlbl ${won?'go':''}" style="font-size:16px">${won ? '🏆 YOU WIN!' : r.winner ? '💀 You lost…' : 'Room closed'}</div>
+      <div class="btns"><button onclick="go('home')">${IC.home} Home</button><button onclick="go('lb')">🏆 Leaderboard</button><button class="pri" onclick="pvpLeave()">${IC.sword} New battle</button></div>`;
+  }
+  const mine = r.turn === me && !PV.anim, left = Math.max(0, Math.ceil((r.deadline - Date.now())/1000));
+  const dis = mine ? '' : 'disabled', mycd = r.cd[me] || {};
+  const sk = CHARS[r[me].st.char].skills.map((id,i) => { const k = SKILLS[id], cd = mycd[id]||0;
+    return `<button class="${cd?'cooling':''}" onclick="pvpAct('${id}')" ${dis || (cd?'disabled':'')}>${sIcon(id)} ${k.n}${
+      cd ? ` <small class="cdc">${cd}</small>` : (CD[i] ? ` <small class="cdt">${CD[i]}T</small>` : '')}</button>`; }).join('');
+  return `<div class="turnlbl ${mine?'go':''}">${mine ? `Your turn! ⏱ ${left}s` : `⏳ ${esc(r[opp(me)].name)}'s turn… ⏱ ${left}s`}</div>
+    <div class="btns">${sk}
+      <button disabled>${IC.bag} No potions (PVP)</button>
+      <button class="warn" onclick="pvpForfeit()">${IC.run} Give up</button></div>`;
+}
+let pvpForfeitArm = false;
+function pvpForfeit(){
+  if(!pvpForfeitArm){ pvpForfeitArm = true; PV.log.push('Tap <b>Give up</b> again to forfeit.'); pvpRefresh(); setTimeout(() => pvpForfeitArm = false, 3000); return; }
+  pvpForfeitArm = false; pvpLeave();
+}
+
+// work out one action (used by the acting player, or by the waiting player when the other times out)
+function pvpResolve(r, actor, id){
+  const tgt = opp(actor), A = r[actor].st, T = r[tgt].st, K = SKILLS[id], idx = CHARS[A.char].skills.indexOf(id);
+  const hp = { ...r.hp }, cd = { p1:{...(r.cd.p1||{})}, p2:{...(r.cd.p2||{})} }, guard = { ...r.guard };
+  const res = { seq:r.seq + 1, by:actor, skill:id, kind:K.kind, dmg:0, heal:0, crit:false };
+  if(K.kind === 'hit'){
+    res.crit = Math.random()*100 < A.crit;
+    let d = Math.round(A.atk * K.mult) * (res.crit ? 2 : 1);
+    d = d * (1 - T.def/100);
+    if(guard[tgt]){ d *= (1 - guard[tgt]); guard[tgt] = 0; res.blocked = true; }
+    res.dmg = Math.max(1, Math.round(d)); hp[tgt] = Math.max(0, hp[tgt] - res.dmg);
+  } else if(K.kind === 'heal'){
+    const b = hp[actor]; hp[actor] = Math.min(A.hp, hp[actor] + Math.round(A.atk * K.healAtk)); res.heal = hp[actor] - b;
+  } else if(K.kind === 'guard'){ guard[actor] = K.block; }
+  // cooldowns: every skill ticks down one turn, then the used one starts its cooldown
+  for(const s in cd[actor]) if(cd[actor][s] > 0) cd[actor][s]--;
+  if(CD[idx]) cd[actor][id] = CD[idx];
+  if(K.cutCd){ const s = CHARS[A.char].skills[K.cutCd[0]]; if(cd[actor][s] > 0) cd[actor][s] = Math.max(0, cd[actor][s] - K.cutCd[1]); }
+  if(K.resetCd){ const s = CHARS[A.char].skills[K.resetCd]; cd[actor][s] = 0; }
+  const nm = r[actor].name;
+  res.text = K.kind === 'hit' ? `${nm} uses ${K.n}${res.crit ? ' — CRITICAL' : ''}! ${res.dmg} damage${res.blocked ? ' (blocked some)' : ''}`
+           : K.kind === 'heal' ? `${nm} uses ${K.n} and heals ${res.heal} HP` : `${nm} uses ${K.n} and raises a guard`;
+  const upd = { hp, cd, guard, seq:res.seq, last:res, turn:tgt, deadline:Date.now() + PVP_TURN_MS };
+  if(hp[tgt] <= 0){ upd.status = 'done'; upd.winner = actor; }
+  return upd;
+}
+async function pvpAct(id, auto){
+  const r = PV.room, me = PV.me;
+  if(!r || r.status !== 'playing' || PV.anim) return;
+  const actor = auto ? opp(me) : me;
+  if(r.turn !== actor) return;
+  if(!auto && (r.cd[me]||{})[id]) return;
+  PV.anim = true; pvpRefresh();
+  try{
+    await FB.F.runTransaction(FB.db, async tx => {
+      const snap = await tx.get(roomRef(PV.code)), cur = snap.data();
+      if(cur.status !== 'playing' || cur.turn !== actor || cur.seq !== r.seq) throw new Error('stale');
+      tx.update(roomRef(PV.code), pvpResolve(cur, actor, id));
+    });
+  }catch(e){ PV.anim = false; pvpRefresh(); }
+}
+// the waiting player's game makes the idle player do a normal attack when their 30 s run out
+function pvpTick(){
+  const r = PV.room;
+  if(!r || view !== 'pvpb') return;
+  if(r.status === 'playing' && !PV.anim && r.turn !== PV.me && Date.now() > r.deadline + 2000){
+    PV.log.push(`${r[r.turn].name} ran out of time — auto attack!`);
+    pvpAct(CHARS[r[r.turn].st.char].skills[0], true);
+  } else if(r.status === 'playing' && !PV.anim && r.turn === PV.me && Date.now() > r.deadline){
+    pvpAct(CHARS[r[PV.me].st.char].skills[0]);   // my own time ran out
+  }
+  const t = document.querySelector('#ctrl .turnlbl');
+  if(t && r.status === 'playing' && !PV.anim){ const left = Math.max(0, Math.ceil((r.deadline - Date.now())/1000));
+    t.innerHTML = r.turn === PV.me ? `Your turn! ⏱ ${left}s` : `⏳ ${esc(r[r.turn].name)}'s turn… ⏱ ${left}s`; }
+}
+// play the newest action as an animation, then update the screen
+async function pvpOnUpdate(){
+  const r = PV.room, L = r && r.last, code = PV.code;
+  if(!L || L.seq <= PV.seqSeen){ pvpRefresh(); return; }
+  PV.seqSeen = L.seq;
+  if(!$('scene')){ render(); }
+  if(L.by){
+    PV.anim = true; pvpRefresh();
+    const mine = L.by === PV.me, A = mine ? $('pl') : $('en'), T = mine ? $('en') : $('pl'), K = SKILLS[L.skill], dir = mine ? 1 : -1;
+    if(L.kind === 'hit'){
+      if(mine && K.anim === 'thrust') await thrustAnim(A, T);
+      else if(mine && K.anim === 'slam') await slamAnim(A, [T]);
+      else { if(CD[CHARS[r[L.by].st.char].skills.indexOf(L.skill)]) await charge(A, K.color || '#fff'); await lunge(A, dir, K.big); }
+      if(!K.anim || !mine) slash(T, K.color || (L.crit ? '#ffd54a' : '#ffffffcc'), K.big || L.crit);
+      hitFx(T); SFX.play(L.crit ? 'crit' : 'hit');
+      burst(T, K.fx || 'spark', L.crit ? 8 : 5, 60, L.crit ? '#ffd54a' : (K.color || '#fff'));
+      floatText(T, L.crit ? `CRIT -${L.dmg}` : `-${L.dmg}`, L.crit ? 'crit' : '');
+      if(L.crit || K.big) shakeScene();
+    } else if(L.kind === 'heal'){
+      charge(A, '#8fd14f'); SFX.play('heal'); rise(A, 'plus', 9, '#b8ff5a'); floatText(A, `+${L.heal}`, 'heal'); await wait(500);
+    } else if(L.kind === 'guard'){
+      SFX.play('guard'); if(K.anim === 'shield') cls(A, 'shieldup', 600); floatText(A, 'GUARD', 'mp'); await wait(450);
+    }
+  }
+  PV.log.push(L.text);
+  if(r.status === 'done' && r.winner){
+    const won = r.winner === PV.me;
+    await wait(300);
+    pvpRecord(PV.code);
+    if(won){ await deathFx($('en')); SFX.play('win'); PV.log.push('🏆 You win!'); }
+    else { await fallFx(); SFX.play('lose'); PV.log.push('💀 You lost this time.'); }
+  }
+  if(PV.code !== code) return;
+  PV.anim = false; pvpRefresh();
+}
+
+// ---- Leaderboard: one shared document rooms/_leaderboard = { p:{ uid:{name,w,l} } } ----
+// The room gets "recorded:true" in the same transaction, so a match is only counted once.
+async function pvpRecord(code){
+  if(!FB.ok || !code) return;
+  try{
+    await FB.F.runTransaction(FB.db, async tx => {
+      const rs = await tx.get(roomRef(code)), ls = await tx.get(lbRef());
+      const r = rs.data();
+      if(!r || r.recorded || r.status !== 'done' || !r.winner || !r.p2) return;
+      const p = (ls.exists() && ls.data().p) || {};
+      const add = (who, win) => { const u = r[who]; const e = p[u.uid] || { name:u.name, w:0, l:0 }; e.name = u.name; win ? e.w++ : e.l++; p[u.uid] = e; };
+      add(r.winner, true); add(opp(r.winner), false);
+      tx.set(lbRef(), { p, updated:Date.now() });
+      tx.update(roomRef(code), { recorded:true });
+    });
+  }catch(e){}
+}
+async function lbLoad(){
+  LB.err = '';
+  if(!FB.ok){ LB.err = 'Online services are not available right now.'; render(); return; }
+  try{
+    const s = await FB.F.getDoc(lbRef()), p = (s.exists() && s.data().p) || {};
+    LB.list = Object.entries(p).map(([uid,e]) => ({ uid, ...e }))
+      .sort((a,b) => b.w - a.w || a.l - b.l || a.name.localeCompare(b.name));
+  }catch(e){ LB.err = 'Could not load the leaderboard — check your internet.'; }
+  if(view === 'lb') render();
+}
+function leaderboard(){
+  if(LB.list === null && !LB.err){ setTimeout(lbLoad, 0); return `<div class="card"><h2>🏆 PVP Leaderboard</h2><p class="small">Loading…</p>${back()}</div>`; }
+  const me = FB.user && FB.user.uid, L = LB.list || [];
+  const medal = i => ['🥇','🥈','🥉'][i] || (i+1);
+  let rows = L.slice(0,50).map((e,i) => `<tr class="${e.uid===me?'me':''}"><td class="rk">${medal(i)}</td><td>${esc(e.name)}</td><td>${e.w}</td><td>${e.l}</td><td>${Math.round(e.w/Math.max(1,e.w+e.l)*100)}%</td></tr>`).join('');
+  const mine = me && L.findIndex(e => e.uid === me);
+  return `<div class="card"><h2>🏆 PVP Leaderboard</h2>
+    ${LB.err ? `<p class="msg">${LB.err}</p>` : L.length ? `<table class="lb"><tr><th>#</th><th>Player</th><th>W</th><th>L</th><th>Win%</th></tr>${rows}</table>`
+      : '<div class="story">No PVP battles yet. Be the first on the board!</div>'}
+    ${mine > 49 ? `<p class="small">Your rank: #${mine+1}</p>` : ''}
+    <div class="btns"><button onclick="LB.list=null;render()">↻ Refresh</button><button class="pri" onclick="go('pvp')">${IC.sword} PVP</button></div>
+    ${back()}</div>`;
+}
 // ====== GAME DATA (edit names / prices / stats here) ======
 const KEY = 'starquest_save_v1';          // guest save
 const ACC_KEY = 'sq_accounts', CUR_KEY = 'sq_current';
@@ -1215,7 +1502,7 @@ const def = () => Math.min(80, cs().def + itemStat('def'));   // DEF = % damage 
 const spd = () => cs().spd + itemStat('spd');
 const crit = () => Math.min(100, 20 + itemStat('crit'));
 const LV_GOLD = lv => earn(lv * 40);          // gold reward for reaching a level
-const MODE_LV = { pvp:10 };             // level needed to open a mode
+const MODE_LV = { pvp:1 };             // level needed to open a mode
 const expNeed = () => 20 + S.lv * 15;
 const rnd = (a,b) => a + Math.random()*(b-a);
 const dmgCalc = (a,d,m=1) => Math.max(1, Math.round((a*rnd(.85,1.15) - d*.6) * m));
@@ -1228,7 +1515,7 @@ const qReady = q => { const t = S.qt[q.id]||0; return t < q.g.length && qVal(q) 
 S.hp = MHP();
 
 // ====== Screens ======
-function go(v){ if(B && B.busy) return; sellArm = null; document.body.classList.remove('locked'); view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
+function go(v){ if(B && B.busy) return; if(PV.code && !['pvp','pvpb','lb'].includes(v)) pvpLeave(true); if(v === 'lb') LB.list = null; sellArm = null; document.body.classList.remove('locked'); view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
 function bar(c,v,m){ return `<div class="bar ${c}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i></div>`; }
 function back(){ return `<button class="full" onclick="go('home')">${IC.back} Back to Home</button>`; }
 function note(){ return msg ? `<p class="msg">${msg}</p>` : ''; }
@@ -1308,6 +1595,7 @@ function render(){
   let h = '';
   if(view==='home') h += heroCard() + menu();
   else if(view==='battle') h += battle();
+  else if(view==='pvpb') h += pvpBattle();
   else {
     h += topBar();
     if(view==='quest') h += quest();
@@ -1316,6 +1604,7 @@ function render(){
     else if(view==='steel') h += steel();
     else if(view==='shop') h += shop();
     else if(view==='pvp') h += pvp();
+    else if(view==='lb') h += leaderboard();
     else if(view==='set') h += setView();
     else if(view==='save') h += saveView();
     else if(view==='account') h += account();
@@ -1323,6 +1612,7 @@ function render(){
   $('app').innerHTML = `<h1><span class="crest">${IC.star}</span> STAR QUEST${soundBtn()}${exitBtn()}</h1><div class="${pageAnim ? 'page' : ''} v-${view}">${h}</div>`;
   pageAnim = false;
   if(view==='battle') refresh();
+  if(view==='pvpb') pvpRefresh();
 }
 
 // Character card (home) — layout from the sketch
@@ -1381,7 +1671,7 @@ function menu(){
     ${tile('quest',TILE.quest,'Quests', ready ? `<span class="badge">${ready}</span>` : '')}
     ${tile('modes',TILE.story,'Story<br>Mode', S.stage%5===0 ? '<span class="badge">BOSS</span>' : '')}
     ${tile('shop',TILE.shop,'Shop')}
-    ${tile('pvp',TILE.pvp,'Create<br>PVP Room',`<span class="badge soon">Lv.${MODE_LV.pvp}</span>`)}
+    ${tile('pvp',TILE.pvp,'PVP<br>Arena','')}
     ${tile('set',TILE.set,'Upgrade /<br>Loadout')}
     ${CUR ? tile('account',`<span class="tile-av">${artOf(ch().art)}</span>`, esc(CUR)) : tile('account',TILE.login,'Login /<br>Sign up')}
   </div>`;
@@ -1512,15 +1802,6 @@ function buyGear(k){
   save(); render();
 }
 
-// ---- PVP (not open yet) ----
-function pvp(){
-  return `<div class="card"><h2>Create PVP Room</h2>
-    <div class="pvp-art">${artOf('hero')}<span class="vs">VS</span>${artOf('valc')}</div>
-    <div class="story">Online rooms are under construction. Soon you'll be able to share a room code with a friend and battle turn by turn!</div>
-    <p class="small">PVP rules: Artifacts (potions) can't be used — only your character, items and skills.</p>
-    ${back()}</div>`;
-}
-
 // ---- Upgrade / Loadout ----
 function setView(){
   let h = '<div class="card"><h2>Characters</h2><div class="chars">';
@@ -1615,7 +1896,7 @@ async function fbInit(){
   FB.loading = false;
   if(view === 'account') render();
 }
-function safeRender(){ if(view === 'battle' && B && !B.over) return; render(); }
+function safeRender(){ if((view === 'battle' && B && !B.over) || view === 'pvpb') return; render(); }
 async function onUser(user){
   FB.user = user;
   if(user){
