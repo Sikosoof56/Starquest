@@ -1000,6 +1000,12 @@ const rarTag = k => { if(typeof k === 'object') k = k.k; return rarTag0(k); };
 const rarTag0 = k => `<span class="rar r-${GEAR[k].r}">${RAR_N[GEAR[k].r]}</span>`;
 const STATN = {hp:'HP', atk:'ATK', def:'DEF', spd:'SPEED', crit:'CRIT'};
 const OLD_PRICES = {w1:80,w2:200,w3:350,w4:550,a1:100,a2:260,a3:550};
+// ---- Economy: shop prices x2, gold income -30% ----
+const PRICE_MULT = 2, GOLD_MULT = .7;
+for(const k in GEAR) GEAR[k].p *= PRICE_MULT;
+for(const k in ITEMS) ITEMS[k].p *= PRICE_MULT;
+for(const k in CHARS) CHARS[k].price *= PRICE_MULT;
+const earn = n => Math.max(1, Math.round(n * GOLD_MULT));
 const MAX_UP = 10;      // upgrade +10 = x2 stats
 const MAX_FU = 4;       // fusion ★4 = another x2 → x4 total
 const ENEMIES = [
@@ -1193,7 +1199,7 @@ const atk = () => cs().atk + itemStat('atk');
 const def = () => Math.min(80, cs().def + itemStat('def'));   // DEF = % damage reduction (max 80%)
 const spd = () => cs().spd + itemStat('spd');
 const crit = () => Math.min(100, 20 + itemStat('crit'));
-const LV_GOLD = lv => lv * 40;          // gold reward for reaching a level
+const LV_GOLD = lv => earn(lv * 40);          // gold reward for reaching a level
 const MODE_LV = { pvp:10 };             // level needed to open a mode
 const expNeed = () => 20 + S.lv * 15;
 const rnd = (a,b) => a + Math.random()*(b-a);
@@ -1374,14 +1380,14 @@ function quest(){
     if(done){ h += `<div class="item"><div>${q.l(q.g[q.g.length-1])}<div class="small">${IC.check} All tiers complete</div></div></div>`; return; }
     const goal = q.g[t], v = Math.min(qVal(q), goal), r = q.r(t);
     h += `<div class="item"><div style="flex:1">${q.l(goal)} <span class="small">(Tier ${t+1}/${q.g.length})</span>
-      ${bar('qb',v,goal)}<div class="small">${v}/${goal} · Reward ${G(r.gold)}${r.item ? ' + '+ITEMS[r.item].icon() : ''}</div></div>
+      ${bar('qb',v,goal)}<div class="small">${v}/${goal} · Reward ${G(earn(r.gold))}${r.item ? ' + '+ITEMS[r.item].icon() : ''}</div></div>
       <button class="${qReady(q)?'ok':''}" onclick="claim('${q.id}')" ${qReady(q)?'':'disabled'}>Claim</button></div>`;
   });
   return h + note() + back() + '</div>';
 }
 function claim(id){
   const q = QUESTS.find(x => x.id===id); if(!q || !qReady(q)) return;
-  const t = S.qt[id]||0, r = q.r(t);
+  const t = S.qt[id]||0, r = q.r(t); r.gold = earn(r.gold);
   S.gold += r.gold; SFX.play('coin'); if(r.item) S.inv[r.item] = (S.inv[r.item]||0) + 1;
   S.qt[id] = t + 1;
   msg = `Reward claimed: ${r.gold} gold${r.item ? ' and a '+ITEMS[r.item].n : ''}!`;
@@ -1710,7 +1716,7 @@ function makeEnemy(mode, st){
     spd: base.spd + Math.floor(st*.5),
     atk: Math.round((7 + st*2) * (boss ? 1.15 : 1) * EASE),
     def: Math.round((2 + st*1) * (boss ? 1.2 : 1)),
-    gold: Math.round((10 + st*6) * (boss ? 2 : 1)),
+    gold: earn((10 + st*6) * (boss ? 2 : 1)),
     exp:  Math.round((10 + st*6) * (boss ? 2 : 1)) };
 }
 async function startBattle(mode = 'story', st){
