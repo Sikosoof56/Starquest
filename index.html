@@ -964,7 +964,7 @@ function sIcon(id){
 const PVP_TURN_MS = 30000;
 const PV = { code:null, me:null, room:null, unsub:null, seqSeen:0, joinCode:'', err:'', anim:false, timer:null, log:[] };
 const LB = { list:null, err:'' };
-const lbRef = () => FB.F.doc(FB.db, 'rooms', '_leaderboard');
+const lbRef = () => FB.F.doc(FB.db, 'rooms', '_leaderboard_s' + SEASON);
 const pvpStats = () => ({ char:S.char, hp:MHP(), atk:atk(), def:def(), spd:spd(), crit:crit() });
 const opp = me => me === 'p1' ? 'p2' : 'p1';
 function pvpCodeGen(){ const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = ''; for(let i=0;i<4;i++) c += A[Math.floor(Math.random()*A.length)]; return c; }
@@ -1253,7 +1253,7 @@ document.addEventListener('visibilitychange', () => { if(document.visibilityStat
 const KEY = 'starquest_save_v1';          // guest save
 const ACC_KEY = 'sq_accounts', CUR_KEY = 'sq_current';
 // Bump SEASON to wipe everyone's progress (local AND cloud saves). Accounts are kept.
-const SEASON = 2;
+const SEASON = 3;
 // Firebase (online accounts + cloud saves). This config is public by design — security comes from Firestore rules.
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDAxIvn7dntesrV1Gwh_VjAjuKT0iGHrWM",
@@ -1474,7 +1474,7 @@ function fix(o){
   return s;
 }
 // ---- One-time fresh start (new forest version): all progress resets, accounts (ID + password) are kept ----
-const RESET_VER = 'forest-2';
+const RESET_VER = 'forest-3';
 if(lsGet('sq_reset') !== RESET_VER){
   try{
     lsDel(KEY);
@@ -1516,7 +1516,7 @@ const atk = () => cs().atk + itemStat('atk');
 const def = () => Math.min(80, cs().def + itemStat('def'));   // DEF = % damage reduction (max 80%)
 const spd = () => cs().spd + itemStat('spd');
 const crit = () => Math.min(100, 20 + itemStat('crit'));
-const LV_GOLD = lv => earn(lv * 40);          // gold reward for reaching a level
+const LV_GOLD = lv => earn(lv * 28);          // gold reward for reaching a level (−30%)
 const MODE_LV = { pvp:1 };             // level needed to open a mode
 const expNeed = () => 20 + S.lv * 15;
 const rnd = (a,b) => a + Math.random()*(b-a);
