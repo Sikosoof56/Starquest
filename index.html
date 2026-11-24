@@ -1029,7 +1029,7 @@ async function pvpJoin(){
 }
 function pvpListen(code, me){
   pvpStop();
-  PV.code = code; PV.me = me; PV.seqSeen = 0; PV.log = [];
+  PV.code = code; PV.me = me; PV.seqSeen = 0; PV.log = []; PV.playing = false; PV.again = false; PV.lastSync = Date.now();
   PV.unsub = FB.F.onSnapshot(roomRef(code), snap => {
     if(PV.code !== code || !snap.exists()) return;
     const prev = PV.room; PV.room = snap.data();
@@ -1059,7 +1059,7 @@ async function pvpLeave(silent){
 function pvpBattle(){
   const r = PV.room, me = PV.me, o = opp(me), O = r[o], M = r[me];
   return `<div class="scene" id="scene">${forestBG()}${ambient()}
-      <div class="plate e"><div class="row"><b>${esc(O.name)}</b><span>SPD ${O.st.spd} · DEF ${O.st.def}%</span></div>
+      <div class="plate e"><div class="row"><b>${esc(O.name)}</b><span>SPD ${O.st.spd}</span></div>
         <div class="bar hp"><i id="enhp"></i></div><div class="small" id="enhpt"></div></div>
       <div class="shadow se"></div><div class="shadow sp"></div>
       <div class="ent en" id="en"><div class="tintw" style="transform:scaleX(-1)">${artOf(CHARS[O.st.char].art)}</div></div>
@@ -1104,7 +1104,7 @@ function pvpForfeit(){
 }
 
 // work out one action (used by the acting player, or by the waiting player when the other times out)
-function pvpResolve(r, actor, id){
+function pvpResolve(r, actor, id, auto){
   const tgt = opp(actor), A = r[actor].st, T = r[tgt].st, K = SKILLS[id], idx = CHARS[A.char].skills.indexOf(id);
   const hp = { ...r.hp }, cd = { p1:{...(r.cd.p1||{})}, p2:{...(r.cd.p2||{})} }, guard = { ...r.guard };
   const res = { seq:r.seq + 1, by:actor, skill:id, kind:K.kind, dmg:0, heal:0, crit:false };
@@ -1123,46 +1123,58 @@ function pvpResolve(r, actor, id){
   if(K.cutCd){ const s = CHARS[A.char].skills[K.cutCd[0]]; if(cd[actor][s] > 0) cd[actor][s] = Math.max(0, cd[actor][s] - K.cutCd[1]); }
   if(K.resetCd){ const s = CHARS[A.char].skills[K.resetCd]; cd[actor][s] = 0; }
   const nm = r[actor].name;
-  res.text = K.kind === 'hit' ? `${nm} uses ${K.n}${res.crit ? ' — CRITICAL' : ''}! ${res.dmg} damage${res.blocked ? ' (blocked some)' : ''}`
-           : K.kind === 'heal' ? `${nm} uses ${K.n} and heals ${res.heal} HP` : `${nm} uses ${K.n} and raises a guard`;
-  const upd = { hp, cd, guard, seq:res.seq, last:res, turn:tgt, deadline:Date.now() + PVP_TURN_MS };
+  const idle = { ...(r.idle || {}) }; idle[actor] = auto ? (idle[actor] || 0) + 1 : 0;
+  res.text = (auto ? `⏱ ${nm} ran out of time — ` : '') + (K.kind === 'hit' ? `${nm} uses ${K.n}${res.crit ? ' — CRITICAL' : ''}! ${res.dmg} damage${res.blocked ? ' (blocked some)' : ''}`
+           : K.kind === 'heal' ? `${nm} uses ${K.n} and heals ${res.heal} HP` : `${nm} uses ${K.n} and raises a guard`);
+  const upd = { hp, cd, guard, idle, seq:res.seq, last:res, turn:tgt, deadline:Date.now() + PVP_TURN_MS };
   if(hp[tgt] <= 0){ upd.status = 'done'; upd.winner = actor; }
+  else if(idle[actor] >= 3){ upd.status = 'done'; upd.winner = tgt; res.text += ` — ${nm} was away for 3 turns and loses.`; }
   return upd;
 }
-async function pvpAct(id, auto){
+async function pvpAct(id, auto, timedOut){
   const r = PV.room, me = PV.me;
   if(!r || r.status !== 'playing' || PV.anim) return;
   const actor = auto ? opp(me) : me;
   if(r.turn !== actor) return;
-  if(!auto && (r.cd[me]||{})[id]) return;
+  if(!auto && !timedOut && (r.cd[me]||{})[id]) return;
   PV.anim = true; pvpRefresh();
   try{
     await FB.F.runTransaction(FB.db, async tx => {
       const snap = await tx.get(roomRef(PV.code)), cur = snap.data();
       if(cur.status !== 'playing' || cur.turn !== actor || cur.seq !== r.seq) throw new Error('stale');
-      tx.update(roomRef(PV.code), pvpResolve(cur, actor, id));
+      tx.update(roomRef(PV.code), pvpResolve(cur, actor, id, auto || timedOut));
     });
-  }catch(e){ PV.anim = false; pvpRefresh(); }
+    PV.lastSync = 0; setTimeout(pvpSync, 1500);   // make sure we see the result even if the live update is slow
+  }catch(e){ PV.anim = false; pvpRefresh(); pvpSync(); }
+}
+// ask the server for the latest room (in case the live connection dropped or lagged)
+async function pvpSync(){
+  const code = PV.code; if(!code || PV.syncing) return; PV.syncing = true;
+  try{ const s = await FB.F.getDoc(roomRef(code)); if(PV.code === code && s.exists()){ const d = s.data();
+    if(!PV.room || d.seq > PV.room.seq || d.status !== PV.room.status){ PV.room = d; if(view === 'pvpb') pvpOnUpdate(); }
+    else if(PV.anim && !PV.playing){ PV.anim = false; pvpRefresh(); } } }catch(e){}
+  PV.syncing = false; PV.lastSync = Date.now();
 }
 // the waiting player's game makes the idle player do a normal attack when their 30 s run out
 function pvpTick(){
   const r = PV.room;
   if(!r || view !== 'pvpb') return;
   if(r.status === 'playing' && !PV.anim && r.turn !== PV.me && Date.now() > r.deadline + 2000){
-    PV.log.push(`${r[r.turn].name} ran out of time — auto attack!`);
     pvpAct(CHARS[r[r.turn].st.char].skills[0], true);
   } else if(r.status === 'playing' && !PV.anim && r.turn === PV.me && Date.now() > r.deadline){
-    pvpAct(CHARS[r[PV.me].st.char].skills[0]);   // my own time ran out
+    pvpAct(CHARS[r[PV.me].st.char].skills[0], false, true);   // my own time ran out
   }
+  if(r.status === 'playing' && !PV.playing && Date.now() - (PV.lastSync || 0) > 4000) pvpSync();   // backup check every few seconds
   const t = document.querySelector('#ctrl .turnlbl');
   if(t && r.status === 'playing' && !PV.anim){ const left = Math.max(0, Math.ceil((r.deadline - Date.now())/1000));
     t.innerHTML = r.turn === PV.me ? `Your turn! ⏱ ${left}s` : `⏳ ${esc(r[r.turn].name)}'s turn… ⏱ ${left}s`; }
 }
 // play the newest action as an animation, then update the screen
 async function pvpOnUpdate(){
+  if(PV.playing){ PV.again = true; return; }       // an animation is running: show this one right after
   const r = PV.room, L = r && r.last, code = PV.code;
   if(!L || L.seq <= PV.seqSeen){ pvpRefresh(); return; }
-  PV.seqSeen = L.seq;
+  PV.seqSeen = L.seq; PV.playing = true;
   if(!$('scene')){ render(); }
   if(L.by){
     PV.anim = true; pvpRefresh();
@@ -1190,8 +1202,10 @@ async function pvpOnUpdate(){
     if(won){ await deathFx($('en')); SFX.play('win'); PV.log.push('🏆 You win!'); }
     else { await fallFx(); SFX.play('lose'); PV.log.push('💀 You lost this time.'); }
   }
+  PV.playing = false;
   if(PV.code !== code) return;
   PV.anim = false; pvpRefresh();
+  if(PV.again){ PV.again = false; pvpOnUpdate(); }
 }
 
 // ---- Leaderboard: one shared document rooms/_leaderboard = { p:{ uid:{name,w,l} } } ----
@@ -1234,6 +1248,7 @@ function leaderboard(){
     <div class="btns"><button onclick="LB.list=null;render()">↻ Refresh</button><button class="pri" onclick="go('pvp')">${IC.sword} PVP</button></div>
     ${back()}</div>`;
 }
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && PV.code) pvpSync(); });
 // ====== GAME DATA (edit names / prices / stats here) ======
 const KEY = 'starquest_save_v1';          // guest save
 const ACC_KEY = 'sq_accounts', CUR_KEY = 'sq_current';
