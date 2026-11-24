@@ -994,7 +994,7 @@ const GEAR = {
   dagger: { n:'Sharp Dagger',     r:'common', icon:()=>gIcon('dagger'), s:{atk:10},        p:100 },
   feather:{ n:'Wind Feather',     r:'rare', icon:()=>gIcon('feather'),s:{spd:10,atk:5},         p:120 },
   eye:    { n:"Eagle's Eye",      r:'rare', icon:()=>gIcon('eye'),    s:{crit:10},        p:150 },
-  mail:   { n:'Guardian Mail',    r:'rare', icon:()=>gIcon('mail'),   s:{def:10},         p:200 },
+  mail:   { n:'Guardian Mail',    r:'rare', icon:()=>gIcon('mail'),   s:{def:4},         p:200 },
   elven:  { n:'Elven Blade',      r:'epic', icon:()=>gIcon('elven'),  s:{atk:15,crit:5}, p:250 },
   heart:  { n:'Titan Heart',      r:'epic', icon:()=>gIcon('heart'),  s:{hp:150},         p:420 },
   fang:   { n:'Dragon Fang',      r:'legend', icon:()=>gIcon('fang'),   s:{atk:30,crit:20}, p:550 }
@@ -1716,7 +1716,7 @@ function makeEnemy(mode, st){
   const base = boss ? bl[(st/5 - 1) % bl.length] : list[Math.floor(Math.random()*list.length)];
   const EASE = .8 * 1.25;   // monster HP and ATK (was 20% weaker, now +25% from that)
   const hp = Math.round((steelM ? 55 + st*13 : 45 + st*11) * (boss ? 1.8 : 1) * EASE);
-  return { n:base.n, art:base.art, fly:!!base.fly, tint:base.tint||'', hp, mhp:hp, boss,
+  return { n:base.n, art:base.art, fly:!!base.fly, tint:base.tint||'', hp, mhp:hp, boss, dp: boss ? .2 : .1,   // DEF %: normal 10%, boss 20%
     spd: base.spd + Math.floor(st*.5),
     atk: Math.round((7 + st*2) * (boss ? 1.15 : 1) * EASE),
     def: Math.round((2 + st*1) * (boss ? 1.2 : 1)),
@@ -1755,7 +1755,7 @@ function battle(){
   const e = B.en;
   return `<div class="scene" id="scene">
       ${B.mode==='steel' ? sandBG() : forestBG()}${ambient()}
-      <div class="plate e"><div class="row"><b>${e.boss?'BOSS · ':''}${e.n}</b><span>SPD ${e.spd}</span></div>
+      <div class="plate e"><div class="row"><b>${e.boss?'BOSS · ':''}${e.n}</b><span>SPD ${e.spd} · DEF ${Math.round(e.dp*100)}%</span></div>
         <div class="bar hp"><i id="enhp"></i></div><div class="small" id="enhpt"></div></div>
       <div class="shadow se ${e.boss?'big':''} ${e.fly?'fly':''}"></div><div class="shadow sp"></div>
       <div class="ent en ${e.boss?'boss':''} ${e.fly?'flyer':''}" id="en"><div class="tintw" style="${e.tint ? 'filter:'+e.tint : ''}">${artOf(e.art)}</div></div>
@@ -1937,7 +1937,7 @@ async function act(type, k){
     const boost = B.buff.atk ? 1.5 : 1;
     for(const t of targets){
       const isCrit = Math.random()*100 < crit();
-      const d = skillDmg(K, boost) * (isCrit ? 2 : 1);
+      const d = Math.max(1, Math.round(skillDmg(K, boost) * (isCrit ? 2 : 1) * (1 - t.e.dp)));
       if(!K.anim) slash(t.el, K.color || (isCrit ? '#ffd54a' : '#ffffffcc'), K.big || isCrit);
       t.e.hp -= d; hitFx(t.el); SFX.play(isCrit ? 'crit' : 'hit');
       burst(t.el, K.fx || 'spark', slotIdx>0 ? 10 : (isCrit?8:4), slotIdx>0 ? 80 : 55, isCrit ? '#ffd54a' : (K.color || '#fff'));
