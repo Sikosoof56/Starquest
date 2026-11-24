@@ -950,6 +950,8 @@ function sIcon(id){
 // ====== GAME DATA (edit names / prices / stats here) ======
 const KEY = 'starquest_save_v1';          // guest save
 const ACC_KEY = 'sq_accounts', CUR_KEY = 'sq_current';
+// Bump SEASON to wipe everyone's progress (local AND cloud saves). Accounts are kept.
+const SEASON = 2;
 // Firebase (online accounts + cloud saves). This config is public by design — security comes from Firestore rules.
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDAxIvn7dntesrV1Gwh_VjAjuKT0iGHrWM",
@@ -1136,11 +1138,12 @@ const G = n => `<span class="gold">${IC.coin} ${n}</span>`;
 
 // ====== State & saving ======
 function newGame(){
-  return {char:'pilot',lv:1,exp:0,hp:80,gold:30,stage:1,best:1,
+  return {season:SEASON,char:'pilot',lv:1,exp:0,hp:80,gold:30,stage:1,best:1,
           inv:{potion:3,power:1,iron:0,bomb:1},arts:['potion','power'],bag:[],nid:1,eq:[],powder:0,ss:1,chars:['pilot'],
           st:{wins:0,bosses:0,lasers:0,buys:0},qt:{}};
 }
 function fix(o){
+  if(!o || (o.season||1) < SEASON) return newGame();   // save from an older season → fresh start
   const s = Object.assign(newGame(), o);
   if(!o.st) s.st = {wins:o.wins||0, bosses:Math.floor(((o.stage||1)-1)/5), lasers:0, buys:0};
   if(!Array.isArray(s.chars)) s.chars = ['pilot'];
@@ -1169,7 +1172,7 @@ function fix(o){
   return s;
 }
 // ---- One-time fresh start (new forest version): all progress resets, accounts (ID + password) are kept ----
-const RESET_VER = 'forest-1';
+const RESET_VER = 'forest-2';
 if(lsGet('sq_reset') !== RESET_VER){
   try{
     lsDel(KEY);
@@ -1620,7 +1623,7 @@ async function onUser(user){
     if(CUR !== name){ CUR = name; lsSet(CUR_KEY, name); S = load() || newGame(); }
     try{
       const ref = FB.F.doc(FB.db, 'saves', user.uid), snap = await FB.F.getDoc(ref);
-      if(snap.exists() && !FB.pendingStart){ S = fix(JSON.parse(snap.data().data)); lsSet(saveKey(), JSON.stringify(S)); }
+      if(snap.exists() && !FB.pendingStart){ const raw = JSON.parse(snap.data().data); S = fix(raw); lsSet(saveKey(), JSON.stringify(S)); if((raw.season||1) < SEASON) await cloudSave(true); }
       else { if(FB.pendingStart) S = fix(FB.pendingStart); lsSet(saveKey(), JSON.stringify(S)); await cloudSave(true); }
     }catch(e){ msg = 'Signed in, but the cloud save could not be reached. Playing with the copy on this device.'; }
     FB.pendingStart = null; FB.pendingName = null;
