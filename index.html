@@ -414,6 +414,9 @@ button.fub span{font-size:10px;color:#d1c4e9}
 body.locked #app *:not(.sound){pointer-events:none!important}
 .turnlbl{text-align:center;font-size:12px;font-weight:900;letter-spacing:1px;color:var(--mute);margin:-2px 0 8px}
 .turnlbl.go{color:var(--leaf)}
+button.sellb{background:linear-gradient(180deg,#6b4a10,#4a3208);border-color:#c99a1e;line-height:1.15}
+button.sellb span{font-size:10px;color:#ffe08a}
+button.sellb.arm{background:linear-gradient(180deg,#a8392b,#7a2418);border-color:#e5533d}
 </style>
 </head>
 <body>
@@ -1195,6 +1198,11 @@ const statTxt = o => Object.entries(o).map(([k,v]) => `${STATN[k]} +${v}${(k==='
 const itemStat = st => S.eq.reduce((t,id) => { const it = inst(id); return t + (it ? (gearStats(it)[st]||0) : 0); }, 0);
 const upCost  = it => Math.round(GEAR[it.k].p * .3 * (it.up + 1));                    // gold (same as before)
 const upPowder = it => Math.ceil(4 * (it.up + 1) * RAR_MULT[GEAR[it.k].r]);           // magic powder (same as before)
+// selling gives back 50% of everything paid for that copy: price (+ copies fused into it) + gold spent upgrading
+const SELL_RATE = .5;
+const sellValue = it => Math.floor(SELL_RATE * (GEAR[it.k].p * (1 + it.fu) + GEAR[it.k].p * .3 * it.up * (it.up + 1) / 2));
+const potionSell = k => Math.floor(ITEMS[k].p * SELL_RATE);
+let sellArm = null;
 const canUp = it => it.up < MAX_UP && S.gold >= upCost(it) && S.powder >= upPowder(it);
 const P = n => `<span class="powder">${IC.powder} ${n}</span>`;
 const cs = () => CHARS[S.char];
@@ -1217,7 +1225,7 @@ const qReady = q => { const t = S.qt[q.id]||0; return t < q.g.length && qVal(q) 
 S.hp = MHP();
 
 // ====== Screens ======
-function go(v){ if(B && B.busy) return; document.body.classList.remove('locked'); view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
+function go(v){ if(B && B.busy) return; sellArm = null; document.body.classList.remove('locked'); view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
 function bar(c,v,m){ return `<div class="bar ${c}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i></div>`; }
 function back(){ return `<button class="full" onclick="go('home')">${IC.back} Back to Home</button>`; }
 function note(){ return msg ? `<p class="msg">${msg}</p>` : ''; }
@@ -1537,6 +1545,7 @@ function setView(){
         ${on ? `<button class="ok" onclick="unequip(${it.i})">On</button>` : `<button onclick="equip(${it.i})" ${S.eq.length>=4?'disabled':''}>Equip</button>`}
         <button class="upb" onclick="upgrade(${it.i})" ${canUp(it)?'':'disabled'}>${max?'MAX':`${IC.up}<span>${IC.coin}${upCost(it)}<br>${IC.powder}${upPowder(it)}</span>`}</button>
         <button class="fub" onclick="fuse(${it.i})" ${canFuse(it)?'':'disabled'}>${it.fu>=MAX_FU?'★MAX':`★ Fuse<br><span>${fuseMat(it)?'1 spare':'need copy'}</span>`}</button>
+        <button class="sellb ${sellArm===it.i?'arm':''}" onclick="sell(${it.i})" ${on?'disabled':''}>${sellArm===it.i?'Sure?':'Sell'}<br><span>${IC.coin}${sellValue(it)}</span></button>
       </div></div>`;
   });
   h += '</div>';
@@ -1544,7 +1553,8 @@ function setView(){
   h += `<div class="card"><h2>Artifacts — Potions</h2><p class="small" style="margin:0 0 4px">Pick 2 to bring into battle. Potions work in Story and other PvE modes only — not in PVP.</p>`;
   for(const k in ITEMS){ const it = ITEMS[k], n = S.inv[k]||0, on = S.arts.includes(k);
     h += `<div class="item"><div class="it">${it.icon()}<div>${it.n} x${n}<div class="small">${it.d}</div></div></div>
-      ${on ? `<button class="ok" disabled>Equipped</button>` : `<button onclick="equipArt('${k}')">Equip</button>`}</div>`;
+      <div class="bagb" style="width:auto">${on ? `<button class="ok" disabled>Equipped</button>` : `<button onclick="equipArt('${k}')">Equip</button>`}
+      <button class="sellb" onclick="sellPotion('${k}')" ${n?'':'disabled'}>Sell<br><span>${IC.coin}${potionSell(k)}</span></button></div></div>`;
   }
   return h + note() + back() + '</div>';
 }
@@ -1560,6 +1570,18 @@ function buyChar(k){
 function equip(id){ const it = inst(id); if(!it || S.eq.includes(id) || S.eq.length >= 4) return;
   S.eq.push(id); msg = `Equipped ${itemName(it)}`; save(); render(); }
 function unequip(id){ const it = inst(id); S.eq = S.eq.filter(x => x !== id); msg = it ? `Took off ${itemName(it)}` : ''; save(); render(); }
+function sell(id){
+  const it = inst(id); if(!it || S.eq.includes(id)) return;
+  if(sellArm !== id){ sellArm = id; msg = `Tap <b>Sure?</b> to sell ${itemName(it)} for ${sellValue(it)} gold.`; render(); return; }
+  sellArm = null;
+  const v = sellValue(it); S.bag = S.bag.filter(b => b !== it); S.gold += v; SFX.play('coin');
+  msg = `Sold ${itemName(it)} for ${v} gold.`; save(); render();
+}
+function sellPotion(k){
+  if(!S.inv[k]) return;
+  const v = potionSell(k); S.inv[k]--; S.gold += v; SFX.play('coin');
+  msg = `Sold a ${ITEMS[k].n} for ${v} gold.`; save(); render();
+}
 function fuse(id){
   const it = inst(id); if(!it || !canFuse(it)) return;
   const m = fuseMat(it); S.bag = S.bag.filter(b => b !== m); it.fu++;
