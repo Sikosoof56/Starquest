@@ -1714,7 +1714,7 @@ function makeEnemy(mode, st){
   const boss = st % 5 === 0, steelM = mode === 'steel';
   const list = steelM ? STEEL_ENEMIES : ENEMIES, bl = steelM ? STEEL_BOSSES : BOSSES;
   const base = boss ? bl[(st/5 - 1) % bl.length] : list[Math.floor(Math.random()*list.length)];
-  const EASE = .8;   // monsters are 20% weaker (HP and ATK)
+  const EASE = .8 * 1.25;   // monster HP and ATK (was 20% weaker, now +25% from that)
   const hp = Math.round((steelM ? 55 + st*13 : 45 + st*11) * (boss ? 1.8 : 1) * EASE);
   return { n:base.n, art:base.art, fly:!!base.fly, tint:base.tint||'', hp, mhp:hp, boss,
     spd: base.spd + Math.floor(st*.5),
