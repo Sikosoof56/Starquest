@@ -515,6 +515,35 @@ button.scx{width:36px;height:36px;padding:0;border-radius:50%}
 .ft.hitn{font-size:16px;z-index:6}.ft.hitn.crit{font-size:18px}
 .pt.shard{width:3px;height:12px;border-radius:2px;background:var(--c,#fff);box-shadow:0 0 6px 1px var(--c,#fff)}
 .wave.healw{border-color:#b8ff5a;box-shadow:0 0 16px #8fd14f,inset 0 0 10px #8fd14f}
+/* ===== 2v2 ===== */
+.teams{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;margin:8px 0}
+.team{display:grid;gap:6px}.team h3{margin:0;text-align:center;font-family:Cinzel,serif;font-size:15px}
+.team.ta h3{color:#8fd14f}.team.tb h3{color:#ff8a80}
+.vs.small2{font-size:20px}
+.seat{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;background:#0f2214;border:2px solid var(--line);border-radius:12px;padding:6px 4px;min-height:104px;font-size:13px;text-align:center}
+.seat small{color:var(--mute);font-size:10px}
+.seat.me{border-color:var(--gold);box-shadow:0 0 10px #f2c94c55}
+.sart{width:52px;height:52px;display:block}.sart .art{width:100%;height:100%}
+button.seat.empty{border-style:dashed;font-size:26px;color:var(--mute);background:#0b170e;justify-content:center}
+.hosttag{position:absolute;top:4px;right:4px;font-size:9px;font-weight:900;background:var(--gold);color:#2a1a00;border-radius:5px;padding:0 4px}
+.scene.s2{height:330px}
+.ent.e2{width:88px;height:88px;animation:none;cursor:pointer}
+.ent.e2.l1{left:3%;bottom:20px}.ent.e2.l2{left:27%;bottom:128px}
+.ent.e2.r1{right:3%;bottom:128px}.ent.e2.r2{right:27%;bottom:20px}
+.ent.e2.r2{z-index:3}.ent.e2.l1{z-index:3}
+.mp2{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:96px;background:#0d1d12d8;border:1px solid #4b8a4f;border-radius:8px;padding:2px 5px;font-size:10px;text-align:center;z-index:4}
+.mp2 b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp2 b::after{content:' · ' attr(data-hp);color:var(--mute);font-weight:700}
+.mp2 .bar{height:5px;margin-top:1px}
+.ent.e2.turn .mp2{border-color:var(--gold);box-shadow:0 0 10px #f2c94c}
+.ent.e2.turn::after{content:'▼';position:absolute;left:50%;top:-46px;transform:translateX(-50%);color:var(--gold);font-size:13px;animation:hop 1s infinite}
+.ent.e2.tgt .tintw{filter:drop-shadow(0 0 6px #ff5252) drop-shadow(0 0 2px #ff5252)}
+.ent.e2.tgt::before{content:'';position:absolute;left:10%;right:10%;bottom:-6px;height:14px;border-radius:50%;border:3px solid #ff5252;box-shadow:0 0 10px #ff5252}
+.ent.e2.dead{opacity:.35;filter:grayscale(1)}
+.ent.e2.stunned .tintw{filter:brightness(1.4) saturate(.4)}
+.ch.lock.soon .e{filter:drop-shadow(0 0 8px #00bfa588)}
+.ch.lock.soon{border-color:#00bfa5;background:radial-gradient(ellipse at 50% 30%,#103a35,#0b170e 70%)}
+.ch.lock.soon{opacity:1}
 </style>
 </head>
 <body>
@@ -706,6 +735,46 @@ const ART = {
         <path d="M72 18 l4 3 -3 2 4 3"/><path d="M96 16 l-4 4 3 1 -3 4"/><path d="M95 34 l-4 -1 2 3 -4 0"/></g>
     </g>
   </g>`, 'mage-art'),
+
+  // ---- Nightshade: an original phantom thief (coming soon) ----
+  thief: () => SV(`
+  <defs>
+    <linearGradient id="tCoat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#263238"/><stop offset="1" stop-color="#0b1114"/></linearGradient>
+    <linearGradient id="tHood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#37474f"/><stop offset="1" stop-color="#101619"/></linearGradient>
+    <linearGradient id="tScarf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#00bfa5"/><stop offset="1" stop-color="#00695c"/></linearGradient>
+    <linearGradient id="tBlade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e0f7fa"/><stop offset="1" stop-color="#80cbc4"/></linearGradient>
+    <radialGradient id="tSkin" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#ffe3c8"/><stop offset="1" stop-color="#e3a47e"/></radialGradient>
+  </defs>
+  <g class="bod">
+    <path class="cape" d="M42 56 Q24 84 28 110 L48 104 L60 110 L72 104 L92 110 Q96 84 78 56Z" fill="url(#tCoat)" stroke="#000" stroke-width="1.2"/>
+    <path d="M36 96 l2 -3 2 3 -2 3z M84 92 l2 -3 2 3 -2 3z M46 104 l1.5 -2.5 1.5 2.5 -1.5 2.5z" fill="#80cbc4" opacity=".8"/>
+    <rect x="49" y="92" width="9" height="15" rx="3" fill="#1c262b"/><rect x="63" y="92" width="9" height="15" rx="3" fill="#1c262b"/>
+    <path d="M46 104 h14 v6 h-16 q0-4 2-6z M61 104 h14 q2 2 2 6 h-16z" fill="#0d1316"/>
+    <path d="M46 62 Q60 56 74 62 L77 96 Q60 101 43 96Z" fill="url(#tCoat)" stroke="#000" stroke-width="1.2"/>
+    <path d="M47 64 L73 92 M73 64 L47 92" stroke="#455a64" stroke-width="2.4"/>
+    <circle cx="60" cy="78" r="3" fill="#00bfa5" stroke="#004d40"/>
+    <rect x="44" y="84" width="33" height="4.5" fill="#3e2723"/><rect x="66" y="86" width="7" height="9" rx="2" fill="#5d4037" stroke="#3e2723"/>
+    <path d="M46 66 Q37 76 41 88" stroke="#263238" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+    <g transform="translate(41 89) rotate(-150)"><path d="M-2 0 L-2.4 -20 L1 -27 L4.4 -20 L4 0Z" fill="url(#tBlade)" stroke="#37474f" stroke-width=".8"/>
+      <rect x="-5" y="-1" width="11" height="3" rx="1.5" fill="#00bfa5"/><rect x="-.4" y="2" width="2.8" height="7" fill="#212121"/></g>
+    <g class="head">
+      <path d="M36 46 Q32 18 60 15 Q88 18 84 46 Q80 62 60 64 Q40 62 36 46Z" fill="url(#tHood)" stroke="#000" stroke-width="1.4"/>
+      <circle cx="60" cy="43" r="17" fill="url(#tSkin)"/>
+      <path d="M43 40 Q44 28 60 27 Q76 28 77 40 Q70 33 64 35 L60 31 L56 35 Q50 33 43 40Z" fill="#cfd8dc"/>
+      <path d="M43 42 Q60 36 77 42 L76 50 Q60 45 44 50Z" fill="#111" opacity=".92"/>
+      <ellipse cx="53.5" cy="45.5" rx="3.2" ry="2.6" fill="#a7ffeb"/><ellipse cx="66.5" cy="45.5" rx="3.2" ry="2.6" fill="#a7ffeb"/>
+      <circle cx="53.5" cy="45.5" r="1.4" fill="#004d40"/><circle cx="66.5" cy="45.5" r="1.4" fill="#004d40"/>
+      <path d="M44 52 Q60 60 76 52 L78 60 Q60 68 42 60Z" fill="url(#tScarf)" stroke="#004d40" stroke-width="1"/>
+      <path class="tail" d="M76 56 Q92 54 100 62 Q92 62 88 66 Q86 60 76 60Z" fill="url(#tScarf)" stroke="#004d40" stroke-width="1"/>
+      <path d="M38 30 Q30 22 34 12 Q40 20 44 24Z" fill="url(#tHood)" stroke="#000" stroke-width="1"/>
+    </g>
+    <g class="arm">
+      <path d="M74 65 Q84 71 87 80" stroke="#263238" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+      <g transform="translate(87 80) rotate(28)"><path d="M-2.4 -2 L-2.8 -26 L1 -34 L4.8 -26 L4.4 -2Z" fill="url(#tBlade)" stroke="#37474f" stroke-width=".8"/>
+        <path d="M1 -31 L1 -5" stroke="#fff" stroke-width=".9" opacity=".8"/>
+        <rect x="-5.5" y="-3" width="13" height="3" rx="1.5" fill="#00bfa5"/><rect x="-.4" y="0" width="2.8" height="7" fill="#212121"/><circle cx="1" cy="8.5" r="2" fill="#00bfa5"/></g>
+    </g>
+  </g>`, 'hero-art thief-art'),
 
   // ---- Thorn Wolf ----
   wolf: () => SV(`
@@ -1225,9 +1294,10 @@ function pvp(){
       <button class="full" onclick="copyRoom()">${IC.copy} Copy code</button>
       <button class="warn full" onclick="pvpLeave()">Cancel room</button></div>`;
   }
-  return h + `<div class="story">Make a room and send the code to a friend, or type their code to join. You fight with your own character, items and skills.
+  return h + `<div class="story">Make a 1v1 room (2 players) or a 2v2 room (4 players, pick your team), then send the code. Have a code? Type it to join. You fight with your own character, items and skills.
       <b>Potions are not allowed.</b> Faster SPEED moves first. Each turn has 30 seconds. Wins and losses go on the leaderboard.</div>
-    <button class="pri full" onclick="pvpCreate()" ${PV.busy?'disabled':''}>${IC.sword} Create room</button>
+    <div class="btns"><button class="pri" onclick="pvpCreate()" ${PV.busy?'disabled':''}>${IC.sword} Create 1v1 room</button>
+      <button class="pri gold10" onclick="pvp2Create()" ${PV.busy||P2.busy?'disabled':''}>👥 Create 2v2 room</button></div>
     <form onsubmit="event.preventDefault();pvpJoin()" class="joinrow">
       <input id="rc" maxlength="4" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="CODE" value="${esc(PV.joinCode)}">
       <button type="submit" ${PV.busy?'disabled':''}>Join</button>
@@ -1254,6 +1324,8 @@ async function pvpJoin(){
   if(code.length !== 4){ PV.err = 'Room codes have 4 characters.'; render(); return; }
   PV.busy = true; PV.err = ''; render();
   try{
+    const pre = await FB.F.getDoc(roomRef(code));
+    if(pre.exists() && pre.data().mode === '2v2'){ PV.busy = false; return pvp2Join(code); }
     await FB.F.runTransaction(FB.db, async tx => {
       const snap = await tx.get(roomRef(code));
       if(!snap.exists()) throw new Error('No room with that code.');
@@ -1749,6 +1821,369 @@ async function rapidHeal(el, total, K){
   }
   floatText(el, `+${total}`, 'heal'); await wait(300);
 }
+
+// ---- PVP 2v2: four players, two teams (A and B). Room doc rooms/{CODE} with mode:'2v2' ----
+// { mode:'2v2', code, status:'waiting'|'playing'|'done', host:uid, created,
+//   seats:{a1,a2,b1,b2: null | {uid,name,st}}, order:[seat...], turn:seat, hp:{seat:n}, cd:{seat:{}}, guard:{seat:n},
+//   shield:{seat:{v,n}|null}, stun:{seat:bool}, idle:{seat:n}, seq, last, deadline, winner:'a'|'b', recorded }
+const SEATS = ['a1','a2','b1','b2'];
+const P2 = { code:null, me:null, room:null, unsub:null, seqSeen:0, log:[], anim:false, playing:false, again:false, timer:null, target:null, busy:false, err:'' };
+const sideOf = s => s[0];
+const foesOf = s => SEATS.filter(x => sideOf(x) !== sideOf(s));
+const alive = (r, s) => r.seats[s] && r.hp[s] > 0;
+
+async function pvp2Create(){
+  if(!FB.ok || !FB.user || P2.busy) return;
+  P2.busy = true; PV.err = ''; render();
+  try{
+    let code, tries = 0, ex;
+    do{ code = pvpCodeGen(); ex = await FB.F.getDoc(roomRef(code)); tries++; } while(tries < 5 && ex.exists() && ex.data().status !== 'done');
+    await FB.F.setDoc(roomRef(code), { mode:'2v2', code, status:'waiting', created:Date.now(), host:FB.user.uid,
+      seats:{ a1:{ uid:FB.user.uid, name:CUR, st:pvpStats() }, a2:null, b1:null, b2:null }, seq:0 });
+    pvp2Listen(code, 'a1'); view = 'pvp2';
+  }catch(e){ PV.err = 'Could not create a room — check your internet.'; }
+  P2.busy = false; render();
+}
+async function pvp2Join(code){
+  P2.busy = true; render();
+  let seat = null;
+  try{
+    await FB.F.runTransaction(FB.db, async tx => {
+      const snap = await tx.get(roomRef(code)); const r = snap.data();
+      if(r.status !== 'waiting') throw new Error('That room has already started or finished.');
+      const mine = SEATS.find(s => r.seats[s] && r.seats[s].uid === FB.user.uid);
+      if(mine){ seat = mine; return; }
+      const cnt = side => SEATS.filter(s => sideOf(s) === side && r.seats[s]).length;
+      const order = cnt('a') <= cnt('b') ? ['a1','a2','b1','b2'] : ['b1','b2','a1','a2'];
+      seat = order.find(s => !r.seats[s]);
+      if(!seat) throw new Error('That room is full (4/4).');
+      tx.update(roomRef(code), { ['seats.' + seat]: { uid:FB.user.uid, name:CUR, st:pvpStats() } });
+    });
+    pvp2Listen(code, seat); view = 'pvp2';
+  }catch(e){ PV.err = e.message && !e.code ? e.message : 'Could not join — check the code and your internet.'; }
+  P2.busy = false; render();
+}
+async function pvp2Sit(to){
+  const code = P2.code; if(!code || P2.busy) return;
+  P2.busy = true;
+  try{
+    await FB.F.runTransaction(FB.db, async tx => {
+      const r = (await tx.get(roomRef(code))).data();
+      if(r.status !== 'waiting' || r.seats[to]) throw new Error('taken');
+      const from = SEATS.find(s => r.seats[s] && r.seats[s].uid === FB.user.uid);
+      if(!from) throw new Error('gone');
+      tx.update(roomRef(code), { ['seats.' + to]: r.seats[from], ['seats.' + from]: null });
+    });
+    P2.me = to; SFX.play('click');
+  }catch(e){}
+  P2.busy = false;
+}
+async function pvp2Start(){
+  const code = P2.code; if(!code || P2.busy) return;
+  P2.busy = true;
+  try{
+    await FB.F.runTransaction(FB.db, async tx => {
+      const r = (await tx.get(roomRef(code))).data();
+      if(r.status !== 'waiting' || SEATS.some(s => !r.seats[s])) throw new Error('not full');
+      const order = [...SEATS].sort((x,y) => r.seats[y].st.spd - r.seats[x].st.spd || SEATS.indexOf(x) - SEATS.indexOf(y));
+      const hp = {}, cd = {}, guard = {}, shield = {}, stun = {}, idle = {};
+      SEATS.forEach(s => { hp[s] = r.seats[s].st.hp; cd[s] = {}; guard[s] = 0; shield[s] = null; stun[s] = false; idle[s] = 0; });
+      tx.update(roomRef(code), { status:'playing', order, turn:order[0], hp, cd, guard, shield, stun, idle, seq:1,
+        deadline:Date.now() + PVP_TURN_MS, last:{ seq:1, text:`Battle start! ${r.seats[order[0]].name} is the fastest and moves first.` } });
+    });
+  }catch(e){}
+  P2.busy = false;
+}
+function pvp2Listen(code, me){
+  pvp2Stop();
+  Object.assign(P2, { code, me, seqSeen:0, log:[], playing:false, again:false, anim:false, target:null, lastSync:Date.now() });
+  P2.unsub = FB.F.onSnapshot(roomRef(code), snap => {
+    if(P2.code !== code || !snap.exists()) return;
+    const prev = P2.room; P2.room = snap.data();
+    const mine = SEATS.find(s => P2.room.seats[s] && P2.room.seats[s].uid === FB.user.uid);
+    if(mine) P2.me = mine;
+    if(P2.room.status === 'waiting'){ if(view === 'pvp2') render(); return; }
+    if(view === 'pvp2' || view === 'pvp2b'){
+      if(view !== 'pvp2b' || !prev || prev.status === 'waiting'){ view = 'pvp2b'; pageAnim = true; render(); }
+      pvp2OnUpdate();
+    }
+  });
+  clearInterval(P2.timer); P2.timer = setInterval(pvp2Tick, 1000);
+}
+function pvp2Stop(){ if(P2.unsub) P2.unsub(); P2.unsub = null; clearInterval(P2.timer); P2.timer = null; }
+async function pvp2Leave(silent){
+  const code = P2.code, me = P2.me, r = P2.room;
+  P2.code = null;
+  pvp2Stop();
+  if(code && r && FB.ok){
+    try{
+      await FB.F.runTransaction(FB.db, async tx => {
+        const cur = (await tx.get(roomRef(code))).data();
+        if(!cur) return;
+        if(cur.status === 'waiting'){
+          if(cur.host === FB.user.uid) tx.update(roomRef(code), { status:'done', winner:null });
+          else tx.update(roomRef(code), { ['seats.' + me]: null });
+        } else if(cur.status === 'playing' && cur.hp[me] > 0){
+          const hp = { ...cur.hp, [me]:0 }, seq = cur.seq + 1;
+          const upd = { hp, seq, last:{ seq, text:`${cur.seats[me].name} left the battle.` } };
+          const win = pvp2Winner({ ...cur, hp });
+          if(win){ upd.status = 'done'; upd.winner = win; }
+          else if(cur.turn === me){ const nx = pvp2Next({ ...cur, hp }, me); Object.assign(upd, { turn:nx.turn, stun:nx.stun, deadline:Date.now() + PVP_TURN_MS }); }
+          tx.update(roomRef(code), upd);
+        }
+      });
+      await pvp2Record(code);
+    }catch(e){}
+  }
+  P2.room = null; P2.me = null;
+  document.body.classList.remove('locked');
+  if(!silent){ view = 'pvp'; render(); }
+}
+
+// ---- rules ----
+function pvp2Winner(r){
+  const a = ['a1','a2'].some(s => r.hp[s] > 0), b = ['b1','b2'].some(s => r.hp[s] > 0);
+  return !a ? 'b' : !b ? 'a' : null;
+}
+function pvp2Next(r, from){   // next living player in speed order; stunned players lose that turn
+  const stun = { ...r.stun }, skipped = [];
+  let i = r.order.indexOf(from);
+  for(let k = 0; k < 8; k++){
+    i = (i + 1) % r.order.length; const s = r.order[i];
+    if(r.hp[s] <= 0) continue;
+    if(stun[s]){ stun[s] = false; skipped.push(s); continue; }
+    return { turn:s, stun, skipped };
+  }
+  return { turn:from, stun, skipped };
+}
+function pvp2Resolve(r, actor, id, target, auto){
+  const K = SKILLS[id], A = r.seats[actor].st, idx = CHARS[A.char].skills.indexOf(id);
+  const hp = { ...r.hp }, guard = { ...r.guard }, stun = { ...r.stun }, idle = { ...r.idle };
+  const shield = {}; SEATS.forEach(s => shield[s] = r.shield[s] ? { ...r.shield[s] } : null);
+  const cd = {}; SEATS.forEach(s => cd[s] = { ...(r.cd[s] || {}) });
+  // the actor's own lasting shield counts down at the start of their turn
+  if(shield[actor]){ shield[actor] = shield[actor].n > 1 ? { v:shield[actor].v, n:shield[actor].n - 1 } : null; }
+  const foes = foesOf(actor).filter(s => hp[s] > 0);
+  if(!foes.includes(target)) target = foes[0];
+  const res = { seq:r.seq + 1, by:actor, skill:id, kind:K.kind, hits:[], heal:0 };
+  const nm = r.seats[actor].name;
+  let text = (auto ? `⏱ ${nm} ran out of time — ` : '') + `${nm} uses ${K.n}`;
+  if(K.kind === 'hit'){
+    const tg = K.aoe ? foes : [target];
+    const parts = [];
+    tg.forEach(t => {
+      const T = r.seats[t].st, crit = Math.random()*100 < A.crit;
+      let d = Math.round(A.atk * K.mult) * (crit ? 2 : 1) * (1 - T.def/100);
+      if(guard[t]){ d *= (1 - guard[t]); guard[t] = 0; }
+      if(shield[t]) d *= (1 - shield[t].v);
+      d = Math.max(1, Math.round(d)); hp[t] = Math.max(0, hp[t] - d);
+      const st = !!(K.stun && hp[t] > 0 && Math.random() < K.stun);
+      if(st) stun[t] = true;
+      res.hits.push({ t, dmg:d, crit, stun:st });
+      parts.push(`${r.seats[t].name} -${d}${crit ? ' (CRIT)' : ''}${st ? ' ⚡stunned' : ''}`);
+    });
+    text += ': ' + parts.join(', ');
+  } else if(K.kind === 'heal'){
+    const b = hp[actor]; hp[actor] = Math.min(A.hp, hp[actor] + Math.round(A.atk * K.healAtk)); res.heal = hp[actor] - b;
+    text += ` and heals ${res.heal} HP`;
+  } else if(K.dur){ shield[actor] = { v:K.block, n:K.dur }; text += ` — ${K.block*100}% less damage for ${K.dur} turns`; }
+  else { guard[actor] = K.block; text += ' and raises a guard'; }
+  for(const s in cd[actor]) if(cd[actor][s] > 0) cd[actor][s]--;
+  if(CD[idx]) cd[actor][id] = CD[idx];
+  if(K.cutCd){ const s = CHARS[A.char].skills[K.cutCd[0]]; if(cd[actor][s] > 0) cd[actor][s] = Math.max(0, cd[actor][s] - K.cutCd[1]); }
+  if(K.resetCd){ cd[actor][CHARS[A.char].skills[K.resetCd]] = 0; }
+  if(K.stunReset && res.hits.some(h => h.stun)){ cd[actor][id] = 0; text += ` — ${K.n} cooldown reset!`; }
+  idle[actor] = auto ? (idle[actor] || 0) + 1 : 0;
+  if(idle[actor] >= 3){ hp[actor] = 0; text += ` — ${nm} was away for 3 turns and is out!`; }
+  const nr = { ...r, hp, stun };
+  const upd = { hp, cd, guard, shield, idle, seq:res.seq, last:res };
+  const win = pvp2Winner(nr);
+  if(win){ upd.status = 'done'; upd.winner = win; upd.stun = stun; }
+  else {
+    const nx = pvp2Next(nr, actor);
+    upd.turn = nx.turn; upd.stun = nx.stun; upd.deadline = Date.now() + PVP_TURN_MS;
+    if(nx.skipped.length) text += ' · ' + nx.skipped.map(s => `${r.seats[s].name} is stunned and skips a turn`).join(' · ');
+  }
+  res.text = text;
+  return upd;
+}
+async function pvp2Act(id, auto, timedOut){
+  const r = P2.room; if(!r || r.status !== 'playing' || P2.anim) return;
+  const actor = auto ? r.turn : P2.me;
+  if(r.turn !== actor) return;
+  if(!auto && !timedOut && (r.cd[actor] || {})[id]) return;
+  const target = auto || timedOut ? null : P2.target;
+  P2.anim = true; pvp2Refresh();
+  try{
+    await FB.F.runTransaction(FB.db, async tx => {
+      const cur = (await tx.get(roomRef(P2.code))).data();
+      if(cur.status !== 'playing' || cur.turn !== actor || cur.seq !== r.seq) throw new Error('stale');
+      tx.update(roomRef(P2.code), pvp2Resolve(cur, actor, id, target, auto || timedOut));
+    });
+    P2.lastSync = 0; setTimeout(pvp2Sync, 1500);
+  }catch(e){ P2.anim = false; pvp2Refresh(); pvp2Sync(); }
+}
+async function pvp2Sync(){
+  const code = P2.code; if(!code || P2.syncing) return; P2.syncing = true;
+  try{ const s = await FB.F.getDoc(roomRef(code)); if(P2.code === code && s.exists()){ const d = s.data();
+    if(!P2.room || d.seq > P2.room.seq || d.status !== P2.room.status){ P2.room = d; if(view === 'pvp2b') pvp2OnUpdate(); else if(view === 'pvp2') render(); }
+    else if(P2.anim && !P2.playing){ P2.anim = false; pvp2Refresh(); } } }catch(e){}
+  P2.syncing = false; P2.lastSync = Date.now();
+}
+function pvp2Tick(){
+  const r = P2.room; if(!r) return;
+  if(r.status === 'waiting'){ if(Date.now() - (P2.lastSync || 0) > 5000) pvp2Sync(); return; }
+  if(view !== 'pvp2b') return;
+  if(r.status === 'playing' && !P2.anim){
+    const basic = s => CHARS[r.seats[s].st.char].skills[0];
+    if(r.turn === P2.me && Date.now() > r.deadline) pvp2Act(basic(P2.me), false, true);
+    else if(r.turn !== P2.me && Date.now() > r.deadline + 2000) pvp2Act(basic(r.turn), true);
+  }
+  if(r.status === 'playing' && !P2.playing && Date.now() - (P2.lastSync || 0) > 4000) pvp2Sync();
+  const t = document.querySelector('#ctrl .turnlbl');
+  if(t && r.status === 'playing' && !P2.anim){ const left = Math.max(0, Math.ceil((r.deadline - Date.now())/1000));
+    t.innerHTML = r.turn === P2.me ? `Your turn! ⏱ ${left}s` : `⏳ ${esc(r.seats[r.turn].name)}'s turn… ⏱ ${left}s`; }
+}
+async function pvp2Record(code){
+  if(!FB.ok || !code) return;
+  try{
+    await FB.F.runTransaction(FB.db, async tx => {
+      const rs = await tx.get(roomRef(code)), ls = await tx.get(lbRef());
+      const r = rs.data();
+      if(!r || r.recorded || r.status !== 'done' || !r.winner) return;
+      const p = (ls.exists() && ls.data().p) || {};
+      SEATS.forEach(s => { const u = r.seats[s]; if(!u) return;
+        const e = p[u.uid] || { name:u.name, w:0, l:0 }; e.name = u.name; sideOf(s) === r.winner ? e.w++ : e.l++; p[u.uid] = e; });
+      tx.set(lbRef(), { p, updated:Date.now() });
+      tx.update(roomRef(code), { recorded:true });
+    });
+  }catch(e){}
+}
+
+// ---- lobby ----
+function pvp2Lobby(){
+  const r = P2.room;
+  if(!r) return `<div class="card"><h2>2v2 Room</h2><p class="small">Connecting…</p><button class="full" onclick="pvp2Leave()">${IC.back} Back</button></div>`;
+  const full = SEATS.every(s => r.seats[s]), host = r.host === FB.user.uid;
+  const seat = s => { const u = r.seats[s];
+    if(!u) return `<button class="seat empty" onclick="pvp2Sit('${s}')">＋<small>Tap to sit</small></button>`;
+    return `<div class="seat ${s === P2.me ? 'me' : ''}"><span class="sart">${artOf(CHARS[u.st.char].art)}</span><b>${esc(u.name)}</b>
+      <small>${CHARS[u.st.char].n} · SPD ${u.st.spd}</small>${u.uid === r.host ? '<span class="hosttag">HOST</span>' : ''}</div>`; };
+  return `<div class="card"><h2>⚔ 2v2 Room</h2>
+    <div class="story" style="text-align:center">Room code<div class="roomcode">${P2.code}</div>Send the code to 3 friends. Tap an empty seat to switch teams.</div>
+    <div class="teams"><div class="team ta"><h3>Team A</h3>${seat('a1')}${seat('a2')}</div>
+      <div class="vs small2">VS</div>
+      <div class="team tb"><h3>Team B</h3>${seat('b1')}${seat('b2')}</div></div>
+    ${host ? `<button class="pri full" onclick="pvp2Start()" ${full ? '' : 'disabled'}>${IC.sword} ${full ? 'Start battle!' : `Waiting for players (${SEATS.filter(s => r.seats[s]).length}/4)`}</button>`
+           : `<div class="turnlbl">${full ? '⏳ Waiting for the host to start…' : `Waiting for players (${SEATS.filter(s => r.seats[s]).length}/4)`}</div>`}
+    <div class="btns"><button onclick="copyRoom2()">${IC.copy} Copy code</button><button class="warn" onclick="pvp2Leave()">Leave room</button></div></div>`;
+}
+function copyRoom2(){ try{ navigator.clipboard.writeText(P2.code); msg = 'Code copied!'; }catch(e){} render(); }
+
+// ---- battle ----
+function pvp2Battle(){
+  const r = P2.room, my = sideOf(P2.me);
+  const L = SEATS.filter(s => sideOf(s) === my), R = SEATS.filter(s => sideOf(s) !== my);
+  const ent = (s, pos) => { const u = r.seats[s];
+    return `<div class="ent e2 ${pos}" id="u_${s}" onclick="pvp2Target('${s}')">
+      <div class="mp2"><b>${esc(u.name)}${s === P2.me ? ' (you)' : ''}</b><div class="bar hp"><i id="hp_${s}"></i></div></div>
+      <div class="tintw" ${pos[0] === 'r' ? 'style="transform:scaleX(-1)"' : ''}>${artOf(CHARS[u.st.char].art)}</div></div>`; };
+  return `<div class="scene s2" id="scene">${forestBG()}${ambient()}
+      ${ent(L[1],'l2')}${ent(L[0],'l1')}${ent(R[1],'r2')}${ent(R[0],'r1')}
+    </div>
+    <div class="card" id="log"></div>
+    <div class="card" id="ctrl"></div>`;
+}
+function pvp2Target(s){
+  const r = P2.room; if(!r || r.status !== 'playing' || sideOf(s) === sideOf(P2.me) || r.hp[s] <= 0) return;
+  P2.target = s; SFX.play('click'); pvp2Refresh();
+}
+function pvp2Refresh(){
+  const r = P2.room; if(!r || view !== 'pvp2b' || !$('scene')) return;
+  const foes = foesOf(P2.me).filter(s => r.hp[s] > 0);
+  if(!foes.includes(P2.target)) P2.target = foes[0] || null;
+  SEATS.forEach(s => { const el = $('u_' + s); if(!el) return; const m = r.seats[s].st.hp;
+    $('hp_' + s).style.width = pct(r.hp[s], m);
+    el.classList.toggle('dead', r.hp[s] <= 0); el.classList.toggle('turn', r.status === 'playing' && r.turn === s);
+    el.classList.toggle('tgt', s === P2.target && r.status === 'playing'); el.classList.toggle('guard', !!r.guard[s]);
+    el.classList.toggle('blessed', !!r.shield[s]); el.classList.toggle('stunned', !!r.stun[s]);
+    el.title = `HP ${Math.max(0, r.hp[s])}/${m}`;
+    const hb = el.querySelector('.mp2 b'); if(hb) hb.dataset.hp = `${Math.max(0, r.hp[s])}`; });
+  const lg = $('log'); lg.innerHTML = P2.log.slice(-30).map(l => `<div>${l}</div>`).join(''); lg.scrollTop = lg.scrollHeight;
+  $('ctrl').innerHTML = pvp2Controls();
+  document.body.classList.toggle('locked', P2.anim);
+}
+function pvp2Controls(){
+  const r = P2.room, me = P2.me;
+  if(r.status === 'done'){
+    const won = r.winner === sideOf(me);
+    return `<div class="turnlbl ${won?'go':''}" style="font-size:16px">${won ? '🏆 YOUR TEAM WINS!' : r.winner ? '💀 Your team lost…' : 'Room closed'}</div>
+      <div class="btns"><button onclick="go('home')">${IC.home} Home</button><button onclick="go('lb')">🏆 Leaderboard</button>
+      <button class="pri" onclick="pvp2Leave()">${IC.sword} New battle</button></div>`;
+  }
+  const out = r.hp[me] <= 0, mine = r.turn === me && !P2.anim && !out, left = Math.max(0, Math.ceil((r.deadline - Date.now())/1000));
+  const dis = mine ? '' : 'disabled', mycd = r.cd[me] || {};
+  const sk = CHARS[r.seats[me].st.char].skills.map((id,i) => { const k = SKILLS[id], cd = mycd[id] || 0;
+    return `<button class="${cd?'cooling':''}" onclick="pvp2Act('${id}')" ${dis || (cd?'disabled':'')}>${sIcon(id)} ${k.n}${
+      cd ? ` <small class="cdc">${cd}</small>` : (CD[i] ? ` <small class="cdt">${CD[i]}T</small>` : '')}</button>`; }).join('');
+  const tg = P2.target ? r.seats[P2.target].name : '-';
+  return `<div class="turnlbl ${mine?'go':''}">${out ? '💀 You are knocked out — cheer for your teammate!' : mine ? `Your turn! ⏱ ${left}s` : `⏳ ${esc(r.seats[r.turn].name)}'s turn… ⏱ ${left}s`}</div>
+    ${mine ? `<div class="small" style="text-align:center;margin:-4px 0 6px">🎯 Target: <b>${esc(tg)}</b> — tap an enemy to change</div>` : ''}
+    <div class="btns">${sk}
+      <button disabled>${IC.bag} No potions (PVP)</button>
+      <button class="warn" onclick="pvp2Forfeit()">${IC.run} Give up</button></div>`;
+}
+let pvp2Arm = false;
+function pvp2Forfeit(){
+  if(!pvp2Arm){ pvp2Arm = true; P2.log.push('Tap <b>Give up</b> again to leave the battle.'); pvp2Refresh(); setTimeout(() => pvp2Arm = false, 3000); return; }
+  pvp2Arm = false; pvp2Leave();
+}
+async function pvp2OnUpdate(){
+  if(P2.playing){ P2.again = true; return; }
+  const r = P2.room, L = r && r.last, code = P2.code;
+  if(!L || L.seq <= P2.seqSeen){ pvp2Refresh(); return; }
+  P2.seqSeen = L.seq; P2.playing = true;
+  if(!$('scene')) render();
+  if(L.by){
+    P2.anim = true; pvp2Refresh();
+    const A = $('u_' + L.by), K = SKILLS[L.skill], leftSide = sideOf(L.by) === sideOf(P2.me), dir = leftSide ? 1 : -1;
+    const Ts = (L.hits || []).map(h => $('u_' + h.t)).filter(Boolean);
+    try{
+      if(L.kind === 'hit' && Ts.length){
+        if(leftSide && K.anim === 'thrust') await thrustAnim(A, Ts[0]);
+        else if(leftSide && K.anim === 'slam') await slamAnim(A, Ts);
+        else if(K.anim === 'orb') await orbAnim(A, Ts[0]);
+        else if(K.anim === 'bolt') await boltAnim(A, Ts[0]);
+        else if(K.anim === 'storm') await stormAnim(A, Ts);
+        else { if(CD[CHARS[r.seats[L.by].st.char].skills.indexOf(L.skill)]) await charge(A, K.color || '#fff'); await lunge(A, dir, K.big); }
+        for(const h of L.hits){ const T = $('u_' + h.t); if(!T) continue;
+          if(K.ult) await rapidHits(T, h.dmg, K, h.crit);
+          else {
+            if(!K.anim || K.anim === 'orb' || !leftSide) slash(T, K.color || (h.crit ? '#ffd54a' : '#ffffffcc'), K.big || h.crit);
+            hitFx(T); SFX.play(h.crit ? 'crit' : 'hit'); burst(T, K.fx || 'spark', h.crit ? 8 : 5, 55, h.crit ? '#ffd54a' : (K.color || '#fff'));
+            floatText(T, h.crit ? `CRIT -${h.dmg}` : `-${h.dmg}`, h.crit ? 'crit' : '');
+          }
+          if(h.stun) stunFx(T);
+        }
+        if(K.big || L.hits.some(h => h.crit)) shakeScene();
+      } else if(L.kind === 'heal'){
+        charge(A, '#8fd14f'); SFX.play('heal'); rise(A, 'plus', 9, '#b8ff5a'); floatText(A, `+${L.heal}`, 'heal'); await wait(500);
+      } else if(L.kind === 'guard' && K.dur){ await blessAnim(A); }
+      else if(L.kind === 'guard'){ SFX.play('guard'); if(K.anim === 'shield') cls(A, 'shieldup', 600); floatText(A, 'GUARD', 'mp'); await wait(450); }
+    }catch(e){}
+  }
+  P2.log.push(L.text);
+  if(r.status === 'done' && r.winner){
+    pvp2Record(code);
+    const won = r.winner === sideOf(P2.me);
+    await wait(300); SFX.play(won ? 'win' : 'lose');
+    P2.log.push(won ? '🏆 Your team wins!' : '💀 Your team lost this time.');
+  }
+  P2.playing = false;
+  if(P2.code !== code) return;
+  P2.anim = false; pvp2Refresh();
+  if(P2.again){ P2.again = false; pvp2OnUpdate(); }
+}
 // ====== GAME DATA (edit names / prices / stats here) ======
 const KEY = 'starquest_save_v1';          // guest save
 const ACC_KEY = 'sq_accounts', CUR_KEY = 'sq_current';
@@ -1789,8 +2224,8 @@ const SKILLS = {
   smash:   { n:'Legion Smash',   kind:'hit',   mult:2,   aoe:true, anim:'slam', fx:'spark', color:'#ffb74a', icon:'smash', d:'Leap and slam the ground — hits ALL enemies' },
   // Mage
   staff:   { n:'Staff Strike',   kind:'hit',   mult:.8,  anim:'orb',  fx:'spark', color:'#d1a6ff', d:'Fire a magic orb from the staff' },
-  bolt:    { n:'Lightning Bolt', kind:'hit',   mult:1,   stun:.25, stunReset:true, anim:'bolt', fx:'spark', color:'#fff176', d:'Call lightning down — 25% chance to stun. If it stuns, its cooldown resets!' },
-  bless:   { n:'Blessed Shield', kind:'guard', block:.3, dur:2, anim:'bless', d:'Pray for a holy shield: take 30% less damage for 2 turns' },
+  bolt:    { n:'Lightning Bolt', kind:'hit',   mult:1,   stun:.3, stunReset:true, anim:'bolt', fx:'spark', color:'#fff176', d:'Call lightning down — 30% chance to stun. If it stuns, its cooldown resets!' },
+  bless:   { n:'Blessed Shield', kind:'guard', block:.3, dur:3, anim:'bless', d:'Pray for a holy shield: take 30% less damage for 3 turns' },
   storm:   { n:'Storm Circle',   kind:'hit',   mult:1.4, ult:7, stun:.4, aoe:true, anim:'storm', fx:'spark', color:'#fff176', big:true, d:'Magic circle lightning — hits ALL enemies, 40% chance to stun' }
 };
 const skillDmg = (K, boost=1) => Math.round(atk() * boost * K.mult);
@@ -2046,7 +2481,7 @@ const qReady = q => { const t = S.qt[q.id]||0; return t < q.g.length && qVal(q) 
 S.hp = MHP();
 
 // ====== Screens ======
-function go(v){ if(B && B.busy) return; if(PV.code && !['pvp','pvpb','lb'].includes(v)) pvpLeave(true); if(v === 'lb') LB.list = null; sellArm = null; document.body.classList.remove('locked'); view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
+function go(v){ if(B && B.busy) return; if(PV.code && !['pvp','pvpb','lb'].includes(v)) pvpLeave(true); if(P2.code && !['pvp2','pvp2b','lb'].includes(v)) pvp2Leave(true); if(v === 'lb') LB.list = null; sellArm = null; document.body.classList.remove('locked'); view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
 function bar(c,v,m){ return `<div class="bar ${c}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i></div>`; }
 function back(){ return `<button class="full" onclick="go('home')">${IC.back} Back to Home</button>`; }
 function note(){ return msg ? `<p class="msg">${msg}</p>` : ''; }
@@ -2127,6 +2562,7 @@ function render(){
   if(view==='home') h += heroCard() + menu();
   else if(view==='battle') h += battle();
   else if(view==='pvpb') h += pvpBattle();
+  else if(view==='pvp2b') h += pvp2Battle();
   else {
     h += topBar();
     if(view==='quest') h += quest();
@@ -2136,6 +2572,7 @@ function render(){
     else if(view==='shop') h += shop();
     else if(view==='pvp') h += pvp();
     else if(view==='lb') h += leaderboard();
+    else if(view==='pvp2') h += pvp2Lobby();
     else if(view==='gacha') h += gacha();
     else if(view==='set') h += setView();
     else if(view==='save') h += saveView();
@@ -2145,6 +2582,7 @@ function render(){
   pageAnim = false;
   if(view==='battle') refresh();
   if(view==='pvpb') pvpRefresh();
+  if(view==='pvp2b') pvp2Refresh();
 }
 
 // Character card (home) — layout from the sketch
@@ -2357,8 +2795,8 @@ function setView(){
             : c.gacha ? `<button class="chb pri gachab" onclick="event.stopPropagation();go('gacha')">✨ Gacha</button>`
             : `<button class="chb pri" onclick="event.stopPropagation();buyChar('${k}')" ${S.gold<c.price?'disabled':''}>${IC.coin} ${c.price}</button>`}</div>`;
   }
-  for(let i = Object.keys(CHARS).length; i < 3; i++)
-    h += `<div class="ch lock"><div class="e lk">${IC.lock}</div><b>???</b><div class="small">Coming soon</div></div>`;
+  h += `<div class="ch lock soon"><div class="e">${artOf('thief')}</div><b>Nightshade</b><div class="small">Phantom thief</div>
+      <div class="chs">Skills coming soon</div><div class="chb">${IC.lock} Coming soon</div></div>`;
   h += '</div></div>';
 
   h += `<div class="card"><h2>Storage — Items</h2><p class="small" style="margin:0 0 6px">Equip any 4 (${S.eq.length}/4) — the same item more than once is OK.
@@ -2442,7 +2880,7 @@ async function fbInit(){
   FB.loading = false;
   if(view === 'account') render();
 }
-function safeRender(){ if((view === 'battle' && B && !B.over) || view === 'pvpb') return; render(); }
+function safeRender(){ if((view === 'battle' && B && !B.over) || view === 'pvpb' || view === 'pvp2b') return; render(); }
 async function onUser(user){
   FB.user = user;
   if(user){
