@@ -2242,7 +2242,7 @@ async function act(type, k){
   if(!B || B.over || B.busy) return;
   const e = B.en, K = type==='skill' ? SKILLS[k] : null;
   if((K && B.cd[k]) || (type==='item' && (!S.inv[k] || B.mode==='pvp')) || (type==='run' && e.boss)) return;
-  B.busy = true; B.defend = 0; B.menu = false; refresh();
+  B.busy = true; if(type !== 'item') B.defend = 0; B.menu = false; refresh();
   const P = $('pl'), E = $('en');
   const slotIdx = K ? cs().skills.indexOf(k) : -1;
 
@@ -2325,6 +2325,8 @@ async function act(type, k){
     if(S.lv > lv0){ await wait(700); SFX.play('levelup'); floatText(P, 'LEVEL UP!', 'big'); rise(P, 'star', 10); charge(P, '#ffd54a'); }
     B.busy = false; save(); refresh(); return;
   }
+
+  if(type === 'item'){ B.log.push('Potions are a free action — your turn continues!'); B.busy = false; save(); refresh(); return; }
 
   await wait(450);
   await enemyTurn(P, E);
