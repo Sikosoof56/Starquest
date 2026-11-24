@@ -1680,7 +1680,8 @@ async function playShowcase(){
       }
       if(K.stun){ await wait(350); stunFx(E); }
     } else if(K.kind === 'heal'){
-      await rapidHeal(P, Math.round(c.atk * K.healAtk), K);
+      if(K.ult) await rapidHeal(P, Math.round(c.atk * K.healAtk), K);
+      else { charge(P, '#8fd14f'); SFX.play('heal'); rise(P, 'plus', 9, '#b8ff5a'); floatText(P, `+${Math.round(c.atk * K.healAtk)}`, 'heal'); }
     } else if(K.dur){ await blessAnim(P); }
     else { SFX.play('guard'); if(K.anim === 'shield') cls(P, 'shieldup', 900); P.classList.add('guard'); floatText(P, 'GUARD', 'mp'); }
     await wait(900);
@@ -1779,12 +1780,12 @@ const SKILLS = {
   atk:     { n:'Attack',         kind:'hit',   mult:.9,  icon:'sword',  d:'Sword strike' },
   leaf:    { n:'Leaf Blade',     kind:'hit',   mult:1,   big:true, fx:'leaf', color:'#8fd14f', icon:'leaf', d:'Nature-charged slash' },
   guard:   { n:'Guard',          kind:'guard', block:.5, icon:'shield', d:'Reduce the next hit by 50%' },
-  heal:    { n:'Heal',           kind:'heal',  healAtk:2, ult:5, icon:'heal',  d:'Heal HP equal to 200% ATK' },
+  heal:    { n:'Heal',           kind:'heal',  healAtk:2, icon:'heal',  d:'Heal HP equal to 200% ATK' },
   // Valcarile
   gladius: { n:'Gladius',        kind:'hit',   mult:1.1, icon:'sword',  d:'Heavy gladius slash' },
   thrust:  { n:'Gladius Thrust', kind:'hit',   mult:1.2, anim:'thrust', fx:'spark', color:'#e8f4ff', icon:'thrust', cutCd:[3,1], d:'Lightning-fast thrust. Also cuts Skill 3 cooldown by 1 turn' },
   testudo: { n:'Testudo',        kind:'guard', block:.5, anim:'shield', icon:'shield', resetCd:1, d:'Raise the shield: reduce the next hit by 50% and reset Skill 1 cooldown' },
-  smash:   { n:'Legion Smash',   kind:'hit',   mult:2,   ult:6, aoe:true, anim:'slam', fx:'spark', color:'#ffb74a', icon:'smash', d:'Leap and slam the ground — hits ALL enemies' },
+  smash:   { n:'Legion Smash',   kind:'hit',   mult:2,   aoe:true, anim:'slam', fx:'spark', color:'#ffb74a', icon:'smash', d:'Leap and slam the ground — hits ALL enemies' },
   // Mage
   staff:   { n:'Staff Strike',   kind:'hit',   mult:.8,  anim:'orb',  fx:'spark', color:'#d1a6ff', d:'Fire a magic orb from the staff' },
   bolt:    { n:'Lightning Bolt', kind:'hit',   mult:1,   stun:.25, anim:'bolt', fx:'spark', color:'#fff176', d:'Call lightning down — 25% chance to stun' },
