@@ -1486,8 +1486,7 @@ function buyGear(k){
   const g = GEAR[k]; if(S.gold < g.p) return;
   const it = { i:S.nid++, k, up:0, fu:0 };
   S.gold -= g.p; S.bag.push(it); S.st.buys++; SFX.play('coin');
-  const typeOn = S.eq.some(id => (inst(id)||{}).k === k);
-  if(S.eq.length < 4 && !typeOn){ S.eq.push(it.i); msg = `Bought and equipped the ${g.n}`; }
+  if(S.eq.length < 4){ S.eq.push(it.i); msg = `Bought and equipped the ${g.n}`; }
   else msg = `Bought the ${g.n} — it's in your Storage (Upgrade / Loadout). Extra copies can be fused!`;
   save(); render();
 }
@@ -1515,17 +1514,17 @@ function setView(){
     h += `<div class="ch lock"><div class="e lk">${IC.lock}</div><b>???</b><div class="small">Coming soon</div></div>`;
   h += '</div></div>';
 
-  h += `<div class="card"><h2>Storage — Items</h2><p class="small" style="margin:0 0 6px">Equip up to 4 (${S.eq.length}/4), one of each kind.
+  h += `<div class="card"><h2>Storage — Items</h2><p class="small" style="margin:0 0 6px">Equip any 4 (${S.eq.length}/4) — the same item more than once is OK.
     <b>Upgrade</b> (+1…+10) uses gold + ${P(S.powder)} Magic Powder and doubles an item at +10.
     <b>Fuse</b> (★1…★4) eats a spare copy of the same item and doubles it again at ★4.</p>`;
   if(!S.bag.length) h += '<p class="small">No items yet — buy some in the Shop.</p>';
   [...S.bag].sort((a,b) => (a.k > b.k ? 1 : a.k < b.k ? -1 : (b.up+b.fu*20) - (a.up+a.fu*20))).forEach(it => {
-    const g = GEAR[it.k], on = S.eq.includes(it.i), max = it.up >= MAX_UP, typeOn = S.eq.some(id => id !== it.i && (inst(id)||{}).k === it.k);
+    const g = GEAR[it.k], on = S.eq.includes(it.i), max = it.up >= MAX_UP;
     const nextUp = max ? '' : ` → +${it.up+1}: ${statTxt(gearStats(it, it.up+1))}`;
     h += `<div class="item bagi ${on?'equipped':''}"><div class="it" style="flex:1">${g.icon()}<div>${g.n} <span class="tag">+${it.up}</span>${stars(it.fu)} ${rarTag(it)}
         <div class="small">${statTxt(gearStats(it))}<span class="nx">${nextUp}</span></div></div></div>
       <div class="bagb">
-        ${on ? `<button class="ok" onclick="unequip(${it.i})">On</button>` : `<button onclick="equip(${it.i})" ${S.eq.length>=4||typeOn?'disabled':''}>Equip</button>`}
+        ${on ? `<button class="ok" onclick="unequip(${it.i})">On</button>` : `<button onclick="equip(${it.i})" ${S.eq.length>=4?'disabled':''}>Equip</button>`}
         <button class="upb" onclick="upgrade(${it.i})" ${canUp(it)?'':'disabled'}>${max?'MAX':`${IC.up}<span>${IC.coin}${upCost(it)}<br>${IC.powder}${upPowder(it)}</span>`}</button>
         <button class="fub" onclick="fuse(${it.i})" ${canFuse(it)?'':'disabled'}>${it.fu>=MAX_FU?'★MAX':`★ Fuse<br><span>${fuseMat(it)?'1 spare':'need copy'}</span>`}</button>
       </div></div>`;
@@ -1549,7 +1548,6 @@ function buyChar(k){
   msg = `You recruited ${c.n}! Now in your party.`; save(); render();
 }
 function equip(id){ const it = inst(id); if(!it || S.eq.includes(id) || S.eq.length >= 4) return;
-  if(S.eq.some(x => (inst(x)||{}).k === it.k)){ msg = `You already wear a ${GEAR[it.k].n} — only one of each kind.`; render(); return; }
   S.eq.push(id); msg = `Equipped ${itemName(it)}`; save(); render(); }
 function unequip(id){ const it = inst(id); S.eq = S.eq.filter(x => x !== id); msg = it ? `Took off ${itemName(it)}` : ''; save(); render(); }
 function fuse(id){
