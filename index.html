@@ -410,6 +410,10 @@ h1{position:relative}
 button.fub{background:linear-gradient(180deg,#5a3e8a,#3a2560);border-color:#b39ddb;line-height:1.15}
 button.fub span{font-size:10px;color:#d1c4e9}
 .nx{display:block;color:#8fd14f;font-size:11px}
+/* no tapping while a turn plays out */
+body.locked #app *:not(.sound){pointer-events:none!important}
+.turnlbl{text-align:center;font-size:12px;font-weight:900;letter-spacing:1px;color:var(--mute);margin:-2px 0 8px}
+.turnlbl.go{color:var(--leaf)}
 </style>
 </head>
 <body>
@@ -1122,7 +1126,7 @@ const SFX = (() => {
   };
 })();
 document.addEventListener('click', e => { const b = e.target.closest('button'); if(b && !b.disabled && !b.classList.contains('nosfx')) SFX.play('click'); }, true);
-const soundBtn = (c='') => `<button class="sound nosfx ${c}" onclick="event.stopPropagation();SFX.toggle();render()" aria-label="Sound">${SFX.on ? '🔊' : '🔇'}</button>`;
+const soundBtn = (c='') => `<button class="sound nosfx ${c}" onclick="event.stopPropagation();SFX.toggle();this.textContent=SFX.on?'🔊':'🔇'" aria-label="Sound">${SFX.on ? '🔊' : '🔇'}</button>`;
 
 const artOf = key => key==='king' ? ART.goblin(true) : ART[key]();
 const G = n => `<span class="gold">${IC.coin} ${n}</span>`;
@@ -1213,7 +1217,7 @@ const qReady = q => { const t = S.qt[q.id]||0; return t < q.g.length && qVal(q) 
 S.hp = MHP();
 
 // ====== Screens ======
-function go(v){ view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
+function go(v){ if(B && B.busy) return; document.body.classList.remove('locked'); view = v; msg = ''; resetArm = false; pageAnim = true; if(v !== 'battle') B = null; if(v === 'account') F = {}; render(); window.scrollTo(0,0); }
 function bar(c,v,m){ return `<div class="bar ${c}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i></div>`; }
 function back(){ return `<button class="full" onclick="go('home')">${IC.back} Back to Home</button>`; }
 function note(){ return msg ? `<p class="msg">${msg}</p>` : ''; }
@@ -1763,6 +1767,7 @@ function battle(){
     <div class="card" id="ctrl"></div>`;
 }
 function refresh(){
+  document.body.classList.toggle('locked', !!(B && B.busy));
   if(view !== 'battle' || !B || !$('scene')) return;
   const e = B.en;
   $('enhp').style.width = pct(e.hp, e.mhp);
@@ -1793,7 +1798,7 @@ function controls(){
   const sk = cs().skills.map((id,i) => { const k = SKILLS[id], cd = B.cd[id]||0;
     return `<button class="${cd?'cooling':''}" onclick="act('skill','${id}')" ${dis || (cd?'disabled':'')}>${sIcon(id)} ${k.n}${
       cd ? ` <small class="cdc">${cd}</small>` : (CD[i] ? ` <small class="cdt">${CD[i]}T</small>` : '')}</button>`; }).join('');
-  return `<div class="btns">${sk}
+  return `${B.busy ? '<div class="turnlbl">⏳ Turn in progress…</div>' : '<div class="turnlbl go">Your turn!</div>'}<div class="btns">${sk}
     ${B.mode==='pvp' ? `<button disabled title="Not allowed in PVP">${IC.bag} No potions (PVP)</button>`
                      : `<button onclick="B.menu=true;refresh()" ${dis}>${IC.bag} Artifacts</button>`}
     <button class="warn" onclick="act('run')" ${dis || (e.boss?'disabled':'')}>${IC.run} Run</button></div>`;
