@@ -511,6 +511,10 @@ button.scx{width:36px;height:36px;padding:0;border-radius:50%}
 .mage-art .cape{transform-box:view-box;transform-origin:60px 58px;animation:capew 3s ease-in-out infinite}
 @keyframes zapz{0%{opacity:1}12%{opacity:0}30%{opacity:.8}38%{opacity:0}70%{opacity:1}78%{opacity:0}}
 @keyframes capew{50%{transform:skewX(-2deg) scaleX(1.02)}}
+/* ultimates: rapid hits */
+.ft.hitn{font-size:16px;z-index:6}.ft.hitn.crit{font-size:18px}
+.pt.shard{width:3px;height:12px;border-radius:2px;background:var(--c,#fff);box-shadow:0 0 6px 1px var(--c,#fff)}
+.wave.healw{border-color:#b8ff5a;box-shadow:0 0 16px #8fd14f,inset 0 0 10px #8fd14f}
 </style>
 </head>
 <body>
@@ -1433,16 +1437,20 @@ async function pvpOnUpdate(){
       else if(K.anim === 'bolt') await boltAnim(A, T);
       else if(K.anim === 'storm') await stormAnim(A, [T]);
       else { if(CD[CHARS[r[L.by].st.char].skills.indexOf(L.skill)]) await charge(A, K.color || '#fff'); await lunge(A, dir, K.big); }
+      if(K.ult){ await rapidHits(T, L.dmg, K, L.crit); }
+      else {
       if(!K.anim || K.anim === 'orb' || (!mine && (K.anim === 'thrust' || K.anim === 'slam'))) slash(T, K.color || (L.crit ? '#ffd54a' : '#ffffffcc'), K.big || L.crit);
       hitFx(T); SFX.play(L.crit ? 'crit' : 'hit');
       burst(T, K.fx || 'spark', L.crit ? 8 : 5, 60, L.crit ? '#ffd54a' : (K.color || '#fff'));
       floatText(T, L.crit ? `CRIT -${L.dmg}` : `-${L.dmg}`, L.crit ? 'crit' : '');
       if(L.crit || K.big) shakeScene();
+      }
       if(L.stun) stunFx(T);
     } else if(L.kind === 'guard' && K.dur){
       await blessAnim(A);
     } else if(L.kind === 'heal'){
-      charge(A, '#8fd14f'); SFX.play('heal'); rise(A, 'plus', 9, '#b8ff5a'); floatText(A, `+${L.heal}`, 'heal'); await wait(500);
+      if(K.ult) await rapidHeal(A, L.heal, K);
+      else { charge(A, '#8fd14f'); SFX.play('heal'); rise(A, 'plus', 9, '#b8ff5a'); floatText(A, `+${L.heal}`, 'heal'); await wait(500); }
     } else if(L.kind === 'guard'){
       SFX.play('guard'); if(K.anim === 'shield') cls(A, 'shieldup', 600); floatText(A, 'GUARD', 'mp'); await wait(450);
     }
@@ -1663,18 +1671,81 @@ async function playShowcase(){
       else if(K.anim === 'bolt') await boltAnim(P, E);
       else if(K.anim === 'storm') await stormAnim(P, [E]);
       else { if(idx > 0) await charge(P, K.color || '#fff'); await lunge(P, 1, K.big); }
+      if(K.ult) await rapidHits(E, Math.round(c.atk * K.mult), K, false);
+      else {
       if(!K.anim || K.anim === 'orb') slash(E, K.color || '#ffffffcc', K.big);
       hitFx(E); SFX.play('hit'); burst(E, K.fx || 'spark', idx > 0 ? 10 : 5, 70, K.color || '#fff');
       floatText(E, `-${Math.round(c.atk * K.mult)}`, idx > 0 ? 'crit' : '');
       if(K.big) shakeScene();
+      }
       if(K.stun){ await wait(350); stunFx(E); }
     } else if(K.kind === 'heal'){
-      charge(P, '#8fd14f'); SFX.play('heal'); rise(P, 'plus', 9, '#b8ff5a'); floatText(P, `+${Math.round(c.atk * K.healAtk)}`, 'heal');
+      await rapidHeal(P, Math.round(c.atk * K.healAtk), K);
     } else if(K.dur){ await blessAnim(P); }
     else { SFX.play('guard'); if(K.anim === 'shield') cls(P, 'shieldup', 900); P.classList.add('guard'); floatText(P, 'GUARD', 'mp'); }
     await wait(900);
   }catch(e){}
   SC.busy = false; if($('screp')) $('screp').disabled = false;
+}
+
+// ---- Ultimates (skill 3): a rapid flurry of small hits. The damage is the SAME — it's just split into pieces ----
+function splitDmg(total, n){
+  n = Math.max(1, Math.min(n, total));
+  const w = Array.from({length:n}, () => .6 + Math.random()*.8), s = w.reduce((a,b) => a+b, 0);
+  const parts = w.map(x => Math.max(1, Math.floor(total * x / s)));
+  let diff = total - parts.reduce((a,b) => a+b, 0), i = 0;
+  while(diff !== 0){ const k = i++ % n; if(diff > 0){ parts[k]++; diff--; } else if(parts[k] > 1){ parts[k]--; diff++; } }
+  return parts;
+}
+function hitNum(el, t, cls){
+  const c = center(el), dx = (Math.random()-.5)*70, dy = (Math.random()-.5)*40;
+  const d = spawn('ft hitn ' + cls, t, c.x + dx, c.y - 30 + dy);
+  an(d, [{transform:'translate(-50%,0) scale(1.6)',opacity:0},{transform:'translate(-50%,-6px) scale(1)',opacity:1,offset:.15},
+         {transform:'translate(-50%,-38px) scale(.9)',opacity:0}], {duration:750,easing:'ease-out'}).then(() => d.remove());
+}
+function chip(el, color, n=5){   // tiny glowing shards flying out
+  const c = center(el);
+  for(let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2, r = 30 + Math.random()*55, d = spawn('pt shard', '', c.x + (Math.random()-.5)*30, c.y + (Math.random()-.5)*30);
+    d.style.setProperty('--c', color); d.style.rotate = (a*57) + 'deg';
+    an(d, [{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*r}px),calc(-50% + ${Math.sin(a)*r}px)) scale(.2)`,opacity:0}],
+       {duration:380+Math.random()*250,easing:'cubic-bezier(.1,.8,.3,1)'}).then(() => d.remove());
+  }
+}
+async function rapidHits(el, total, K, crit, onPart){
+  const parts = splitDmg(total, K.ult || 5), col = crit ? '#ffd54a' : (K.color || '#fff');
+  for(let i = 0; i < parts.length; i++){
+    const c = center(el);
+    if(K.anim === 'storm'){
+      const x = c.x + (Math.random()-.5)*60, bt = spawn('pt boltp', BOLT_SVG(c.y + 30, 26), x, 0);
+      an(bt, [{opacity:0},{opacity:1,offset:.15},{opacity:0}], {duration:220}).then(() => bt.remove());
+      sceneFlash('#e8eaf6', .22); chip(el, '#b3e5fc', 4); SFX.play(i % 2 ? 'zap' : 'stab');
+    } else if(K.anim === 'slam'){
+      const w = spawn('wave', '', c.x + (Math.random()-.5)*40, c.y + el.offsetHeight*.42);
+      an(w, [{transform:'translate(-50%,-50%) scale(.2)',opacity:1},{transform:'translate(-50%,-50%) scale(1.5)',opacity:0}], {duration:380,easing:'ease-out'}).then(() => w.remove());
+      burst(el, 'dust', 3, 60); chip(el, '#ffcc80', 4); slash(el, '#ffb74a', false); SFX.play(i % 2 ? 'hit' : 'stab');
+    } else { slash(el, col, false); chip(el, col, 4); SFX.play('hit'); }
+    hitFx(el);
+    an(el, [{transform:`translateX(${i % 2 ? 5 : -5}px)`},{transform:'translateX(0)'}], {duration:90});
+    hitNum(el, `-${parts[i]}`, crit ? 'crit' : ''); if(onPart) onPart(parts[i]);
+    await wait(i === parts.length - 1 ? 160 : 95);
+  }
+  shakeScene(); burst(el, K.fx || 'spark', 12, 95, col); if(K.anim === 'storm') sceneFlash('#ffffff', .6);
+  SFX.play(crit ? 'crit' : 'boom');
+  floatText(el, `${crit ? 'CRIT ' : ''}-${total}`, 'big');
+  await wait(250);
+}
+async function rapidHeal(el, total, K){
+  charge(el, '#8fd14f'); SFX.play('heal');
+  const ring = spawn('wave healw', '', center(el).x, center(el).y + el.offsetHeight*.42);
+  an(ring, [{transform:'translate(-50%,-50%) scale(.3)',opacity:1},{transform:'translate(-50%,-50%) scale(1.8)',opacity:0}], {duration:900}).then(() => ring.remove());
+  const parts = splitDmg(Math.max(1,total), K.ult || 5);
+  for(let i = 0; i < parts.length; i++){
+    rise(el, i % 2 ? 'leaf' : 'plus', 3, '#b8ff5a'); chip(el, '#ccff90', 3);
+    hitNum(el, `+${total ? parts[i] : 0}`, 'heal');
+    SFX.play('potion'); await wait(110);
+  }
+  floatText(el, `+${total}`, 'heal'); await wait(300);
 }
 // ====== GAME DATA (edit names / prices / stats here) ======
 const KEY = 'starquest_save_v1';          // guest save
@@ -1708,17 +1779,17 @@ const SKILLS = {
   atk:     { n:'Attack',         kind:'hit',   mult:.9,  icon:'sword',  d:'Sword strike' },
   leaf:    { n:'Leaf Blade',     kind:'hit',   mult:1,   big:true, fx:'leaf', color:'#8fd14f', icon:'leaf', d:'Nature-charged slash' },
   guard:   { n:'Guard',          kind:'guard', block:.5, icon:'shield', d:'Reduce the next hit by 50%' },
-  heal:    { n:'Heal',           kind:'heal',  healAtk:2, icon:'heal',  d:'Heal HP equal to 200% ATK' },
+  heal:    { n:'Heal',           kind:'heal',  healAtk:2, ult:5, icon:'heal',  d:'Heal HP equal to 200% ATK' },
   // Valcarile
   gladius: { n:'Gladius',        kind:'hit',   mult:1.1, icon:'sword',  d:'Heavy gladius slash' },
   thrust:  { n:'Gladius Thrust', kind:'hit',   mult:1.2, anim:'thrust', fx:'spark', color:'#e8f4ff', icon:'thrust', cutCd:[3,1], d:'Lightning-fast thrust. Also cuts Skill 3 cooldown by 1 turn' },
   testudo: { n:'Testudo',        kind:'guard', block:.5, anim:'shield', icon:'shield', resetCd:1, d:'Raise the shield: reduce the next hit by 50% and reset Skill 1 cooldown' },
-  smash:   { n:'Legion Smash',   kind:'hit',   mult:2,   aoe:true, anim:'slam', fx:'spark', color:'#ffb74a', icon:'smash', d:'Leap and slam the ground — hits ALL enemies' },
+  smash:   { n:'Legion Smash',   kind:'hit',   mult:2,   ult:6, aoe:true, anim:'slam', fx:'spark', color:'#ffb74a', icon:'smash', d:'Leap and slam the ground — hits ALL enemies' },
   // Mage
   staff:   { n:'Staff Strike',   kind:'hit',   mult:.8,  anim:'orb',  fx:'spark', color:'#d1a6ff', d:'Fire a magic orb from the staff' },
   bolt:    { n:'Lightning Bolt', kind:'hit',   mult:1,   stun:.25, anim:'bolt', fx:'spark', color:'#fff176', d:'Call lightning down — 25% chance to stun' },
   bless:   { n:'Blessed Shield', kind:'guard', block:.3, dur:2, anim:'bless', d:'Pray for a holy shield: take 30% less damage for 2 turns' },
-  storm:   { n:'Storm Circle',   kind:'hit',   mult:1.4, stun:.4, aoe:true, anim:'storm', fx:'spark', color:'#fff176', big:true, d:'Magic circle lightning — hits ALL enemies, 40% chance to stun' }
+  storm:   { n:'Storm Circle',   kind:'hit',   mult:1.4, ult:7, stun:.4, aoe:true, anim:'storm', fx:'spark', color:'#fff176', big:true, d:'Magic circle lightning — hits ALL enemies, 40% chance to stun' }
 };
 const skillDmg = (K, boost=1) => Math.round(atk() * boost * K.mult);
 // Artifacts = buff potions (equip 2 to bring into battle)
@@ -2721,20 +2792,24 @@ async function act(type, k){
     for(const t of targets){
       const isCrit = Math.random()*100 < crit();
       const d = Math.max(1, Math.round(skillDmg(K, boost) * (isCrit ? 2 : 1) * (1 - t.e.dp)));
+      if(K.ult){ await rapidHits(t.el, d, K, isCrit, p => { t.e.hp -= p; if(t.e === B.en){ $('enhp').style.width = pct(t.e.hp, t.e.mhp); $('enhpt').textContent = `HP ${Math.max(0,t.e.hp)}/${t.e.mhp}`; } }); refresh(); }
+      else {
+      t.e.hp -= d;
       if(!K.anim || K.anim==='orb') slash(t.el, K.color || (isCrit ? '#ffd54a' : '#ffffffcc'), K.big || isCrit);
-      t.e.hp -= d; hitFx(t.el); SFX.play(isCrit ? 'crit' : 'hit');
+      hitFx(t.el); SFX.play(isCrit ? 'crit' : 'hit');
       burst(t.el, K.fx || 'spark', slotIdx>0 ? 10 : (isCrit?8:4), slotIdx>0 ? 80 : 55, isCrit ? '#ffd54a' : (K.color || '#fff'));
       floatText(t.el, isCrit ? `CRIT -${d}` : `-${d}`, (isCrit || slotIdx>0) ? 'crit' : '');
       if(isCrit || K.big) shakeScene();
+      }
       B.log.push(`${isCrit ? 'Critical! ' : ''}${slotIdx>0 ? K.n : 'You'} ${slotIdx>0 ? 'hits' : 'strike'} ${K.aoe ? t.e.n+' ' : ''}for ${d} damage${slotIdx>0?'!':''}`);
       if(K.stun && t.e.hp > 0 && Math.random() < K.stun){ B.stun = true; stunFx(t.el); B.log.push(`⚡ ${t.e.n} is stunned!`); }
     }
   } else if(K && K.kind==='heal'){
     S.st.lasers++;
     const b = S.hp; S.hp = Math.min(MHP(), S.hp + Math.round(atk()*K.healAtk));
-    charge(P, '#8fd14f'); SFX.play('heal'); rise(P, 'plus', 9, '#b8ff5a'); floatText(P, `+${S.hp-b}`, 'heal');
+    if(K.ult) await rapidHeal(P, S.hp-b, K);
+    else { charge(P, '#8fd14f'); SFX.play('heal'); rise(P, 'plus', 9, '#b8ff5a'); floatText(P, `+${S.hp-b}`, 'heal'); await wait(500); }
     B.log.push(`${K.n} restores ${S.hp-b} HP`);
-    await wait(500);
   } else if(K && K.kind==='guard' && K.dur){
     S.st.lasers++;
     B.shield = { v:K.block, n:K.dur };
