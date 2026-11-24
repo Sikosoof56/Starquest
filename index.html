@@ -1377,6 +1377,7 @@ function pvpResolve(r, actor, id, auto){
            : K.kind === 'heal' ? `${nm} uses ${K.n} and heals ${res.heal} HP`
            : K.dur ? `${nm} uses ${K.n} — ${K.block*100}% less damage for ${K.dur} turns` : `${nm} uses ${K.n} and raises a guard`);
   if(res.stun) res.text += ` ⚡ ${r[tgt].name} is stunned and loses a turn!`;
+  if(res.stun && K.stunReset){ cd[actor][id] = 0; res.text += ` ${K.n} cooldown reset!`; }
   const upd = { hp, cd, guard, shield, idle, seq:res.seq, last:res, turn:res.stun ? actor : tgt, deadline:Date.now() + PVP_TURN_MS };
   if(hp[tgt] <= 0){ upd.status = 'done'; upd.winner = actor; }
   else if(idle[actor] >= 3){ upd.status = 'done'; upd.winner = tgt; res.text += ` — ${nm} was away for 3 turns and loses.`; }
@@ -1788,7 +1789,7 @@ const SKILLS = {
   smash:   { n:'Legion Smash',   kind:'hit',   mult:2,   aoe:true, anim:'slam', fx:'spark', color:'#ffb74a', icon:'smash', d:'Leap and slam the ground — hits ALL enemies' },
   // Mage
   staff:   { n:'Staff Strike',   kind:'hit',   mult:.8,  anim:'orb',  fx:'spark', color:'#d1a6ff', d:'Fire a magic orb from the staff' },
-  bolt:    { n:'Lightning Bolt', kind:'hit',   mult:1,   stun:.25, anim:'bolt', fx:'spark', color:'#fff176', d:'Call lightning down — 25% chance to stun' },
+  bolt:    { n:'Lightning Bolt', kind:'hit',   mult:1,   stun:.25, stunReset:true, anim:'bolt', fx:'spark', color:'#fff176', d:'Call lightning down — 25% chance to stun. If it stuns, its cooldown resets!' },
   bless:   { n:'Blessed Shield', kind:'guard', block:.3, dur:2, anim:'bless', d:'Pray for a holy shield: take 30% less damage for 2 turns' },
   storm:   { n:'Storm Circle',   kind:'hit',   mult:1.4, ult:7, stun:.4, aoe:true, anim:'storm', fx:'spark', color:'#fff176', big:true, d:'Magic circle lightning — hits ALL enemies, 40% chance to stun' }
 };
@@ -2803,7 +2804,7 @@ async function act(type, k){
       if(isCrit || K.big) shakeScene();
       }
       B.log.push(`${isCrit ? 'Critical! ' : ''}${slotIdx>0 ? K.n : 'You'} ${slotIdx>0 ? 'hits' : 'strike'} ${K.aoe ? t.e.n+' ' : ''}for ${d} damage${slotIdx>0?'!':''}`);
-      if(K.stun && t.e.hp > 0 && Math.random() < K.stun){ B.stun = true; stunFx(t.el); B.log.push(`⚡ ${t.e.n} is stunned!`); }
+      if(K.stun && t.e.hp > 0 && Math.random() < K.stun){ B.stun = true; B.stunHit = true; stunFx(t.el); B.log.push(`⚡ ${t.e.n} is stunned!`); }
     }
   } else if(K && K.kind==='heal'){
     S.st.lasers++;
@@ -2857,6 +2858,8 @@ async function act(type, k){
     B.log.push("Couldn't escape!");
   }
   if(K && CD[slotIdx]) B.cd[k] = CD[slotIdx] + 1;   // +1 because this turn's tick happens below
+  if(K && K.stunReset && B.stunHit){ B.cd[k] = 0; B.log.push(`${K.n} cooldown reset!`); }
+  B.stunHit = false;
   if(K && K.cutCd){ const id = cs().skills[K.cutCd[0]];
     if(B.cd[id] > 0){ B.cd[id] = Math.max(0, B.cd[id] - K.cutCd[1]); B.log.push(`${SKILLS[id].n} cooldown -${K.cutCd[1]}`); } }
   if(K && K.resetCd){ const id = cs().skills[K.resetCd];
