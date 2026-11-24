@@ -2038,7 +2038,7 @@ function makeEnemy(mode, st){
   const EASE = .8 * 1.25;   // monster HP and ATK (was 20% weaker, now +25% from that)
   const hp = Math.round((steelM ? 55 + st*13 : 45 + st*11) * (boss ? 1.8 : 1) * EASE);
   return { n:base.n, art:base.art, fly:!!base.fly, tint:base.tint||'', hp, mhp:hp, boss, dp: boss ? .2 : .1,   // DEF %: normal 10%, boss 20%
-    spd: base.spd + Math.floor(st*.5),
+    spd: Math.min(40, base.spd + Math.floor(st*.5)),   // monster SPEED is capped at 40
     atk: Math.round((7 + st*2) * (boss ? 1.15 : 1) * EASE),
     def: Math.round((2 + st*1) * (boss ? 1.2 : 1)),
     gold: earn((10 + st*6) * (boss ? 2 : 1)),
