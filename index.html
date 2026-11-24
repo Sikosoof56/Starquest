@@ -397,6 +397,19 @@ h1{position:relative}
 .eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;height:40px;padding:0;border-radius:10px;font-size:18px;background:transparent;border:none;box-shadow:none}
 .eye{z-index:2}
 .eye:active{transform:translateY(-50%) scale(.9);box-shadow:none}
+/* smaller floating damage numbers */
+.ft{font-size:19px}.ft.crit{font-size:23px}.ft.big{font-size:22px}
+/* fusion stars + storage */
+.stars{color:#ffd54a;font-size:12px;letter-spacing:-1px;margin-left:3px;text-shadow:0 0 6px #ffb300}
+.sl .fu{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-size:9px;color:#ffd54a;letter-spacing:-1px;text-shadow:0 0 4px #000,0 0 6px #ffb300;white-space:nowrap}
+.bagi{flex-wrap:wrap}
+.bagi.equipped{background:linear-gradient(90deg,#f2c94c14,transparent);border-radius:10px}
+.bagi .it{min-width:0}
+.bagb{display:flex;gap:6px;width:100%;justify-content:flex-end}
+.bagb button{padding:6px 10px;font-size:12px;min-height:40px}
+button.fub{background:linear-gradient(180deg,#5a3e8a,#3a2560);border-color:#b39ddb;line-height:1.15}
+button.fub span{font-size:10px;color:#d1c4e9}
+.nx{display:block;color:#8fd14f;font-size:11px}
 </style>
 </head>
 <body>
@@ -983,10 +996,12 @@ const GEAR = {
   fang:   { n:'Dragon Fang',      r:'legend', icon:()=>gIcon('fang'),   s:{atk:30,crit:20}, p:550 }
 };
 const RAR_N = {common:'Common', rare:'Rare', epic:'Epic', legend:'Legendary'};
-const rarTag = k => `<span class="rar r-${GEAR[k].r}">${RAR_N[GEAR[k].r]}</span>`;
+const rarTag = k => { if(typeof k === 'object') k = k.k; return rarTag0(k); };
+const rarTag0 = k => `<span class="rar r-${GEAR[k].r}">${RAR_N[GEAR[k].r]}</span>`;
 const STATN = {hp:'HP', atk:'ATK', def:'DEF', spd:'SPEED', crit:'CRIT'};
 const OLD_PRICES = {w1:80,w2:200,w3:350,w4:550,a1:100,a2:260,a3:550};
-const MAX_UP = 10;
+const MAX_UP = 10;      // upgrade +10 = x2 stats
+const MAX_FU = 4;       // fusion ★4 = another x2 → x4 total
 const ENEMIES = [
   {n:'Green Slime', art:'slime', spd:8}, {n:'Angry Mushroom', art:'mushroom', spd:11},
   {n:'Cave Bat', art:'bat', fly:true, spd:24}, {n:'Goblin', art:'goblin', spd:14}
@@ -1109,7 +1124,7 @@ const G = n => `<span class="gold">${IC.coin} ${n}</span>`;
 // ====== State & saving ======
 function newGame(){
   return {char:'pilot',lv:1,exp:0,hp:80,gold:30,stage:1,best:1,
-          inv:{potion:3,power:1,iron:0,bomb:1},arts:['potion','power'],gear:[],eq:[],up:{},powder:0,ss:1,chars:['pilot'],
+          inv:{potion:3,power:1,iron:0,bomb:1},arts:['potion','power'],bag:[],nid:1,eq:[],powder:0,ss:1,chars:['pilot'],
           st:{wins:0,bosses:0,lasers:0,buys:0},qt:{}};
 }
 function fix(o){
@@ -1123,8 +1138,17 @@ function fix(o){
   if(s.inv.ether){ s.inv.power += s.inv.ether; delete s.inv.ether; }
   // old weapons/armor are refunded as gold
   (s.gear||[]).forEach(k => { if(!GEAR[k] && OLD_PRICES[k]) s.gold += OLD_PRICES[k]; });
-  s.gear = (s.gear||[]).filter(k => GEAR[k]);
-  s.eq = (s.eq||[]).filter(k => s.gear.includes(k)).slice(0,4);
+  // items are now individual copies in a bag: {i:id, k:itemKey, up:upgrade, fu:fusion}
+  if(!Array.isArray(o.bag)){
+    s.bag = []; s.nid = 1;
+    const oldUp = s.up || {}, oldEq = s.eq || [];
+    (s.gear||[]).filter(k => GEAR[k]).forEach(k => s.bag.push({ i:s.nid++, k, up:Math.min(MAX_UP, oldUp[k]||0), fu:0 }));
+    s.eq = oldEq.map(k => (s.bag.find(b => b.k === k) || {}).i).filter(Boolean);
+  }
+  s.bag = s.bag.filter(b => GEAR[b.k]);
+  s.eq = (s.eq||[]).filter(id => s.bag.some(b => b.i === id)).slice(0,4);
+  s.nid = Math.max(s.nid||1, ...s.bag.map(b => b.i + 1), 1);
+  delete s.gear; delete s.up;
   delete s.w; delete s.mhp; delete s.batk; delete s.bdef;
   if(!Array.isArray(s.arts) || s.arts.length !== 2) s.arts = ['potion','power'];
   s.arts = s.arts.map(k => ITEMS[k] ? k : 'potion');
@@ -1150,19 +1174,25 @@ S.hp = 0;   // set after helpers load
 let B = null, view = 'cover', msg = '', resetArm = false, pageAnim = true, F = {};
 
 // an item's stats at its upgrade level (+30% of base per level)
-const gearStats = (k, lv = S.up[k]||0) => { const o = {}; for(const st in GEAR[k].s){ const v = GEAR[k].s[st]; o[st] = v + Math.ceil(v*.3)*lv; } return o; };
+// stats of one item copy: base × (1 + 10% per upgrade) × (1 + 25% per fusion star)  →  max +10 ★4 = ×4
+const gearStats = (it, up = it.up, fu = it.fu) => { const o = {}; for(const st in GEAR[it.k].s){ const v = GEAR[it.k].s[st]; o[st] = Math.round(v * (1 + .1*up) * (1 + .25*fu)); } return o; };
+const inst = id => S.bag.find(b => b.i === id);
+const stars = n => n ? `<span class="stars">${'★'.repeat(n)}</span>` : '';
+const itemName = it => `${GEAR[it.k].n} +${it.up}${stars(it.fu)}`;
+const fuseMat = it => S.bag.filter(b => b.k === it.k && b.i !== it.i && !S.eq.includes(b.i)).sort((a,b) => (a.up+a.fu*20) - (b.up+b.fu*20))[0];
+const canFuse = it => it.fu < MAX_FU && !!fuseMat(it);
 const statTxt = o => Object.entries(o).map(([k,v]) => `${STATN[k]} +${v}${(k==='crit'||k==='def')?'%':''}`).join(' · ');
-const itemStat = st => S.eq.reduce((t,k) => t + (gearStats(k)[st]||0), 0);
-const upCost  = k => Math.round(GEAR[k].p * .3 * ((S.up[k]||0) + 1));                      // gold
-const upPowder = k => Math.ceil(4 * ((S.up[k]||0) + 1) * RAR_MULT[GEAR[k].r]);              // magic powder
-const canUp = k => (S.up[k]||0) < MAX_UP && S.gold >= upCost(k) && S.powder >= upPowder(k);
+const itemStat = st => S.eq.reduce((t,id) => { const it = inst(id); return t + (it ? (gearStats(it)[st]||0) : 0); }, 0);
+const upCost  = it => Math.round(GEAR[it.k].p * .3 * (it.up + 1));                    // gold (same as before)
+const upPowder = it => Math.ceil(4 * (it.up + 1) * RAR_MULT[GEAR[it.k].r]);           // magic powder (same as before)
+const canUp = it => it.up < MAX_UP && S.gold >= upCost(it) && S.powder >= upPowder(it);
 const P = n => `<span class="powder">${IC.powder} ${n}</span>`;
 const cs = () => CHARS[S.char];
 const MHP = () => cs().hp + itemStat('hp');
 const atk = () => cs().atk + itemStat('atk');
 const def = () => Math.min(80, cs().def + itemStat('def'));   // DEF = % damage reduction (max 80%)
 const spd = () => cs().spd + itemStat('spd');
-const crit = () => 20 + itemStat('crit');
+const crit = () => Math.min(100, 20 + itemStat('crit'));
 const LV_GOLD = lv => lv * 40;          // gold reward for reaching a level
 const MODE_LV = { pvp:10 };             // level needed to open a mode
 const expNeed = () => 20 + S.lv * 15;
@@ -1280,8 +1310,8 @@ function slot(inner, label, onclick, extra=''){
 }
 function heroCard(){
   const c = cs();
-  const weapons = [0,1,2,3].map(i => { const k = S.eq[i];
-    return k ? slot(GEAR[k].icon() + `<b class="cnt">+${S.up[k]||0}</b>`, '', `tapItem('${k}')`, 'on r-'+GEAR[k].r)
+  const weapons = [0,1,2,3].map(i => { const it = inst(S.eq[i]);
+    return it ? slot(GEAR[it.k].icon() + `<b class="cnt">+${it.up}</b>${it.fu ? `<b class="fu">${'★'.repeat(it.fu)}</b>` : ''}`, '', `tapItem(${it.i})`, 'on r-'+GEAR[it.k].r)
              : slot('<span class="plus">+</span>', '', `go('set')`, 'empty'); });
   const arts = S.arts.map((k,i) => slot(ITEMS[k].icon() + `<b class="cnt">${S.inv[k]||0}</b>`, '', `go('set')`, (S.inv[k]||0) ? '' : 'dim'));
   const skills = c.skills.map((id,i) => { const k = SKILLS[id];
@@ -1314,7 +1344,7 @@ function showSkill(id, i){
             : k.kind==='heal' ? ` · heals <b>${Math.round(atk()*k.healAtk)}</b> HP` : '';
   msg = `<b>${k.n}</b> · ${CD[i] ? `Cooldown ${CD[i]} turn${CD[i]>1?'s':''}` : 'No cooldown'} — ${k.d}${val}`; render();
 }
-function tapItem(k){ msg = `<b>${GEAR[k].n} +${S.up[k]||0}</b> ${rarTag(k)} — ${statTxt(gearStats(k))}`; render(); }
+function tapItem(id){ const it = inst(id); if(!it) return; msg = `<b>${itemName(it)}</b> ${rarTag(it)} — ${statTxt(gearStats(it))}`; render(); }
 function topBar(){
   return `<div class="card topbar"><div class="mini-av">${artOf(ch().art)}</div>
     <div style="flex:1"><div class="row"><b>${ch().n} · Lv.${S.lv}</b><span class="money">${G(S.gold)}${P(S.powder)}</span></div>
@@ -1436,9 +1466,9 @@ function story(){
 // ---- Shop ----
 function shop(){
   let h = `<div class="card"><h2>Shop</h2><div class="sub">Items — any character can equip 4</div>`;
-  for(const k in GEAR){ const g = GEAR[k], own = S.gear.includes(k);
-    h += `<div class="item"><div class="it">${g.icon()}<div>${g.n} ${rarTag(k)}<div class="small">${statTxt(g.s)}</div></div></div>
-      ${own ? '<span class="small">Owned</span>' : `<button onclick="buyGear('${k}')" ${S.gold<g.p?'disabled':''}>${IC.coin} ${g.p}</button>`}</div>`;
+  for(const k in GEAR){ const g = GEAR[k], own = S.bag.filter(b => b.k === k).length;
+    h += `<div class="item"><div class="it">${g.icon()}<div>${g.n} ${rarTag(k)}<div class="small">${statTxt(g.s)}${own ? ` · Owned ${own}` : ''}</div></div></div>
+      <button onclick="buyGear('${k}')" ${S.gold<g.p?'disabled':''}>${IC.coin} ${g.p}</button></div>`;
   }
   h += '<div class="sub">Potions (Artifacts) — not usable in PVP</div>';
   for(const k in ITEMS){ const it = ITEMS[k];
@@ -1453,9 +1483,12 @@ function buy(k){
   msg = `Bought ${/^[AEIOU]/.test(it.n)?'an':'a'} ${it.n}`; save(); render();
 }
 function buyGear(k){
-  const g = GEAR[k]; if(S.gold < g.p || S.gear.includes(k)) return;
-  S.gold -= g.p; S.gear.push(k); S.st.buys++; SFX.play('coin');
-  if(S.eq.length < 4){ S.eq.push(k); msg = `Bought and equipped the ${g.n}`; } else msg = `Bought the ${g.n} — equip it in Upgrade / Loadout`;
+  const g = GEAR[k]; if(S.gold < g.p) return;
+  const it = { i:S.nid++, k, up:0, fu:0 };
+  S.gold -= g.p; S.bag.push(it); S.st.buys++; SFX.play('coin');
+  const typeOn = S.eq.some(id => (inst(id)||{}).k === k);
+  if(S.eq.length < 4 && !typeOn){ S.eq.push(it.i); msg = `Bought and equipped the ${g.n}`; }
+  else msg = `Bought the ${g.n} — it's in your Storage (Upgrade / Loadout). Extra copies can be fused!`;
   save(); render();
 }
 
@@ -1482,14 +1515,20 @@ function setView(){
     h += `<div class="ch lock"><div class="e lk">${IC.lock}</div><b>???</b><div class="small">Coming soon</div></div>`;
   h += '</div></div>';
 
-  h += `<div class="card"><h2>Items</h2><p class="small" style="margin:0 0 4px">Equip up to 4 (${S.eq.length}/4). Items only add stats. Upgrades cost gold + Magic Powder (you have ${P(S.powder)}) — farm it in Steel Sand.</p>`;
-  if(!S.gear.length) h += '<p class="small">No items yet — buy some in the Shop.</p>';
-  S.gear.forEach(k => {
-    const g = GEAR[k], on = S.eq.includes(k), lv = S.up[k]||0, max = lv >= MAX_UP;
-    h += `<div class="item"><div class="it" style="flex:1">${g.icon()}<div>${g.n} <span class="tag">+${lv}</span> ${rarTag(k)}
-        <div class="small">${statTxt(gearStats(k))}${max?'':` → next: ${statTxt(gearStats(k, lv+1))}`}</div></div></div>
-      ${on ? `<button class="ok" onclick="unequip('${k}')">On</button>` : `<button onclick="equip('${k}')" ${S.eq.length>=4?'disabled':''}>Equip</button>`}
-      <button class="upb" onclick="upgrade('${k}')" ${canUp(k)?'':'disabled'}>${max?'MAX':`${IC.up}<span>${IC.coin}${upCost(k)}<br>${IC.powder}${upPowder(k)}</span>`}</button></div>`;
+  h += `<div class="card"><h2>Storage — Items</h2><p class="small" style="margin:0 0 6px">Equip up to 4 (${S.eq.length}/4), one of each kind.
+    <b>Upgrade</b> (+1…+10) uses gold + ${P(S.powder)} Magic Powder and doubles an item at +10.
+    <b>Fuse</b> (★1…★4) eats a spare copy of the same item and doubles it again at ★4.</p>`;
+  if(!S.bag.length) h += '<p class="small">No items yet — buy some in the Shop.</p>';
+  [...S.bag].sort((a,b) => (a.k > b.k ? 1 : a.k < b.k ? -1 : (b.up+b.fu*20) - (a.up+a.fu*20))).forEach(it => {
+    const g = GEAR[it.k], on = S.eq.includes(it.i), max = it.up >= MAX_UP, typeOn = S.eq.some(id => id !== it.i && (inst(id)||{}).k === it.k);
+    const nextUp = max ? '' : ` → +${it.up+1}: ${statTxt(gearStats(it, it.up+1))}`;
+    h += `<div class="item bagi ${on?'equipped':''}"><div class="it" style="flex:1">${g.icon()}<div>${g.n} <span class="tag">+${it.up}</span>${stars(it.fu)} ${rarTag(it)}
+        <div class="small">${statTxt(gearStats(it))}<span class="nx">${nextUp}</span></div></div></div>
+      <div class="bagb">
+        ${on ? `<button class="ok" onclick="unequip(${it.i})">On</button>` : `<button onclick="equip(${it.i})" ${S.eq.length>=4||typeOn?'disabled':''}>Equip</button>`}
+        <button class="upb" onclick="upgrade(${it.i})" ${canUp(it)?'':'disabled'}>${max?'MAX':`${IC.up}<span>${IC.coin}${upCost(it)}<br>${IC.powder}${upPowder(it)}</span>`}</button>
+        <button class="fub" onclick="fuse(${it.i})" ${canFuse(it)?'':'disabled'}>${it.fu>=MAX_FU?'★MAX':`★ Fuse<br><span>${fuseMat(it)?'1 spare':'need copy'}</span>`}</button>
+      </div></div>`;
   });
   h += '</div>';
 
@@ -1509,18 +1548,24 @@ function buyChar(k){
   S.gold -= c.price; S.chars.push(k); SFX.play('levelup'); S.char = k; S.hp = MHP();
   msg = `You recruited ${c.n}! Now in your party.`; save(); render();
 }
-function equip(k){ if(S.eq.includes(k) || S.eq.length >= 4) return; S.eq.push(k); msg = `Equipped the ${GEAR[k].n}`; save(); render(); }
-function unequip(k){ S.eq = S.eq.filter(x => x !== k); msg = `Took off the ${GEAR[k].n}`; save(); render(); }
+function equip(id){ const it = inst(id); if(!it || S.eq.includes(id) || S.eq.length >= 4) return;
+  if(S.eq.some(x => (inst(x)||{}).k === it.k)){ msg = `You already wear a ${GEAR[it.k].n} — only one of each kind.`; render(); return; }
+  S.eq.push(id); msg = `Equipped ${itemName(it)}`; save(); render(); }
+function unequip(id){ const it = inst(id); S.eq = S.eq.filter(x => x !== id); msg = it ? `Took off ${itemName(it)}` : ''; save(); render(); }
+function fuse(id){
+  const it = inst(id); if(!it || !canFuse(it)) return;
+  const m = fuseMat(it); S.bag = S.bag.filter(b => b !== m); it.fu++;
+  SFX.play('levelup'); msg = `Fused! ${itemName(it)} — ${statTxt(gearStats(it))}`; save(); render();
+}
 function equipArt(k){
   if(S.arts.includes(k)) return;
   S.arts = [S.arts[1], k];          // newest replaces the oldest slot
   msg = `${ITEMS[k].n} added to your artifacts`; save(); render();
 }
-function upgrade(k){
-  const lv = S.up[k]||0;
-  if(!canUp(k)) return;
-  S.gold -= upCost(k); S.powder -= upPowder(k); S.up[k] = lv + 1; SFX.play('upgrade');
-  msg = `${GEAR[k].n} upgraded to +${lv+1}!`; save(); render();
+function upgrade(id){
+  const it = inst(id); if(!it || !canUp(it)) return;
+  S.gold -= upCost(it); S.powder -= upPowder(it); it.up++; SFX.play('upgrade');
+  msg = `${GEAR[it.k].n} upgraded to +${it.up}!`; save(); render();
 }
 
 // ---- Online accounts (Firebase Auth + Firestore) ----
