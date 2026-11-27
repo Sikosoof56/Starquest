@@ -1,5 +1,5 @@
 // เก็บไฟล์เกมไว้ในเครื่อง ให้เล่นได้แม้ไม่มีเน็ต
-const CACHE = 'starquest-v54';
+const CACHE = 'starquest-v55';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192-v2.png', 'icon-512-v2.png', 'apple-touch-icon-v2.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
